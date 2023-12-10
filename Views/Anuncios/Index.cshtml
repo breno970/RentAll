@@ -1,0 +1,64 @@
+﻿@model IEnumerable<aluguel.Models.Anuncio>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <!-- Cabeçalho do HTML -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/caditem.css">
+    <title>Rent All - Meus Anúncios</title>
+</head>
+
+<body>
+    <h1>Meus Anúncios<span>Gerencie seus Anúncios</span></h1>
+    <div class="create-container">
+        <a asp-action="Create" class="create">Criar novo</a>
+    </div>
+
+
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model) 
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <div class="item-content">
+                        <img src="~/imagens/@item.item.imagem1" class="item-image" asp-append-version="true">
+                        <div class="item-details">
+                            <div class="item-name">@Html.DisplayFor(modelItem => item.item.nmitem)</div>
+                            <div class="item-name">@Html.DisplayFor(modelItem => item.Cidade)</div>
+                            <div class="item-name">@Html.DisplayFor(modelItem => item.contato)</div>
+
+                            <div class="item-actions">
+                                <a href="@Url.Action("Edit", "Anuncios", new { id = item.id })" class="edit">Editar</a>
+                                <a href="@Url.Action("Details", "Anuncios", new { id = item.id })" class="details">Detalhes</a>
+                                <a href="@Url.Action("Delete", "Anuncios", new { id = item.id })" class="delete">Excluir</a>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</body>
+
+</html>
+

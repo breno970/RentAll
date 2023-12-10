@@ -1,0 +1,95 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using aluguel.Areas.Identity.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="shortcut icon" href="./imagens/ico.png" type="image/x-icon" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+   
+    <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3045181554995684"
+            crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+
+    <nav>
+
+
+        <div class="nave">
+
+            <a class="logo" href="/"> <img src="~/imagens/ra.png" class="logo-img" /></a>
+
+            <div class="mobile-menu">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav">
+                    <a class="nav-link text-white-50" asp-area="" asp-controller="Home" asp-action="Privacy">Sobre nós</a>
+                </li>
+                @if (User.Identity.IsAuthenticated)
+                { }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Entrar</a>
+                    </li>
+                }
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" asp-area="" asp-controller="Items" asp-action="Index">Meus Itens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" asp-area="" asp-controller="Anuncios" asp-action="Index">Meus Anúncios</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a id="manage" class="nav-link text-white-50" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                            <i class="fas fa-user"></i>Sua Conta
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <form class="nav-link text-white-50" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button type="submit" class="btn btn-link"><i class="fas fa-sign-out-alt"></i></button>
+                        </form>
+                    </li>
+
+                }
+            </ul>
+        </div>
+
+    </nav>
+
+
+    <div class="container">
+
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/cep.js"></script>
+    <script type="text/javascript" src="~/js/cadastro.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

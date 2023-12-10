@@ -1,0 +1,166 @@
+﻿/* Estilos para o cabeçalho "Meus Itens" */
+h1 {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
+    text-transform: uppercase;
+    padding: 1rem 0;
+    margin: 0;
+    background-color: #797984;
+    color: #fff;
+}
+
+    h1 span {
+        display: block;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+
+/* Estilos para o botão Criar Novo */
+.create-container {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+a.create {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #23232e;
+    color: #fff;
+    border: 2px solid #23232e;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+    a.create:hover {
+        background-color: #797984;
+        border: 2px solid #797984;
+    }
+
+/* Estilos para a tabela */
+table {
+    width: 90%;
+    margin: 1rem auto;
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    text-align: center;
+}
+
+.item-content {
+    display: flex;
+    align-items: center;
+}
+
+.item-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.item-details {
+    display: flex;
+    flex-direction: column;
+    margin-left: 1rem;
+}
+
+.item-name {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.item-actions a {
+    padding: 0.5rem 1rem;
+   
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
+.edit {
+    background-color: #23232e;
+    border: 1px solid #23232e;
+}
+
+.details {
+    background-color: #797984;
+    border: 1px solid #797984;
+}
+
+.delete {
+    background-color: #23232e;
+    border: 1px solid #23232e;
+}
+
+/* Estilos para telas menores */
+@media screen and (max-width: 768px) {
+    table {
+        width: 100%;
+    }
+
+    td {
+        display: block;
+        text-align: left;
+    }
+
+    .item-name {
+        font-size: 1.2rem;
+        margin-top: 1rem;
+    }
+
+    .item-image {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-actions a {
+        margin-bottom: 0.5rem;
+    }
+
+    .card-it {
+        margin: 10% auto;
+        width: 300px;
+        padding: 40px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+    }
+
+}
+
+
+.card-it {
+    margin: 10% auto;
+    width: 600px;
+   
+    padding: 40px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+@media screen and (max-width: 768px) {
+    .card-it {
+        width: 300px;
+    }
+}
+
+    .card-it h1 {
+        text-align: center;
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .card-it span {
+        display: block;
+        font-size: 14px;
+        color: #888;
+        margin-top: 5px;
+    }

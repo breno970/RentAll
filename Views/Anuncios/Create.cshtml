@@ -1,0 +1,225 @@
+﻿@model aluguel.Models.Anuncio
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
+    
+    <title>Rent All - Criar Anúncio</title>
+</head>
+
+
+<body>
+
+   
+    <!-- FORM HEADER -->
+    <div class="card-it">
+
+        <h1>Criar Anúncio </h1>
+
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+
+                <div class="form-group">
+                    <label asp-for="itemid" class="control-label">Nome do Item</label>
+                    <select asp-for="itemid" class="form-control" asp-items="ViewBag.itemid"></select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="vlitem" class="control-label">Valor</label>
+                    <input asp-for="vlitem" class="form-control" placeholder="Informe o valor" />
+                    <span asp-validation-for="vlitem" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="diasAluguel" class="control-label">Dias Oferecidos</label>
+                    <input asp-for="diasAluguel" class="form-control" placeholder="Dias oferecidos" />
+                    <span asp-validation-for="diasAluguel" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input asp-for="iduser" type="hidden" value="@User.FindFirst(ClaimTypes.NameIdentifier).Value" class="form-control" />
+                    <span asp-validation-for="iduser" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Categoria</label>
+                    <select asp-items="ViewBag.Categoria" id="Categoria" name="Categoria" class="form-control">
+                        <option value="">Selecione a categoria</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Tipo</label>
+                    <select id="Tipo" class="form-control" name="Tipo"></select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="modelo" class="control-label"></label>
+                    <input asp-for="modelo" class="form-control" placeholder="Modelo do item" />
+                </div>
+
+                <div class="form-group">
+                    <label for="txtCep">CEP *</label>
+                    <input id="txtCep" type="text" name="Cep" placeholder="00000-000" class="form-control">
+                    <span asp-validation-for="CEP" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtCidade">Cidade *</label>
+                    <input id="txtCidade" type="text" name="Cidade" placeholder="Cidade" class="form-control">
+                    <span asp-validation-for="Cidade" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtBairro">Bairro *</label>
+                    <input id="txtBairro" type="text" name="Bairro" placeholder="Bairro" class="form-control">
+                    <span asp-validation-for="Bairro" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtEstado">Estado *</label>
+                    <input id="txtEstado" type="text" name="Estado" placeholder="UF" class="form-control">
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtNumero">Número</label>
+                    <input id="txtNumero" type="text" name="Numero" placeholder="Número" class="form-control">
+                    <span asp-validation-for="Numero" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtRua">Rua *</label>
+                    <input id="txtRua" type="text" name="Rua" placeholder="Rua" class="form-control">
+                    <span asp-validation-for="Rua" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="Complemento">Complemento</label>
+                    <textarea id="Complemento" name="Complemento" placeholder="Complemento" class="form-control"></textarea>
+                    <span asp-validation-for="Complemento" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="contato" class="control-label">Contato</label>
+                    <input asp-for="contato" class="form-control" placeholder="Forma de comunicação" />
+                    <span asp-validation-for="contato" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="NomeFantasia" class="control-label">Como as pessoas devem te chamar?</label>
+                    <input asp-for="NomeFantasia" class="form-control" placeholder="Nome para contato" />
+                    <span asp-validation-for="NomeFantasia" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Criar" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-primary">Voltar para lista</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+
+</body>
+
+<div class="footer-container">
+
+    <div class="footer-content-2">
+        <div>
+            <i class="fa fa-map-marker"></i>
+            <p>
+                <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
+                    Visconde de Mauá, Resende - RJ
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-envelope"></i>
+            <p>
+                <a href="mailto:rent.all.bn@gmail.com">
+                    rent.all.bn@gmail.com
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-phone"></i>
+            <p><a href="tel:2499965669">(24)999656679</a></p>
+        </div>
+        <div>
+            <i class="fa fa-whatsapp"></i>
+            <p>
+                <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
+                    +55 24-999656679
+                </a>
+            </p>
+        </div>
+    </div>
+
+
+    <div class="footer-content-3">
+        <p class="footer-empresa">
+            <span>Sobre a Empresa</span>
+            Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
+        </p>
+        <div class="footer-icons">
+
+            <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
+            <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
+            <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
+
+        </div>
+        <hr>
+        <p>©2023 Rent All Ltda.</p>
+    </div>
+    <div class="copyright">
+        <hr>
+        <p>©Copyright. Todos os direitos reservados.</p>
+    </div>
+
+</div>
+</html>
+
+@if (ViewBag.SelectCategoria != null)
+{
+    <div>
+        You selected : @ViewBag.SelectCategoria <br />
+        You selected : @ViewBag.SelectTipo <br />
+    </div>
+}
+
+@section Scripts {
+
+    <script>
+        $(function () {
+            //jquery function to be called when country dropdown changes
+            $("#Categoria").change(function () {
+                var cid = $(this).val();
+                $("#Tipo").empty();
+                //call GetStates method to get states list
+                $.getJSON(`/Anuncios/GetTipos?id=${cid}`, function (data) {
+                    //console.log(data);
+                    $.each(data, function (i, item) {
+                        $("#Tipo").append(`<option value="${item.Value}">${item.Text}</option>`);
+                    });
+                });
+            })
+        });
+    </script>
+
+    @{
+
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

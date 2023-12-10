@@ -1,0 +1,241 @@
+﻿@model aluguel.Models.Anuncio
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/site.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  
+    <title>Rent All - Detalhes do Anúncio</title>
+
+    <style>
+        /* Estilos gerais */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        #form_header {
+            width: 450px;
+            height: 480px;
+            background-color: rgba(0, 0, 0, 0); /* Define a cor como completamente transparente */
+           
+        
+        }
+
+
+        /* Estilo para as imagens do carrossel */
+        .carousel-item img {
+            display: block;
+            margin: 0 auto;
+            object-fit: cover;
+            order: 1;
+            max-width: 400px;
+            max-height: 400px;
+            min-height: 400px;
+            min-width: 400px;
+            width: auto;
+            height: auto;
+        }
+
+        /* Estilo para os elementos da card */
+        .card {
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilo para as linhas com bordas */
+        .card-body.row {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        /* Estilo para os títulos */
+        .card-body p strong {
+            font-weight: bold;
+        }
+
+        /* Estilo para os detalhes */
+        .card-body p {
+            margin-bottom: 5px;
+        }
+
+        /* Estilos para links */
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+            a:hover {
+                color: #0056b3;
+            }
+
+        /* Estilos para botões */
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            border: 1px solid transparent;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+            .btn-primary:hover {
+                color: #fff;
+                background-color: #0056b3;
+                border-color: #0056b3;
+            }
+
+    </style>
+</head>
+<body>
+
+    <div class="card" id="form_header">
+        <div class="l-cards">
+            <div class="carousel-container">
+                <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="/imagens/@Html.DisplayFor(model => model.item.imagem1)" class="d-block" alt="Imagem 1">
+                        </div>
+
+                        @if (Model.item.imagem2 != null)
+                        {
+                            <div class="carousel-item">
+                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem2)" class="d-block" alt="Imagem 2">
+                            </div>
+                        }
+                        @if (Model.item.imagem3 != null)
+                        {
+                            <div class="carousel-item">
+                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem3)" class="d-block" alt="Imagem 3">
+                            </div>
+                        }
+                        @if (Model.item.imagem4 != null)
+                        {
+                            <div class="carousel-item">
+                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem4)" class="d-block" alt="Imagem 4">
+                            </div>
+                        }
+                        @if (Model.item.imagem5 != null)
+                        {
+                            <div class="carousel-item">
+                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem5)" class="d-block" alt="Imagem 5">
+                            </div>
+                        }
+                    </div>
+                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Anterior</span>
+                    </a>
+                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Próximo</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+
+
+
+
+    <div class="anuncio-details row">
+
+
+        <!-- Seção de Informações do Item -->
+        <div class="section col-md-6">
+            <h3>Informações do Item</h3>
+            <div class="details">
+                <p><strong>Nome: </strong>@Html.DisplayFor(model => model.item.nmitem)</p>
+                <p><strong>Categoria: </strong>@Html.DisplayFor(model => model.categoria.nmcategoria)</p>
+                <p><strong>Tipo: </strong>@Html.DisplayFor(model => model.tipo.nmtipo)</p>
+                <p><strong>Modelo: </strong>@Html.DisplayFor(model => model.modelo)</p>
+                <p><strong>Descrição do Item: </strong>@Html.DisplayFor(model => model.item.dsitem)</p>
+                <!-- Adicione outros detalhes específicos do item -->
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <!-- Seção de Detalhes do Anúncio -->
+        <div class="section col-md-6">
+            <h3>Detalhes do Anúncio</h3>
+            <div class="details">
+                <p><strong>Valor da Diaria: </strong>@Model.vlitem.ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("pt-BR"))</p>
+                <p><strong>Quantos dias posso usar: </strong>@Html.DisplayFor(model => model.diasAluguel)</p>
+                <!-- Adicione outros detalhes relacionados ao anúncio -->
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+
+        <!-- Seção de Ofertante -->
+        <div class="section col-md-6">
+            <h3>Detalhes do Ofertante</h3>
+            <div class="details">
+                <p><strong>Nome do Ofertante: </strong>@Html.DisplayFor(model => model.NomeFantasia)</p>
+                <p><strong>CEP: </strong>@Html.DisplayFor(model => model.CEP)</p>
+                <p><strong>Cidade: </strong>@Html.DisplayFor(model => model.Cidade)</p>
+                <p><strong>Bairro: </strong>@Html.DisplayFor(model => model.Bairro)</p>
+                <p><strong>Estado: </strong>@Html.DisplayFor(model => model.Estado)</p>
+                <p><strong>Número: </strong>@Html.DisplayFor(model => model.Numero)</p>
+                <p><strong>Rua: </strong>@Html.DisplayFor(model => model.Rua)</p>
+                <p><strong>Complemento: </strong>@Html.DisplayFor(model => model.Complemento)</p>
+                <p><strong>Contato: </strong>@Html.DisplayFor(model => model.contato)</p>
+                <!-- Adicione outros detalhes relacionados ao anúncio -->
+            </div>
+        </div>
+
+
+        <!-- Outras seções para informações adicionais do anúncio -->
+    </div>
+
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="~/js/cadastro.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
+
+
+
+</body>
+
+
+</html>

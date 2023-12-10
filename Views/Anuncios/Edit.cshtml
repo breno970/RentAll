@@ -1,0 +1,134 @@
+﻿@model aluguel.Models.Anuncio
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
+
+    <title>Rent All - Editar Anúncio</title>
+
+</head>
+
+
+<body>
+
+
+    <!-- FORM HEADER -->
+    <div class="card-it">
+
+        <h1>Ediar Anúncio </h1>
+
+
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="id" />
+
+            <div class="form-group">
+
+
+                <div class="form-group">
+                    <label asp-for="vlitem" class="control-label" value="@Model.vlitem">Valor</label>
+                    <input asp-for="vlitem" class="form-control" placeholder="Informe o valor" />
+                    <span asp-validation-for="vlitem" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="diasAluguel" class="control-label" value="@Model.diasAluguel">Dias Oferecidos</label>
+                    <input asp-for="diasAluguel" class="form-control" placeholder="Dias oferecidos" />
+                    <span asp-validation-for="diasAluguel" class="text-danger"></span>
+                </div>
+
+                <input asp-for="iduser" type="hidden" value="@User.FindFirst(ClaimTypes.NameIdentifier).Value" class="form-control" />
+                <span asp-validation-for="iduser" class="text-danger"></span>
+
+                <input asp-for="itemid" type="hidden" class="form-control" />
+                <span asp-validation-for="itemid" class="text-danger"></span>
+
+                <div class="form-group">
+                    <input asp-for="categoriaid" type="hidden" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <input asp-for="tipoid" type="hidden" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="modelo" class="control-label" value="@Model.modelo"></label>
+                    <input asp-for="modelo" class="form-control" placeholder="Modelo do item" />
+                </div>
+
+                <div class="form-group">
+                    <label for="txtCep">CEP *</label>
+                    <input id="txtCep" type="text" name="Cep" placeholder="00000-000" class="form-control" value="@Model.CEP">
+                    <span asp-validation-for="CEP" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtCidade">Cidade *</label>
+                    <input id="txtCidade" type="text" name="Cidade" placeholder="Cidade" class="form-control" value="@Model.Cidade">
+                    <span asp-validation-for="Cidade" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtBairro">Bairro *</label>
+                    <input id="txtBairro" type="text" name="Bairro" placeholder="Bairro" class="form-control" value="@Model.Bairro">
+                    <span asp-validation-for="Bairro" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtEstado">Estado *</label>
+                    <input id="txtEstado" type="text" name="Estado" placeholder="UF" class="form-control" value="@Model.Estado">
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtNumero">Número</label>
+                    <input id="txtNumero" type="text" name="Numero" placeholder="Número" class="form-control" value="@Model.Numero">
+                    <span asp-validation-for="Numero" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtRua">Rua *</label>
+                    <input id="txtRua" type="text" name="Rua" placeholder="Rua" class="form-control" value="@Model.Rua">
+                    <span asp-validation-for="Rua" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="Complemento">Complemento</label>
+                    <textarea id="dsitem" name="Complemento" class="form-control">@Model.Complemento</textarea>
+                    <span asp-validation-for="Complemento" class="text-danger"></span>
+                </div>
+
+                <label asp-for="contato" class="control-label">Contato</label>
+                <input asp-for="contato" class="form-control" />
+                <span asp-validation-for="contato" class="text-danger"></span>
+
+                <label asp-for="NomeFantasia" class="control-label">Como as pessoas devem te chamar?</label>
+                <input asp-for="NomeFantasia" class="form-control" />
+                <span asp-validation-for="NomeFantasia" class="text-danger"></span>
+
+                <input type="submit" value="Salvar Alterações" class="btn btn-primary" />
+                <a asp-action="Index">Voltar para a lista</a>
+            </div>
+        </form>
+        
+    </div>
+   
+</body>
+
+</html>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

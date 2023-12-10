@@ -1,0 +1,48 @@
+﻿@model IEnumerable<aluguel.Models.Item>
+
+@{
+    ViewData["Title"] = "Meus Itens";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <!-- Cabeçalho do HTML -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/caditem.css">
+    <title>Rent All - Meus Itens</title>
+</head>
+
+<body>
+    <h1>Meus Itens<span>Gerencie seus produtos</span></h1>
+    <div class="create-container">
+        <a asp-action="Create" class="create">Criar novo</a>
+    </div>
+
+    <table>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="item-content">
+                            <img src="~/imagens/@item.imagem1" class="item-image" asp-append-version="true">
+                            <div class="item-details">
+                                <div class="item-name">@Html.DisplayFor(modelItem => item.nmitem)</div>
+                                <div class="item-actions">
+                                    <a href="@Url.Action("Edit", "Items", new { id = item.id })" class="edit">Editar</a>
+                                    <a href="@Url.Action("Details", "Items", new { id = item.id })" class="details">Detalhes</a>
+                                    <a href="@Url.Action("Delete", "Items", new { id = item.id })" class="delete">Excluir</a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+
+</html>

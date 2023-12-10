@@ -1,0 +1,171 @@
+﻿@page
+@model RegisterModel
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="assets/css/site.css">
+    <link rel="stylesheet" href="assets/css/cadastro.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <title>Registrar</title>
+</head>
+<body>
+    <main id="container">
+
+        <form id="login_form" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+
+            <!-- FORM HEADER -->
+            <div id="form_header">
+                <h1>Cadastro</h1>
+                <i id="mode_icon" class="fa-solid fa-moon"></i>
+            </div>
+           
+
+            <div class="input-box">
+                <label for="Nome"> </label> Nome
+                <div class="input-field">
+                    <i class="fa-solid fa-user"></i><input asp-for="Input.FirstName">
+                    <span asp-validation-for="Input.FirstName" class="text"></span>
+                </div>
+            </div>
+
+
+            <div class="input-box">
+                <label for="Nome"> </label> Sobrenome
+                <div class="input-field">
+                    <i class="fa-solid fa-user"></i><input asp-for="Input.LastName">
+                    <span asp-validation-for="Input.LastName" class="text"></span>
+                </div>
+
+            </div>
+
+            <div class="input-box">
+                <label for="Email"> </label>E-mail
+                <div class="input-field">
+                    <i class="fa-solid fa-envelope"></i><input asp-for="Input.Email">
+                    <span asp-validation-for="Input.Email" class="text"></span>
+                </div>
+            </div>
+
+
+            <div class="input-box">
+                <label for="password"> </label>Senha
+                <div class="input-field">
+                    <i class="fa-solid fa-key"></i><input asp-for="Input.Password">
+                    <span asp-validation-for="Input.Password" class="password"></span>
+                </div>
+
+            </div>
+
+
+            <div class="input-box">
+                <label for="password2"> </label>Repita sua senha
+                <div class="input-field">
+                    <i class="fa-solid fa-key"></i><input asp-for="Input.ConfirmPassword">
+                    <span asp-validation-for="Input.ConfirmPassword" class="text"></span>
+                </div>
+            </div>
+
+
+
+            <div class="terms-container">
+                <a class="terms-link" asp-controller="Termos" asp-action="Index">Ao clicar aqui, você aceita nossos termos de utilização</a>
+                <label class="checkbox-container">
+                    <input type="checkbox" class="checkbox_class" />
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+            
+
+
+            <!-- REGISTRAR BUTTON -->
+            <button type="submit" disabled id="login_button" href=".. /Areas/Identity/Pages/Account/RegisterConfirmation.cshtml.cs">
+
+                Cadastrar
+            </button>
+
+        </form>
+    </main>
+
+
+
+    <!-- JAVASCRIPT -->
+    <script type="text/javascript" src="~/js/cadastro.js"></script>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+
+        <script type="text/javascript">
+            $('.checkbox_class').change(function () {
+                if ($('.checkbox_class:checked').length > 0) {
+                    $('#login_button').prop('disabled', false);
+                } else {
+                    $('#login_button').prop('disabled', true);
+                }
+            });
+        </script>
+    }
+</body>
+
+<div class="footer-container">
+
+    <div class="footer-content-2">
+        <div>
+            <i class="fa fa-map-marker"></i>
+            <p>
+                <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
+                    Visconde de Mauá, Resende - RJ
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-envelope"></i>
+            <p>
+                <a href="mailto:rent.all.bn@gmail.com">
+                    rent.all.bn@gmail.com
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-phone"></i>
+            <p><a href="tel:2499965669">(24)999656679</a></p>
+        </div>
+        <div>
+            <i class="fa fa-whatsapp"></i>
+            <p>
+                <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
+                    +55 24-999656679
+                </a>
+            </p>
+        </div>
+    </div>
+
+
+    <div class="footer-content-3">
+        <p class="footer-empresa">
+            <span>Sobre a Empresa</span>
+            Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
+        </p>
+        <div class="footer-icons">
+
+            <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
+            <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
+            <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
+
+        </div>
+        <hr>
+        <p>©2023 Rent All Ltda.</p>
+    </div>
+    <div class="copyright">
+        <hr>
+        <p>©Copyright. Todos os direitos reservados.</p>
+    </div>
+
+</div>
+</html>

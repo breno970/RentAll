@@ -1,0 +1,605 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.rtl.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.rtl.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.rtl.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-grid.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-grid.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.rtl.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.rtl.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.rtl.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-reboot.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-reboot.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.rtl.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.rtl.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.rtl.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap-utilities.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap-utilities.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.rtl.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.rtl.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.rtl.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\css\\bootstrap.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.bundle.js",
+      "PackagePath": "staticwebassets\\js\\bootstrap.bundle.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.bundle.js.map",
+      "PackagePath": "staticwebassets\\js\\bootstrap.bundle.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.bundle.min.js",
+      "PackagePath": "staticwebassets\\js\\bootstrap.bundle.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.bundle.min.js.map",
+      "PackagePath": "staticwebassets\\js\\bootstrap.bundle.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.esm.js",
+      "PackagePath": "staticwebassets\\js\\bootstrap.esm.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.esm.js.map",
+      "PackagePath": "staticwebassets\\js\\bootstrap.esm.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.esm.min.js",
+      "PackagePath": "staticwebassets\\js\\bootstrap.esm.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.esm.min.js.map",
+      "PackagePath": "staticwebassets\\js\\bootstrap.esm.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.js",
+      "PackagePath": "staticwebassets\\js\\bootstrap.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.js.map",
+      "PackagePath": "staticwebassets\\js\\bootstrap.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\.nuget\\packages\\bootstrap\\5.3.2\\contentFiles\\any\\any\\wwwroot\\js\\bootstrap.min.js.map",
+      "PackagePath": "staticwebassets\\js\\bootstrap.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\cadastro.css",
+      "PackagePath": "staticwebassets\\css\\cadastro.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\estrelas.css",
+      "PackagePath": "staticwebassets\\css\\estrelas.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\imgcad.css",
+      "PackagePath": "staticwebassets\\css\\imgcad.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\rodape.css",
+      "PackagePath": "staticwebassets\\css\\rodape.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\secao4-div.css",
+      "PackagePath": "staticwebassets\\css\\secao4-div.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\style.css",
+      "PackagePath": "staticwebassets\\css\\style.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\styles.css",
+      "PackagePath": "staticwebassets\\css\\styles.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\css\\voltartopo.css",
+      "PackagePath": "staticwebassets\\css\\voltartopo.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\01cb0800-9edd-47d0-8516-d72b3e5bacae-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp",
+      "PackagePath": "staticwebassets\\imagens\\01cb0800-9edd-47d0-8516-d72b3e5bacae-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\0af52286-d1d7-4728-b76e-c3d6d368323d-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp",
+      "PackagePath": "staticwebassets\\imagens\\0af52286-d1d7-4728-b76e-c3d6d368323d-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\0efe4f45-0fb8-4004-88f0-52b9e87b538d-2025954097302c01309.webp",
+      "PackagePath": "staticwebassets\\imagens\\0efe4f45-0fb8-4004-88f0-52b9e87b538d-2025954097302c01309.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\24fd3f2b-781e-47c7-a78b-e374567d6257-martelo_high_15589_1_1c9dd0be1eb7b70e2f1ba498142ffa52.webp",
+      "PackagePath": "staticwebassets\\imagens\\24fd3f2b-781e-47c7-a78b-e374567d6257-martelo_high_15589_1_1c9dd0be1eb7b70e2f1ba498142ffa52.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\2d8177c7-a7dd-4585-b1ec-0a9cf535974e-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp",
+      "PackagePath": "staticwebassets\\imagens\\2d8177c7-a7dd-4585-b1ec-0a9cf535974e-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\5813eae0-c904-4e9c-bfb3-bb770e2d5810-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp",
+      "PackagePath": "staticwebassets\\imagens\\5813eae0-c904-4e9c-bfb3-bb770e2d5810-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\63f591db-0fb0-4659-b2fc-4e0a6c87ac37-limpou-a-casa-com-aspirador-de-po-saiba-como-limpa-lo-pos-uso-20180424163907.jpg-1024x684.jpg",
+      "PackagePath": "staticwebassets\\imagens\\63f591db-0fb0-4659-b2fc-4e0a6c87ac37-limpou-a-casa-com-aspirador-de-po-saiba-como-limpa-lo-pos-uso-20180424163907.jpg-1024x684.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\64f222ac-3434-4a02-9a77-04f215371278-download.jpg",
+      "PackagePath": "staticwebassets\\imagens\\64f222ac-3434-4a02-9a77-04f215371278-download.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\675e185f-2a8f-41ac-8980-c4d614453130-o-que-e-batedeira-planetaria-4-1024x683.jpg",
+      "PackagePath": "staticwebassets\\imagens\\675e185f-2a8f-41ac-8980-c4d614453130-o-que-e-batedeira-planetaria-4-1024x683.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\67e8d23b-e7cf-4eb4-b789-85fcf4d05ac0-Captura de Tela (3).png",
+      "PackagePath": "staticwebassets\\imagens\\67e8d23b-e7cf-4eb4-b789-85fcf4d05ac0-Captura de Tela (3).png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\6b4547f8-7a0a-4ad2-98e6-fc82c0464e76-download.jpg",
+      "PackagePath": "staticwebassets\\imagens\\6b4547f8-7a0a-4ad2-98e6-fc82c0464e76-download.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\72f88647-3951-421d-a769-038263387b6b-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp",
+      "PackagePath": "staticwebassets\\imagens\\72f88647-3951-421d-a769-038263387b6b-batedeira-planetaria-arno-daily-sx88-com-8-velocidades-e-600w-de-potencia-branca_4907.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\734239f9-2fb9-4bae-aa35-f7a4b5492ab2-parafusadeira-furadeira-bosch-eletrica-38-400w-127v-gsr-7-14e-8610552-1652116476405.jpg",
+      "PackagePath": "staticwebassets\\imagens\\734239f9-2fb9-4bae-aa35-f7a4b5492ab2-parafusadeira-furadeira-bosch-eletrica-38-400w-127v-gsr-7-14e-8610552-1652116476405.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\76407dda-7a7a-49a3-be7e-1989f76f5956-carrinho_mao_pedras.jpg",
+      "PackagePath": "staticwebassets\\imagens\\76407dda-7a7a-49a3-be7e-1989f76f5956-carrinho_mao_pedras.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\93942d16-100e-4589-8778-a5e346edd992-graphics-smallerbounds-Portrait.png",
+      "PackagePath": "staticwebassets\\imagens\\93942d16-100e-4589-8778-a5e346edd992-graphics-smallerbounds-Portrait.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\9970b227-fd66-4bb8-8ca7-7c25e190ffa8-7499613af65ba4ca4c1fbac6d7899e81.jpg",
+      "PackagePath": "staticwebassets\\imagens\\9970b227-fd66-4bb8-8ca7-7c25e190ffa8-7499613af65ba4ca4c1fbac6d7899e81.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\a9ad2707-c44c-43a7-887e-889ad90d6293-martelo_de_garra_1_1_1_1.jpg",
+      "PackagePath": "staticwebassets\\imagens\\a9ad2707-c44c-43a7-887e-889ad90d6293-martelo_de_garra_1_1_1_1.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\b64a5669-bf10-4476-8ccb-14dfd7663b31-conheca-os-diferentes-tipos-de-martelof025687d4640a235b0380f0e2b708e8a.webp",
+      "PackagePath": "staticwebassets\\imagens\\b64a5669-bf10-4476-8ccb-14dfd7663b31-conheca-os-diferentes-tipos-de-martelof025687d4640a235b0380f0e2b708e8a.webp"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\b68bbccc-2488-4b2f-ac4c-b378bf5cffd8-4.jpg",
+      "PackagePath": "staticwebassets\\imagens\\b68bbccc-2488-4b2f-ac4c-b378bf5cffd8-4.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\box-ico.png",
+      "PackagePath": "staticwebassets\\imagens\\box-ico.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\c7b4bde1-3d7a-40a7-ba8b-48d79699f110-Captura de Tela (36).png",
+      "PackagePath": "staticwebassets\\imagens\\c7b4bde1-3d7a-40a7-ba8b-48d79699f110-Captura de Tela (36).png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\d7c2b03d-add6-4d9b-bae3-e73e859d2c67-Captura de Tela (19).png",
+      "PackagePath": "staticwebassets\\imagens\\d7c2b03d-add6-4d9b-bae3-e73e859d2c67-Captura de Tela (19).png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\d94f7dd6-c8ab-4da0-8666-453b8f9a5b93-MARTELO-UNHA-CABO-MADEIRA-20MM-1.jpg",
+      "PackagePath": "staticwebassets\\imagens\\d94f7dd6-c8ab-4da0-8666-453b8f9a5b93-MARTELO-UNHA-CABO-MADEIRA-20MM-1.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\edb75747-1e27-4ac1-9bf8-0f82cefc1330-carrinho_mao_pedras.jpg",
+      "PackagePath": "staticwebassets\\imagens\\edb75747-1e27-4ac1-9bf8-0f82cefc1330-carrinho_mao_pedras.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\facebook.png",
+      "PackagePath": "staticwebassets\\imagens\\facebook.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\fd4d4be6-40fa-4500-9929-be6bbc0be913-martelo_de_garra_1_1_1_1.jpg",
+      "PackagePath": "staticwebassets\\imagens\\fd4d4be6-40fa-4500-9929-be6bbc0be913-martelo_de_garra_1_1_1_1.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\github.png",
+      "PackagePath": "staticwebassets\\imagens\\github.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\google.png",
+      "PackagePath": "staticwebassets\\imagens\\google.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\ico.png",
+      "PackagePath": "staticwebassets\\imagens\\ico.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\rent.jpg",
+      "PackagePath": "staticwebassets\\imagens\\rent.jpg"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\star0.png",
+      "PackagePath": "staticwebassets\\imagens\\star0.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\imagens\\star1.png",
+      "PackagePath": "staticwebassets\\imagens\\star1.png"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\js\\cadastro.js",
+      "PackagePath": "staticwebassets\\js\\cadastro.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\js\\mobile-navbar.js",
+      "PackagePath": "staticwebassets\\js\\mobile-navbar.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\LICENSE",
+      "PackagePath": "staticwebassets\\lib\\bootstrap"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation\\LICENSE.md",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\LICENSE.md"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.js"
+    },
+    {
+      "Id": "C:\\Users\\breno\\Desktop\\aluguel\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "obj\\Release\\net7.0\\win-x64\\staticwebassets\\msbuild.aluguel.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Release\\net7.0\\win-x64\\staticwebassets\\msbuild.build.aluguel.props",
+      "PackagePath": "build\\aluguel.props"
+    },
+    {
+      "Id": "obj\\Release\\net7.0\\win-x64\\staticwebassets\\msbuild.buildMultiTargeting.aluguel.props",
+      "PackagePath": "buildMultiTargeting\\aluguel.props"
+    },
+    {
+      "Id": "obj\\Release\\net7.0\\win-x64\\staticwebassets\\msbuild.buildTransitive.aluguel.props",
+      "PackagePath": "buildTransitive\\aluguel.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

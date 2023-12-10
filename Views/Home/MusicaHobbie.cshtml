@@ -1,0 +1,140 @@
+﻿@model IEnumerable<aluguel.Models.Anuncio>
+
+@{
+    ViewData["Title"] = "Música&Hobbies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
+  
+    <link rel="stylesheet" href="~/css/rodape.css" asp-append-version="true" />
+    <title>Rent All</title>
+</head>
+<body>
+
+    <div class="form-se">
+
+
+        <form method="get" action="/Home/MusicaHobbie">
+            <td>
+                <input class="form-control" type="text" placeholder="Pesquisar por..." name="SearchString" value="@ViewData["CurrentFilter"]" aria-label="Search" aria-describedby="btnNavbarSearch" />
+            </td>
+            <td>
+                <input type="submit" value="Buscar" class="btn btn-outline-dark" />
+            </td>
+        </form>
+
+    </div>
+
+    <div class="l-cards">
+        @foreach (var item in Model)
+        {
+            <div class="c-card">
+                <div class="c-card__image">
+                    <img class="img" src="~/imagens/@item.item.imagem1" alt="@item.item.nmitem"
+                         width="100%"
+                         alt="@item.item.nmitem">
+                </div>
+
+                <div class="c-card__content">
+                    <h1>@item.item.nmitem</h1>
+                    <p>@item.item.dsitem</p>
+                    <h3>Dias de Aluguel:@item.diasAluguel</h3>
+                    <span>R$:@item.vlitem </span>
+
+                    <a asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id">Saiba+</a>
+                    <span class="@item.item.nmitem" style="width:30%"></span>
+                    <span class="@item.item.dsitem" style="width:85%"></span>
+                    <span class="Dias de Aluguel:@item.diasAluguel" style="width:60%"></span>
+
+                </div>
+
+
+                <div vw class="enabled">
+                    <div vw-access-button class="active"></div>
+                    <div vw-plugin-wrapper>
+                        <div class="vw-plugin-top-wrapper"></div>
+                    </div>
+                </div>
+                <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+                <script>
+                    new window.VLibras.Widget('https://vlibras.gov.br/app');
+                </script>
+            </div>
+
+        }
+
+
+    </div>
+
+
+
+
+</body>
+
+
+<div class="footer-container">
+
+    <div class="footer-content-2">
+        <div>
+            <i class="fa fa-map-marker"></i>
+            <p>
+                <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
+                    Visconde de Mauá, Resende - RJ
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-envelope"></i>
+            <p>
+                <a href="mailto:rent.all.bn@gmail.com">
+                    rent.all.bn@gmail.com
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-phone"></i>
+            <p><a href="tel:2499965669">(24)999656679</a></p>
+        </div>
+        <div>
+            <i class="fa fa-whatsapp"></i>
+            <p>
+                <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
+                    +55 24-999656679
+                </a>
+            </p>
+        </div>
+    </div>
+
+
+    <div class="footer-content-3">
+        <p class="footer-empresa">
+            <span>Sobre a Empresa</span>
+            Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
+        </p>
+        <div class="footer-icons">
+
+            <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
+            <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
+            <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
+
+        </div>
+        <hr>
+        <p>©2023 Rent All Ltda.</p>
+    </div>
+    <div class="copyright">
+        <hr>
+        <p>©Copyright. Todos os direitos reservados.</p>
+    </div>
+
+</div>
+</html>

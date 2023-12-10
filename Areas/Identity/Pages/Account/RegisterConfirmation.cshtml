@@ -1,0 +1,160 @@
+﻿@page
+@model RegisterConfirmationModel
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar E-mail</title>
+    <style>
+        .bodyyy {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .ct {
+            margin: 0;
+            padding: 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-containerrr {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        .form-contenttt {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .h11 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .status-messagee {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border: 1px solid #797984;
+            border-radius: 6px;
+            color: #797984;
+        }
+    </style>
+</head>
+<body>
+    <div class="bodyyy">
+        <form class="form-containerrr">
+            <div class="form-contenttt">
+                <h1 class="h11">Email de confirmação</h1>
+
+
+
+                <h1>@ViewData["Title"]</h1>
+
+                @{
+                    if (@Model.DisplayConfirmAccountLink)
+                    {
+                        <p>
+                            This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
+                            Confirme sua Conta: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Clique aqui para confirmar seu E-mail.</a>
+                        </p>
+                    }
+                    else
+                    {
+                        <p>
+                            Verifique seu e-mail para confirmar sua conta.
+                        </p>
+                        <br />
+                        <hr />
+                        <br />
+                        <p>
+                            O E-mail não chegou ?
+                        </p>
+                        <br />
+                    }
+                }
+
+                <p>
+                    <a id="resend-confirmation" class="link" asp-page="./ResendEmailConfirmation">Reenviar email de confirmação</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+
+</body>
+
+<div class="footer-container">
+
+    <div class="footer-content-2">
+        <div>
+            <i class="fa fa-map-marker"></i>
+            <p>
+                <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
+                    Visconde de Mauá, Resende - RJ
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-envelope"></i>
+            <p>
+                <a href="mailto:rent.all.bn@gmail.com">
+                    rent.all.bn@gmail.com
+                </a>
+            </p>
+        </div>
+        <div>
+            <i class="fa fa-phone"></i>
+            <p><a href="tel:2499965669">(24)999656679</a></p>
+        </div>
+        <div>
+            <i class="fa fa-whatsapp"></i>
+            <p>
+                <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
+                    +55 24-999656679
+                </a>
+            </p>
+        </div>
+    </div>
+
+
+    <div class="footer-content-3">
+        <p class="footer-empresa">
+            <span>Sobre a Empresa</span>
+            Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
+        </p>
+        <div class="footer-icons">
+
+            <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
+            <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
+            <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
+
+        </div>
+        <hr>
+        <p>©2023 Rent All Ltda.</p>
+    </div>
+    <div class="copyright">
+        <hr>
+        <p>©Copyright. Todos os direitos reservados.</p>
+    </div>
+
+</div>
+</html>
+
+<script type="text/javascript" src="~/js/cadastro.js"></script>
