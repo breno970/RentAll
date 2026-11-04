@@ -29,6 +29,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
         builder.Entity<Avaliacao>()
             .HasOne(a => a.anuncio).WithMany()
             .HasForeignKey(a => a.idanuncio).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Mensagem>().HasIndex(m => new { m.DestinatarioId, m.AnuncioId, m.CriadaEm });
         builder.Entity<Favorito>()
             .HasIndex(f => new { f.UserId, f.AnuncioId }).IsUnique();
         // Customize the ASP.NET Identity model and override the defaults if needed.
@@ -40,6 +41,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
 
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
     public DbSet<Favorito> Favoritos { get; set; } = null!;
+    public DbSet<Mensagem> Mensagens { get; set; } = null!;
     public DbSet<Anuncio> Anuncios { get; set; }
     public DbSet<Avaliacao> Avaliacoes { get; set; }
     public DbSet<ImagensItem> ImagensItems { get; set; }
