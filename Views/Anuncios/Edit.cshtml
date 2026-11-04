@@ -18,7 +18,7 @@
                 <span asp-validation-for="modelo" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="vlitem">Valor por dia (R$) *</label>
+                <label asp-for="vlitem" data-rental-currency>Valor por dia (@(Model.Pais == "PT" ? "€" : "R$")) *</label>
                 <input asp-for="vlitem" type="number" step="0.01" min="0.01" inputmode="decimal" class="form-control" required />
                 <span asp-validation-for="vlitem" class="text-danger"></span>
             </div>
@@ -32,10 +32,18 @@
         <h2><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Região do item</h2>
         <div class="ra-form-grid">
             <div class="form-group">
-                <label asp-for="Estado">Estado *</label>
+                <label asp-for="Pais">País *</label>
+                <select asp-for="Pais" class="form-control" data-region-country required>
+                    <option value="BR">Brasil</option>
+                    <option value="PT">Portugal</option>
+                </select>
+                <span asp-validation-for="Pais" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Estado" data-region-label>@LocationCatalog.RegionLabel(Model.Pais) *</label>
                 <select asp-for="Estado" id="txtEstado" class="form-control" data-region-uf required>
                     <option value="">Selecione o estado</option>
-                    @foreach (var uf in LocationCatalog.States)
+                    @foreach (var uf in LocationCatalog.RegionsFor(Model.Pais))
                     {
                         <option value="@uf.Code">@uf.Name (@uf.Code)</option>
                     }
@@ -54,7 +62,7 @@
                 <span asp-validation-for="Bairro" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CEP">CEP *</label>
+                <label asp-for="CEP" data-postal-label>@LocationCatalog.PostalLabel(Model.Pais) *</label>
                 <input asp-for="CEP" id="txtCep" class="form-control" inputmode="numeric" maxlength="9" required />
                 <span asp-validation-for="CEP" class="text-danger"></span>
             </div>
