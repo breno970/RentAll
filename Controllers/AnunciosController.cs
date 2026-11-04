@@ -1,239 +1,224 @@
-﻿using aluguel.Areas.Identity.Data;
+using aluguel.Areas.Identity.Data;
 using aluguel.Models;
-using Microsoft.AspNetCore.Mvc;
+using aluguel.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace aluguel.Controllers
+namespace aluguel.Controllers;
+
+[Authorize]
+public class AnunciosController : Controller
 {
-    public class AnunciosController : Controller
+    private readonly ApplicationDbContext _db;
+    private readonly ILogger<AnunciosController> _logger;
+    public AnunciosController(ApplicationDbContext db, ILogger<AnunciosController> logger)
     {
-        private readonly ApplicationDbContext _context;
+        _db = db;
+        _logger = logger;
+    }
 
-        public AnunciosController(ApplicationDbContext context)
+    private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? throw new UnauthorizedAccessException();
+
+    private async Task PrepareCreateOptions(int? selectedItemId = null)
+    {
+        ViewBag.Categoria = await _db.Categorias.AsNoTracking().OrderBy(x => x.nmcategoria)
+            .Select(x => new SelectListItem { Value = x.id.ToString(), Text = x.nmcategoria }).ToListAsync();
+        var items = await _db.Items.AsNoTracking()
+            .Where(x => x.iduser == UserId && x.snativo != "N").OrderBy(x => x.nmitem).ToListAsync();
+        ViewBag.itemid = new SelectList(items, "id", "nmitem", selectedItemId);
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var ads = await _db.Anuncios.AsNoTracking().Where(a => a.iduser == UserId)
+            .Include(a => a.item).Include(a => a.categoria).Include(a => a.tipo)
+            .OrderByDescending(a => a.id).ToListAsync();
+        return View(ads);
+    }
+
+    [AllowAnonymous]
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id is null) return NotFound();
+        var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
+            .Include(a => a.categoria).Include(a => a.tipo)
+            .FirstOrDefaultAsync(a => a.id == id);
+        if (ad == null || ad.item == null) return NotFound();
+        if (ad.item.snativo == "N" && ad.iduser != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            return NotFound();
+        return View(ad);
+    }
+
+    public async Task<IActionResult> Create()
+    {
+        await PrepareCreateOptions();
+        return View(new Anuncio());
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> GetTipos(int id)
+    {
+        if (id <= 0) return Json(Array.Empty<SelectListItem>());
+        var types = await _db.Tipos.AsNoTracking().Where(t => t.categoriaid == id)
+            .OrderBy(t => t.nmtipo)
+            .Select(t => new SelectListItem { Value = t.id.ToString(), Text = t.nmtipo })
+            .ToListAsync();
+        return Json(types);
+    }
+
+    private void NormalizeLocation(Anuncio ad)
+    {
+        ad.Estado = (ad.Estado ?? "").Trim().ToUpperInvariant();
+        ad.Cidade = (ad.Cidade ?? "").Trim();
+        ad.Bairro = (ad.Bairro ?? "").Trim();
+        ad.Rua = (ad.Rua ?? "").Trim();
+        ad.CEP = (ad.CEP ?? "").Trim();
+        ad.modelo = (ad.modelo ?? "").Trim();
+        ad.contato = (ad.contato ?? "").Trim();
+        ad.NomeFantasia = (ad.NomeFantasia ?? "").Trim();
+
+        if (!LocationCatalog.IsValidUf(ad.Estado))
+            ModelState.AddModelError(nameof(ad.Estado), "Selecione um estado brasileiro válido.");
+        if (string.IsNullOrWhiteSpace(ad.Cidade))
+            ModelState.AddModelError(nameof(ad.Cidade), "Informe a cidade em que o item está disponível.");
+        if (string.IsNullOrWhiteSpace(ad.Bairro))
+            ModelState.AddModelError(nameof(ad.Bairro), "Informe o bairro.");
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(int Categoria, int Tipo, Anuncio anuncio)
+    {
+        anuncio.iduser = UserId;
+        anuncio.categoriaid = Categoria;
+        anuncio.tipoid = Tipo;
+        ModelState.Remove(nameof(Anuncio.iduser));
+        ModelState.Remove(nameof(Anuncio.categoriaid));
+        ModelState.Remove(nameof(Anuncio.tipoid));
+        NormalizeLocation(anuncio);
+
+        if (!await _db.Items.AnyAsync(x => x.id == anuncio.itemid && x.iduser == UserId && x.snativo != "N"))
+            ModelState.AddModelError(nameof(anuncio.itemid), "Selecione um item ativo cadastrado na sua conta.");
+        if (!await _db.Categorias.AnyAsync(x => x.id == Categoria))
+            ModelState.AddModelError(nameof(Categoria), "Selecione uma categoria.");
+        if (!await _db.Tipos.AnyAsync(x => x.id == Tipo && x.categoriaid == Categoria))
+            ModelState.AddModelError(nameof(Tipo), "Selecione um tipo válido para esta categoria.");
+
+        if (!ModelState.IsValid)
         {
-            _context = context;
-        }
-
-        //var applicationDbContext = _context.Anuncios.Include(a => a.item);
-        //    return View(await applicationDbContext.ToListAsync());
-
-
-
-        // GET: Anuncios
-        [Authorize]
-        public async Task<IActionResult> Index()
-        {
-            var model = await _context.Anuncios
-                            .Where(a => a.iduser == HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value)
-                            .Include(a => a.item)
-                            .Include(a => a.categoria)
-                            .Include(a => a.tipo)
-                            .ToListAsync();
-            return View(model);
-
-        }
-
-        // GET: Anuncios/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Anuncios == null)
-            {
-                return NotFound();
-            }
-
-            var anuncio = await _context.Anuncios
-                .Include(a => a.item)
-                .Include(a => a.categoria)
-                .Include(a => a.tipo)
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (anuncio == null)
-            {
-                return NotFound();
-            }
-
+            await PrepareCreateOptions(anuncio.itemid);
             return View(anuncio);
         }
 
-        // GET: Anuncios/Create
-        [Authorize]
-        public IActionResult Create()
+        // Bind only user-controlled content. Owner/category associations are validated server-side.
+        var ad = new Anuncio
         {
-            ViewBag.Categoria = _context.Categorias.ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmcategoria }).ToList();
-            ViewData["itemid"] = new SelectList(_context.Items
-                .Where(a => a.iduser == HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value && a.snativo != "N"), "id", "nmitem");
-
-            return View();
-        }
-
-        public IActionResult GetTipos(int id)
+            vlitem = anuncio.vlitem, diasAluguel = anuncio.diasAluguel,
+            modelo = anuncio.modelo, itemid = anuncio.itemid, iduser = UserId,
+            categoriaid = Categoria, tipoid = Tipo,
+            CEP = anuncio.CEP, Rua = anuncio.Rua, Numero = anuncio.Numero,
+            Bairro = anuncio.Bairro, Cidade = anuncio.Cidade, Estado = anuncio.Estado,
+            Complemento = anuncio.Complemento, contato = anuncio.contato,
+            NomeFantasia = anuncio.NomeFantasia
+        };
+        try
         {
-            //get state list as SelectListItem
-            var statesList = _context.Tipos.Where(s => s.categoriaid == id).ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmtipo }).ToList();
-            return Json(statesList);
-        }
-
-        // POST: Anuncios/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public IActionResult Create(int Categoria, int Tipo, Anuncio anuncio)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            if (!_context.Items.Any(x => x.id == anuncio.itemid && x.iduser == userId && x.snativo != "N"))
-                return BadRequest("O artigo não pertence a este utilizador.");
-            if (!_context.Categorias.Any(x => x.id == Categoria) || !_context.Tipos.Any(x => x.id == Tipo && x.categoriaid == Categoria))
-                return BadRequest("Categoria ou tipo inválido.");
-            ViewBag.SelectCategoria = _context.Categorias.Where(a => a.id == Categoria).Select(a => a.nmcategoria).FirstOrDefault();
-            ViewBag.SelectTipo = _context.Tipos.Where(a => a.id == Tipo).Select(a => a.nmtipo).FirstOrDefault();
-
-            var item = new Anuncio
-            {
-                vlitem = anuncio.vlitem,
-                diasAluguel = anuncio.diasAluguel,
-                iduser = userId,
-                itemid = anuncio.itemid,
-                modelo = anuncio.modelo,
-                CEP = anuncio.CEP,
-                Rua = anuncio.Rua,
-                Numero = anuncio.Numero,
-                Bairro = anuncio.Bairro,
-                Cidade = anuncio.Cidade,
-                Estado = anuncio.Estado,
-                Complemento = anuncio.Complemento,
-                contato = anuncio.contato,
-                NomeFantasia = anuncio.NomeFantasia,
-                categoriaid = Categoria,
-                tipoid = Tipo
-            };
-
-            ViewBag.Categoria = _context.Categorias.ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmcategoria }).ToList();
-
-            _context.Anuncios.Add(item);
-            _context.SaveChanges();
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: Anuncios/Edit/5
-        [Authorize]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Anuncios == null)
-            {
-                return NotFound();
-            }
-
-            var anuncio = await _context.Anuncios.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (anuncio == null)
-            {
-                return NotFound();
-            }
-            ViewBag.Categoria = _context.Categorias.ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmcategoria }).ToList();
-            ViewData["itemid"] = new SelectList(_context.Items, "id", "id", anuncio.itemid);
-            return View(anuncio);
-        }
-
-        // POST: Anuncios/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-
-        [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("id,vlitem,diasAluguel,iduser,itemid,categoriaid,CEP,Rua,Numero,Bairro,Cidade,Estado,Complemento,tipoid,modelo,estado,cidade,bairro,contato,NomeFantasia")] Anuncio anuncio)
-        {
-
-            if (id != anuncio.id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var existing = await _context.Anuncios.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-                    if (existing == null) return NotFound();
-                    // Preserve owner and foreign keys from the database, never from hidden form inputs.
-                    existing.vlitem = anuncio.vlitem;
-                    existing.diasAluguel = anuncio.diasAluguel;
-                    existing.modelo = anuncio.modelo;
-                    existing.CEP = anuncio.CEP;
-                    existing.Rua = anuncio.Rua;
-                    existing.Numero = anuncio.Numero;
-                    existing.Bairro = anuncio.Bairro;
-                    existing.Cidade = anuncio.Cidade;
-                    existing.Estado = anuncio.Estado;
-                    existing.Complemento = anuncio.Complemento;
-                    existing.contato = anuncio.contato;
-                    existing.NomeFantasia = anuncio.NomeFantasia;
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AnuncioExists(anuncio.id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["itemid"] = new SelectList(_context.Items, "id", "id", anuncio.itemid);
-            return View(anuncio);
-        }
-
-        // GET: Anuncios/Delete/5
-        [Authorize]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Anuncios == null)
-            {
-                return NotFound();
-            }
-
-            var anuncio = await _context.Anuncios
-                .Include(a => a.item)
-                .FirstOrDefaultAsync(m => m.id == id && m.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (anuncio == null)
-            {
-                return NotFound();
-            }
-
-            return View(anuncio);
-        }
-
-        // POST: Anuncios/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Anuncios == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Anuncios'  is null.");
-            }
-            var anuncio = await _context.Anuncios.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (anuncio != null)
-            {
-                _context.Anuncios.Remove(anuncio);
-            }
-
-            await _context.SaveChangesAsync();
+            _db.Anuncios.Add(ad);
+            await _db.SaveChangesAsync();
+            TempData["Success"] = "Anúncio publicado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
-
-        private bool AnuncioExists(int id)
+        catch (DbUpdateException ex)
         {
-            return (_context.Anuncios?.Any(e => e.id == id)).GetValueOrDefault();
+            _logger.LogError(ex, "Could not create rental listing.");
+            ModelState.AddModelError("", "Não foi possível publicar o anúncio. Tente novamente.");
+            await PrepareCreateOptions(anuncio.itemid);
+            return View(anuncio);
+        }
+    }
+
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id is null) return NotFound();
+        var ad = await _db.Anuncios.FirstOrDefaultAsync(a => a.id == id && a.iduser == UserId);
+        return ad is null ? NotFound() : View(ad);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Anuncio anuncio)
+    {
+        if (id != anuncio.id) return NotFound();
+        var existing = await _db.Anuncios.FirstOrDefaultAsync(a => a.id == id && a.iduser == UserId);
+        if (existing is null) return NotFound();
+
+        anuncio.iduser = existing.iduser;
+        anuncio.itemid = existing.itemid;
+        anuncio.categoriaid = existing.categoriaid;
+        anuncio.tipoid = existing.tipoid;
+        ModelState.Remove(nameof(Anuncio.iduser));
+        ModelState.Remove(nameof(Anuncio.itemid));
+        ModelState.Remove(nameof(Anuncio.categoriaid));
+        ModelState.Remove(nameof(Anuncio.tipoid));
+        NormalizeLocation(anuncio);
+        if (!ModelState.IsValid) return View(anuncio);
+
+        // The owner, linked item, category and type cannot be changed via hidden fields.
+        existing.vlitem = anuncio.vlitem;
+        existing.diasAluguel = anuncio.diasAluguel;
+        existing.modelo = anuncio.modelo;
+        existing.CEP = anuncio.CEP;
+        existing.Rua = anuncio.Rua;
+        existing.Numero = anuncio.Numero;
+        existing.Bairro = anuncio.Bairro;
+        existing.Cidade = anuncio.Cidade;
+        existing.Estado = anuncio.Estado;
+        existing.Complemento = anuncio.Complemento;
+        existing.contato = anuncio.contato;
+        existing.NomeFantasia = anuncio.NomeFantasia;
+
+        try
+        {
+            await _db.SaveChangesAsync();
+            TempData["Success"] = "Anúncio atualizado com sucesso!";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Could not update rental listing.");
+            ModelState.AddModelError("", "Não foi possível guardar as alterações. Tente novamente.");
+            return View(anuncio);
+        }
+    }
+
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id is null) return NotFound();
+        var ad = await _db.Anuncios.Include(a => a.item)
+            .FirstOrDefaultAsync(a => a.id == id && a.iduser == UserId);
+        return ad is null ? NotFound() : View(ad);
+    }
+
+    [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var ad = await _db.Anuncios.FirstOrDefaultAsync(a => a.id == id && a.iduser == UserId);
+        if (ad is null) return NotFound();
+        try
+        {
+            _db.Anuncios.Remove(ad);
+            await _db.SaveChangesAsync();
+            TempData["Success"] = "Anúncio excluído.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Could not delete rental listing.");
+            TempData["Error"] = "Não foi possível excluir este anúncio porque há registos associados.";
+            return RedirectToAction(nameof(Index));
         }
     }
 }
