@@ -19,15 +19,18 @@ namespace aluguel.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _configuration;
 
         public EmailModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -114,6 +117,14 @@ namespace aluguel.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             if (Input.NewEmail != email)
             {
+                if (string.IsNullOrWhiteSpace(_configuration["SendGridKey"]))
+                {
+                    StatusMessage = "Error: o serviço de e-mail ainda não está disponível para alterar o endereço.";
+                    return RedirectToPage();
+                }
+            }
+            if (Input.NewEmail != email)
+            {
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -147,6 +158,12 @@ namespace aluguel.Areas.Identity.Pages.Account.Manage
             {
                 await LoadAsync(user);
                 return Page();
+            }
+
+            if (string.IsNullOrWhiteSpace(_configuration["SendGridKey"]))
+            {
+                StatusMessage = "Error: o serviço de e-mail ainda não está disponível para enviar confirmações.";
+                return RedirectToPage();
             }
 
             var userId = await _userManager.GetUserIdAsync(user);

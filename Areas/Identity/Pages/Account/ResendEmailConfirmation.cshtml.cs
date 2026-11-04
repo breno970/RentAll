@@ -20,11 +20,13 @@ namespace aluguel.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _configuration;
 
-        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -60,10 +62,16 @@ namespace aluguel.Areas.Identity.Pages.Account
                 return Page();
             }
 
+            if (string.IsNullOrWhiteSpace(_configuration["SendGridKey"]))
+            {
+                ModelState.AddModelError(string.Empty, "O envio de e-mails está temporariamente indisponível. Contacta o suporte.");
+                return Page();
+            }
+
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Verificação de email enviada. Verifique seu email.");
+                ModelState.AddModelError(string.Empty, "Se existir uma conta com esse e-mail, receberás instruções de confirmação.");
                 return Page();
             }
 
@@ -79,7 +87,7 @@ namespace aluguel.Areas.Identity.Pages.Account
                 Input.Email,"Valide Sua Conta",
                 $"Valide sua conta RentAll clicando <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>NESTE LINK</a>.");
 
-            ModelState.AddModelError(string.Empty, "Vereficação enviada. olhe seu email ou caixa de spam.");
+            ModelState.AddModelError(string.Empty, "Se existir uma conta com esse e-mail, receberás instruções de confirmação.");
             return Page();
         }
     }
