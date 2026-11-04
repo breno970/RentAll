@@ -3,7 +3,7 @@
 @{ ViewData["Title"] = "Criar anúncio"; }
 <div class="page-width"><div class="form-shell">
     <div class="page-intro">
-        <div><p class="eyebrow">Publicar um artigo já cadastrado</p><h1>Prepara o teu anúncio</h1><p>Define onde está o artigo, o preço e como poderão contactar-te.</p></div>
+        <div><p class="eyebrow">Publicar um artigo já cadastrado</p><h1>Prepara o teu anúncio</h1><p>Define onde está o artigo, o preço e como os interessados te podem contactar pela RentAll.</p></div>
         <a class="btn btn-outline" asp-controller="Items" asp-action="Index"><i class="fas fa-arrow-left"></i> Meus itens</a>
     </div>
     <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>A localização pública será aproximada. A rua, o número e o código postal não aparecem nos detalhes do anúncio.</span></div>
@@ -92,18 +92,14 @@
             <a class="btn btn-outline" data-region-map-link href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt"></i> Ver localização aproximada no Maps</a>
             <div class="ra-map-preview" data-ra-map hidden aria-label="Mapa aproximado da região"></div>
         </div>
-        <h2><i class="far fa-comments" aria-hidden="true"></i> Contacto</h2>
+        <h2><i class="far fa-comments" aria-hidden="true"></i> Perfil público</h2>
         <div class="form-grid">
             <div class="form-field">
                 <label asp-for="NomeFantasia">Nome público (opcional)</label>
                 <input asp-for="NomeFantasia" class="form-control" placeholder="Como gostarias de ser tratado?" />
                 <span asp-validation-for="NomeFantasia" class="text-danger"></span>
             </div>
-            <div class="form-field">
-                <label asp-for="contato">Contacto (opcional, não divulgado)</label>
-                <input asp-for="contato" class="form-control" placeholder="Telefone, WhatsApp ou outro meio" />
-                <span asp-validation-for="contato" class="text-danger"></span>
-            </div>
+            
         </div>
         <div class="form-actions"><button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Publicar anúncio</button><a asp-action="Index" class="btn btn-outline">Cancelar</a></div>
     </form>
