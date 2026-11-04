@@ -4,6 +4,7 @@ using aluguel.Models;
 using aluguel.Services;
 using aluguel.ViewModel;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -65,6 +66,7 @@ public sealed class PublicarController : Controller
     [HttpPost("")]
     [ValidateAntiForgeryToken]
     [RequestSizeLimit(35_000_000)]
+    [EnableRateLimiting("publish")]
     public async Task<IActionResult> Index(PublishViewModel vm, CancellationToken ct)
     {
         vm.Photos ??= new();
