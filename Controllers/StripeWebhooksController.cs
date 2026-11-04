@@ -28,7 +28,7 @@ public sealed class StripeWebhooksController : ControllerBase
         try { evt = stripe.VerifiedEvent(payload,Request.Headers["Stripe-Signature"].ToString()); }
         catch (Exception ex) when (ex is StripeException or ArgumentException or InvalidOperationException)
         { return BadRequest("Assinatura Stripe inválida."); }
-        if (string.IsNullOrWhiteSpace(evt.Id)) return BadRequest();
+        if (string.IsNullOrWhiteSpace(evt.Id) || evt.Livemode) return BadRequest("Apenas eventos da sandbox são aceites.");
         await using var txn = await db.Database.BeginTransactionAsync(ct);
         if (await db.EventosStripeProcessados.AnyAsync(x=>x.EventId==evt.Id,ct)) return Ok();
 
@@ -49,7 +49,8 @@ public sealed class StripeWebhooksController : ControllerBase
             if (session.PaymentStatus=="paid" &&
                 (evt.Type=="checkout.session.completed" || evt.Type=="checkout.session.async_payment_succeeded"))
             {
-                payment.Estado="Pago em teste";
+                if (payment.Estado == "Checkout criado" || payment.Estado == "Falhado" || payment.Estado == "Expirado")
+                    payment.Estado="Pago em teste";
                 payment.PagoEm ??=DateTime.UtcNow;
                 payment.StripePaymentIntentId=session.PaymentIntentId;
             }
@@ -60,6 +61,46 @@ public sealed class StripeWebhooksController : ControllerBase
             }
             payment.AtualizadoEm=DateTime.UtcNow;
         }
+        // Reconcile test refunds using the original PaymentIntent reference.
+        // Charge.amount_refunded is cumulative, so retries and partial refunds remain idempotent.
+        if (evt.Type == "charge.refunded" && evt.Data.Object is Charge charge &&
+            !string.IsNullOrEmpty(charge.PaymentIntentId))
+        {
+            var payment = await db.PagamentosAluguer.FirstOrDefaultAsync(
+                p => p.StripePaymentIntentId == charge.PaymentIntentId, ct);
+            if (payment == null) return StatusCode(503);
+            if (charge.Amount < payment.TotalCentimos ||
+                charge.AmountRefunded < 0 || charge.AmountRefunded > payment.TotalCentimos)
+                return BadRequest("Valor de reembolso incompatível.");
+            payment.ReembolsadoCentimos = Math.Max(payment.ReembolsadoCentimos, charge.AmountRefunded);
+            if (payment.ReembolsadoCentimos == payment.TotalCentimos)
+                payment.Estado = "Reembolsado em teste";
+            else if (payment.ReembolsadoCentimos > 0 && !payment.DisputaAberta)
+                payment.Estado = "Reembolso parcial";
+            payment.AtualizadoEm = DateTime.UtcNow;
+        }
+
+        // A dispute is not a completed refund. Keep it visible to staff for manual review.
+        if ((evt.Type == "charge.dispute.created" || evt.Type == "charge.dispute.closed") &&
+            evt.Data.Object is Dispute dispute &&
+            !string.IsNullOrEmpty(dispute.PaymentIntentId))
+        {
+            var payment = await db.PagamentosAluguer.FirstOrDefaultAsync(
+                p => p.StripePaymentIntentId == dispute.PaymentIntentId, ct);
+            if (payment == null) return StatusCode(503);
+            if (evt.Type == "charge.dispute.created")
+            {
+                payment.DisputaAberta = true;
+                if (payment.Estado != "Reembolsado em teste") payment.Estado = "Disputa aberta";
+            }
+            else
+            {
+                payment.DisputaAberta = false;
+                if (payment.Estado != "Reembolsado em teste") payment.Estado = "Disputa encerrada";
+            }
+            payment.AtualizadoEm = DateTime.UtcNow;
+        }
+
         // Record other signed events for reconciliation; don't infer refunds or successful
         // payment from an unknown event without verifying its object.
         db.EventosStripeProcessados.Add(new EventoStripeProcessado {
