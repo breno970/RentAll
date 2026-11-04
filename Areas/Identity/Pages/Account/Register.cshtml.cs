@@ -52,7 +52,7 @@ namespace aluguel.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         [BindProperty]
-        [Range(typeof(bool), "true", "true", ErrorMessage = "É necessário aceitar os termos de utilização.")]
+        
         public bool AcceptTerms { get; set; }
 
         public string ReturnUrl { get; set; }
@@ -126,6 +126,13 @@ namespace aluguel.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            // Only a posted true value counts; never trust client-only required validation.
+            var accepted = Request.Form["AcceptTerms"].Any(v =>
+                string.Equals(v, "true", StringComparison.OrdinalIgnoreCase));
+            if (!accepted)
+                ModelState.AddModelError(nameof(AcceptTerms), "É necessário aceitar os termos de utilização.");
+            else
+                AcceptTerms = true;
             if (ModelState.IsValid)
             {
                 var user = CreateUser();

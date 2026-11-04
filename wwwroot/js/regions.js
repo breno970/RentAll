@@ -104,7 +104,7 @@
       for (const label of form.querySelectorAll("[data-region-label]"))
         label.textContent = (selectedCountry === "PT" ? "Distrito / Região autónoma" : "Estado (UF)") + (label.dataset.required === "true" ? " *" : "");
       for (const label of form.querySelectorAll("[data-postal-label]"))
-        label.textContent = (selectedCountry === "PT" ? "Código postal" : "CEP") + " *";
+        label.textContent = (selectedCountry === "PT" ? "Código postal" : "CEP") + (label.dataset.required === "true" ? " *" : " (opcional)");
       for (const label of form.querySelectorAll("[data-rental-currency]"))
         label.textContent = "Preço por dia (" + (selectedCountry === "PT" ? "€" : "R$") + ") (opcional)";
       for (const label of form.querySelectorAll("[data-filter-min-price]"))
@@ -144,14 +144,14 @@
       type.disabled = !id;
       if (!id) return;
       try {
-        const response = await fetch("/Anuncios/GetTipos?id=" + encodeURIComponent(id), {
+        const response = await fetch("/api/v1/catalogo/tipos?categoriaId=" + encodeURIComponent(id), {
           credentials: "same-origin"
         });
         if (!response.ok) throw new Error("Falha ao carregar tipos");
         const types = await response.json();
         for (const row of types) {
-          const value = row.value ?? row.Value;
-          const label = row.text ?? row.Text;
+          const value = row.id ?? row.value ?? row.Value;
+          const label = row.nome ?? row.text ?? row.Text;
           if (value != null && label != null) type.add(new Option(label, value));
         }
         const preferred = type.dataset.selectedType;

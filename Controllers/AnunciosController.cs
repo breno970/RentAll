@@ -44,6 +44,13 @@ public class AnunciosController : Controller
     public async Task<IActionResult> Details(int? id)
     {
         if (id is null) return NotFound();
+        // Browsing/search results are public, but full listing details require an account.
+        if (User.Identity?.IsAuthenticated != true)
+            return RedirectToPage("/Account/Register", new
+            {
+                area = "Identity",
+                returnUrl = Url.Action(nameof(Details), "Anuncios", new { id })
+            });
         var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .Include(a => a.categoria).Include(a => a.tipo)
             .FirstOrDefaultAsync(a => a.id == id);
