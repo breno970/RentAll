@@ -27,7 +27,7 @@ public class HomeController : Controller
     {
         filters.Normalize();
         if (categoryOverride.HasValue) filters.CategoriaId = categoryOverride;
-        var query = AvailableAds();
+        var query = AvailableAds().Where(a => a.Pais == filters.Pais);
 
         if (!string.IsNullOrWhiteSpace(filters.SearchString))
         {
