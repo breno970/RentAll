@@ -113,8 +113,22 @@ public sealed class PagamentosController : Controller
             TempData["Error"] = "O anunciante ainda não está inscrito na Stripe de teste.";
             return RedirectToAction("Index","Pedidos");
         }
-        if (await db.PagamentosAluguer.AnyAsync(p => p.PedidoId == order.Id,ct))
+        var previous = await db.PagamentosAluguer.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.PedidoId == order.Id, ct);
+        if (previous != null)
+        {
+            try
+            {
+                if (previous.Estado == "Checkout criado")
+                {
+                    var url = await checkout.ResumeCheckoutUrlAsync(previous.StripeSessionId, ct);
+                    if (url != null) return Redirect(url);
+                }
+            }
+            catch (StripeException ex) { log.LogWarning(ex, "Could not resume sandbox checkout."); }
+            TempData["Error"] = "Esta tentativa já foi encerrada ou confirmada. Consulta o estado do pagamento.";
             return RedirectToAction("Index","Pedidos");
+        }
         try
         {
             if (!await accounts.CanReceiveAsync(connected.AccountId,ct))
