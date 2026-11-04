@@ -2,12 +2,14 @@
 using aluguel.Models;
 using aluguel.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace aluguel.Controllers
 {
+    [Authorize]
     public class ItemsController : Controller
     {
         private readonly ILogger<ItemsController> _logger;
@@ -39,7 +41,7 @@ namespace aluguel.Controllers
             }
 
             var item = await Context.Items
-                .FirstOrDefaultAsync(m => m.id == id);
+                .FirstOrDefaultAsync(m => m.id == id && m.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (item == null)
             {
                 return NotFound();
@@ -61,6 +63,7 @@ namespace aluguel.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(ItemViewModel vm)
         {
             string imagem1 = Imagem1(vm);
@@ -74,7 +77,7 @@ namespace aluguel.Controllers
                 dsitem = vm.dsitem,
                 dtcriacao = vm.dtcriacao = DateTime.Now,
                 snativo = vm.snativo,
-                iduser = vm.iduser,
+                iduser = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
                 imagem1 = imagem1,
                 imagem2 = imagem2,
                 imagem3 = imagem3,
@@ -98,7 +101,7 @@ namespace aluguel.Controllers
                 return NotFound();
             }
 
-            var item = await Context.Items.FindAsync(id);
+            var item = await Context.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (item == null)
             {
                 return NotFound();
@@ -122,7 +125,12 @@ namespace aluguel.Controllers
             {
                 try
                 {
-                    Context.Update(item);
+                    var existing = await Context.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
+                    if (existing == null) return NotFound();
+                    // Never accept the owner or image paths from form fields.
+                    existing.nmitem = item.nmitem;
+                    existing.dsitem = item.dsitem;
+                    existing.snativo = item.snativo;
                     await Context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -150,7 +158,7 @@ namespace aluguel.Controllers
             }
 
             var item = await Context.Items
-                .FirstOrDefaultAsync(m => m.id == id);
+                .FirstOrDefaultAsync(m => m.id == id && m.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (item == null)
             {
                 return NotFound();
@@ -168,7 +176,7 @@ namespace aluguel.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.Items'  is null.");
             }
-            var item = await Context.Items.FindAsync(id);
+            var item = await Context.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (item != null)
             {
                 Context.Items.Remove(item);
