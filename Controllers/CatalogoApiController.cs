@@ -11,7 +11,7 @@ namespace aluguel.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/v1/catalogo")]
-[ResponseCache(Duration = 120, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new[] { "*" })]
+[ResponseCache(Duration = 120, Location = ResponseCacheLocation.Client)]
 public sealed class CatalogoApiController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
