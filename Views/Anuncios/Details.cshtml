@@ -121,6 +121,27 @@
             {
                 <a class="btn btn-outline" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path"><i class="far fa-heart"></i> Entrar para guardar</a>
             }
+            @if (User.Identity?.IsAuthenticated == true &&
+                 User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser)
+            {
+                <details class="ra-report-details">
+                    <summary><i class="far fa-flag" aria-hidden="true"></i> Denunciar este anúncio</summary>
+                    <form asp-controller="Denuncias" asp-action="Criar" method="post">
+                        <input type="hidden" name="anuncioId" value="@Model.id"/>
+                        <label for="report-reason">Motivo</label>
+                        <select class="form-select" name="motivo" id="report-reason" required>
+                            <option value="">Seleciona o motivo</option>
+                            <option>Artigo suspeito</option><option>Informação falsa</option>
+                            <option>Pedido de dados pessoais</option><option>Possível fraude</option>
+                            <option>Conteúdo proibido</option><option>Outro</option>
+                        </select>
+                        <label for="report-details">Descrição adicional (opcional)</label>
+                        <textarea class="form-control" name="detalhes" id="report-details" maxlength="700" rows="3" placeholder="Descreve o que identificaste, sem inserir dados pessoais."></textarea>
+                        <button class="btn btn-outline" type="submit">Enviar denúncia</button>
+                    </form>
+                    <p class="muted" style="font-size:.8rem">A denúncia é privada e será avaliada pela equipa responsável.</p>
+                </details>
+            }
             <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>Por privacidade, a rua e a porta não são divulgadas. Nunca partilhes palavras-passe, códigos de acesso ou documentos pessoais.</span></div>
             <a class="btn btn-outline" href="@mapsUrl" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt"></i> Ver zona no Google Maps</a>
             <button class="btn btn-outline" type="button" data-load-approx-map style="margin-top:12px">Mostrar mapa aproximado</button>
