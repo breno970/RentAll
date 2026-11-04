@@ -67,7 +67,7 @@ public sealed class PedidosController : Controller
         _db.PedidosAluguer.Add(new PedidoAluguer
         {
             AnuncioId = anuncioId, InteressadoId = me, AnuncianteId = ad.iduser,
-            Dias = dias, PrecoDia = daily, TotalEstimado = gross,
+            Dias = dias, PrecoDia = daily, Pais = ad.Pais, TotalEstimado = gross,
             ComissaoIndicativa = indicativeFee, Estado = "Pendente", CriadoEm = DateTime.UtcNow
         });
         await _db.SaveChangesAsync(ct);
