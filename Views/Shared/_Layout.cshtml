@@ -1,82 +1,95 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using aluguel.Areas.Identity.Data
+
 @inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
-    <meta name="description" content="RentAll — encontre equipamentos e objetos para alugar, perto de você." />
-    <title>@(ViewData["Title"] ?? "Explore itens") · RentAll</title>
-    <link rel="icon" type="image/png" href="~/imagens/ico.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/rentall.css" asp-append-version="true" />
+    <link rel="shortcut icon" href="./imagens/ico.png" type="image/x-icon" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+   
+    <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3045181554995684"
+            crossorigin="anonymous"></script>
+
+
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Ir para o conteúdo</a>
-    <header class="site-header">
-        <div class="shell nav-shell">
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="brand" aria-label="RentAll — página inicial">
-                <span class="brand-mark" aria-hidden="true">R</span>Rent<span>All</span>
-            </a>
-            <button class="nav-toggle" type="button" aria-label="Abrir menu" aria-controls="primary-navigation" aria-expanded="false" data-nav-toggle>☰</button>
-            <nav id="primary-navigation" class="site-nav" aria-label="Navegação principal">
-                <a asp-area="" asp-controller="Home" asp-action="Index">Explorar</a>
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Sobre nós</a>
-                @if (SignInManager.IsSignedIn(User))
-                {
-                    <a asp-area="" asp-controller="Items" asp-action="Index">Meus itens</a>
-                    <a asp-area="" asp-controller="Anuncios" asp-action="Index">Meus anúncios</a>
-                    <a asp-area="Identity" asp-page="/Account/Manage/Index">Minha conta</a>
-                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
-                        <button type="submit">Sair</button>
-                    </form>
-                    <a asp-area="" asp-controller="Items" asp-action="Create" class="nav-accent">+ Anunciar item</a>
-                }
+
+    <nav>
+
+
+        <div class="nave">
+
+            <a class="logo" href="/"> <img src="~/imagens/ra.png" class="logo-img" /></a>
+
+            <div class="mobile-menu">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav">
+                    <a class="nav-link text-white-50" asp-area="" asp-controller="Home" asp-action="Privacy">Sobre nós</a>
+                </li>
+                @if (User.Identity.IsAuthenticated)
+                { }
                 else
                 {
-                    <a asp-area="Identity" asp-page="/Account/Login">Entrar</a>
-                    <a asp-area="Identity" asp-page="/Account/Register" class="nav-accent">Criar conta</a>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Entrar</a>
+                    </li>
                 }
-            </nav>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" asp-area="" asp-controller="Items" asp-action="Index">Meus Itens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" asp-area="" asp-controller="Anuncios" asp-action="Index">Meus Anúncios</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a id="manage" class="nav-link text-white-50" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                            <i class="fas fa-user"></i>Sua Conta
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <form class="nav-link text-white-50" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button type="submit" class="btn btn-link"><i class="fas fa-sign-out-alt"></i></button>
+                        </form>
+                    </li>
+
+                }
+            </ul>
         </div>
-    </header>
-    <main id="main-content" class="page-wrap">
-        @RenderBody()
-    </main>
-    <footer class="site-footer">
-        <div class="shell footer-inner">
-            <div class="footer-brand">
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="brand">
-                    <span class="brand-mark" aria-hidden="true">R</span>Rent<span>All</span>
-                </a>
-                <p>Compartilhe mais. Compre menos. Encontre o que precisa para o seu próximo projeto.</p>
-            </div>
-            <div class="footer-links">
-                <strong>Plataforma</strong>
-                <a asp-area="" asp-controller="Home" asp-action="Index">Explorar itens</a>
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Sobre o RentAll</a>
-                <a asp-area="" asp-controller="Termos" asp-action="Index">Termos de uso</a>
-            </div>
-            <div class="footer-links">
-                <strong>Minha conta</strong>
-                <a asp-area="Identity" asp-page="/Account/Login">Entrar</a>
-                <a asp-area="Identity" asp-page="/Account/Register">Criar conta</a>
-                <a href="mailto:rent.all.bn@gmail.com">Fale connosco</a>
-            </div>
-        </div>
-        <div class="shell footer-bottom">
-            <span>© @DateTime.UtcNow.Year RentAll. Todos os direitos reservados.</span>
-            <span>Uma forma mais inteligente de usar o que precisa.</span>
-        </div>
-    </footer>
+
+    </nav>
+
+
+    <div class="container">
+
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/cep.js"></script>
+    <script type="text/javascript" src="~/js/cadastro.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/cep.js" asp-append-version="true" defer></script>
-    <script src="~/js/rentall.js" asp-append-version="true" defer></script>
+    <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

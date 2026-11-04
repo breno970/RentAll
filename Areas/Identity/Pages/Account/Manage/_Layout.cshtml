@@ -1,21 +1,49 @@
-@{
-    Layout = "/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Minha conta";
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
 }
-<div class="page-heading">
-    <div><div class="eyebrow">Configurações</div><h1>Minha conta</h1><p>Gerencie os dados e a segurança do seu perfil.</p></div>
-</div>
-<div class="detail-card">
-    <div class="row g-4">
-        <aside class="col-lg-4">
-            <h2 style="font-size:1.05rem;margin:0 0 15px">Configurações</h2>
-            <partial name="_ManageNav" />
-        </aside>
-        <section class="col-lg-8" aria-label="Definições da conta">
-            @RenderBody()
-        </section>
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
+
+    <title>Rent All</title>
+</head>
+<body>
+
+
+
+
+    <div class="card-it">
+
+
+        <h1>Gerencie sua conta</h1>
+
+        <div>
+            <h2>Alterar as configurações da sua conta</h2>
+            <hr />
+            <div class="row">
+                <div class="col-md">
+                    <partial name="_ManageNav" />
+                </div>
+                <div class="col-md">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+
     </div>
-</div>
+</body>
+<
 @section Scripts {
     @RenderSection("Scripts", required: false)
 }

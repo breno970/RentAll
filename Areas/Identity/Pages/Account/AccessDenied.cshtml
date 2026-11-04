@@ -1,8 +1,10 @@
-@page
+﻿@page
 @model AccessDeniedModel
-@{ ViewData["Title"] = "Acesso negado"; }
-<div class="auth-wrap"><div class="auth-card">
-    <div class="eyebrow">Acesso restrito</div><h1>Sem permissão</h1>
-    <p class="intro">Não tem permissão para aceder a esta página com a conta atual.</p>
-    <a asp-controller="Home" asp-action="Index" asp-area="" class="btn btn-primary" style="width:100%">Voltar à página inicial</a>
-</div></div>
+@{
+    ViewData["Title"] = "Acesso negado";
+}
+
+<header>
+    <h1 class="text-danger">@ViewData["Title"]</h1>
+    <p class="text-danger">Você não tem acesso permitido..</p>
+</header>
