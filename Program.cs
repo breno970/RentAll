@@ -34,6 +34,9 @@ services.Configure<AuthMessageSenderOptions>(configuration);
 services.Configure<Microsoft.AspNetCore.Identity.DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(3));
 services.AddScoped<IItemService, ItemService>();
 services.AddHttpClient<IImageStorage, SupabaseImageStorage>();
+services.Configure<StripePaymentOptions>(configuration.GetSection("StripePayments"));
+services.AddSingleton<StripeTestGateway>();
+services.AddHttpClient<StripeV2Accounts>();
 services.AddControllersWithViews().AddJsonOptions(o =>
 {
     o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
