@@ -69,7 +69,7 @@ public sealed class ItemsController : Controller
         return item is null ? NotFound() : View(item);
     }
 
-    public IActionResult Create() => View();
+    public IActionResult Create() => RedirectToAction("Index", "Publicar");
 
     [HttpPost]
     [ValidateAntiForgeryToken]

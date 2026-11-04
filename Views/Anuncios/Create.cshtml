@@ -3,7 +3,7 @@
 @{ ViewData["Title"] = "Criar anúncio"; }
 <div class="page-width"><div class="form-shell">
     <div class="page-intro">
-        <div><p class="eyebrow">Passo 2 de 2 · Publicar</p><h1>Prepara o teu anúncio</h1><p>Define onde está o artigo, o preço e como poderão contactar-te.</p></div>
+        <div><p class="eyebrow">Publicar um artigo já cadastrado</p><h1>Prepara o teu anúncio</h1><p>Define onde está o artigo, o preço e como poderão contactar-te.</p></div>
         <a class="btn btn-outline" asp-controller="Items" asp-action="Index"><i class="fas fa-arrow-left"></i> Meus itens</a>
     </div>
     <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>A localização pública será aproximada. A rua, o número e o código postal não aparecem nos detalhes do anúncio.</span></div>
@@ -14,7 +14,7 @@
             <div class="form-field full">
                 <label asp-for="itemid">Artigo cadastrado *</label>
                 <select asp-for="itemid" asp-items="ViewBag.itemid" class="form-select" required><option value="">Seleciona o artigo</option></select>
-                <small>Não aparece? <a asp-controller="Items" asp-action="Create">Adiciona-o primeiro com fotografias.</a></small>
+                <small>Não aparece? <a asp-controller="Publicar" asp-action="Index">Ou cria tudo numa página, sem passos separados.</a></small>
                 <span asp-validation-for="itemid" class="text-danger"></span>
             </div>
             <div class="form-field">
@@ -26,22 +26,22 @@
                 <select class="form-select" name="Tipo" id="Tipo" data-selected-type="@Model.tipoid" required disabled><option value="">Escolhe primeiro a categoria</option></select>
             </div>
             <div class="form-field full">
-                <label asp-for="modelo">Marca / modelo / referência *</label>
-                <input asp-for="modelo" class="form-control" required placeholder="Ex.: Bosch GSB 13 RE" maxlength="150" />
+                <label asp-for="modelo">Marca / modelo / referência (opcional)</label>
+                <input asp-for="modelo" class="form-control" placeholder="Ex.: Bosch GSB 13 RE" maxlength="150" />
                 <span asp-validation-for="modelo" class="text-danger"></span>
             </div>
             <div class="form-field">
-                <label asp-for="vlitem" data-rental-currency>Valor por dia (@(Model.Pais == "PT" ? "€" : "R$")) *</label>
-                <input asp-for="vlitem" class="form-control" type="number" step="0.01" min="0.01" max="10000000" required />
+                <label asp-for="vlitem" data-rental-currency>Preço por dia (opcional)</label>
+                <input asp-for="vlitem" class="form-control" type="number" step="0.01" min="0" max="10000000" />
                 <span asp-validation-for="vlitem" class="text-danger"></span>
             </div>
             <div class="form-field">
-                <label asp-for="diasAluguel">Dias disponíveis *</label>
-                <input asp-for="diasAluguel" class="form-control" type="number" min="1" max="365" required />
+                <label asp-for="diasAluguel">Dias disponíveis (opcional)</label>
+                <input asp-for="diasAluguel" class="form-control" type="number" min="0" max="365" />
                 <span asp-validation-for="diasAluguel" class="text-danger"></span>
             </div>
         </div>
-        <h2><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Onde está o artigo?</h2>
+        <h2><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Em que zona está o artigo?</h2>
         <div class="form-grid">
             <div class="form-field">
                 <label asp-for="Pais">País *</label>
@@ -65,18 +65,18 @@
                 <span asp-validation-for="Cidade" class="text-danger"></span>
             </div>
             <div class="form-field">
-                <label asp-for="Bairro">Bairro / freguesia *</label>
-                <input asp-for="Bairro" class="form-control" id="txtBairro" required />
+                <label asp-for="Bairro">Bairro / freguesia (opcional)</label>
+                <input asp-for="Bairro" class="form-control" id="txtBairro" />
                 <span asp-validation-for="Bairro" class="text-danger"></span>
             </div>
             <div class="form-field">
-                <label asp-for="CEP" data-postal-label>@LocationCatalog.PostalLabel(Model.Pais) *</label>
-                <input asp-for="CEP" class="form-control" id="txtCep" placeholder="@(Model.Pais == "PT" ? "0000-000" : "00000-000")" maxlength="9" required inputmode="numeric" />
+                <label asp-for="CEP" data-postal-label>@LocationCatalog.PostalLabel(Model.Pais) (opcional)</label>
+                <input asp-for="CEP" class="form-control" id="txtCep" placeholder="@(Model.Pais == "PT" ? "0000-000" : "00000-000")" maxlength="9" inputmode="numeric" />
                 <span asp-validation-for="CEP" class="text-danger"></span>
             </div>
             <div class="form-field">
-                <label asp-for="Rua">Rua *</label>
-                <input asp-for="Rua" class="form-control" id="txtRua" required autocomplete="street-address" />
+                <label asp-for="Rua">Rua (opcional)</label>
+                <input asp-for="Rua" class="form-control" id="txtRua" autocomplete="street-address" />
                 <span asp-validation-for="Rua" class="text-danger"></span>
             </div>
             <div class="form-field">
@@ -95,13 +95,13 @@
         <h2><i class="far fa-comments" aria-hidden="true"></i> Contacto</h2>
         <div class="form-grid">
             <div class="form-field">
-                <label asp-for="NomeFantasia">Nome público *</label>
-                <input asp-for="NomeFantasia" class="form-control" required placeholder="Como gostarias de ser tratado?" />
+                <label asp-for="NomeFantasia">Nome público (opcional)</label>
+                <input asp-for="NomeFantasia" class="form-control" placeholder="Como gostarias de ser tratado?" />
                 <span asp-validation-for="NomeFantasia" class="text-danger"></span>
             </div>
             <div class="form-field">
-                <label asp-for="contato">Contacto *</label>
-                <input asp-for="contato" class="form-control" required placeholder="Telefone, WhatsApp ou outro meio" />
+                <label asp-for="contato">Contacto (opcional, não divulgado)</label>
+                <input asp-for="contato" class="form-control" placeholder="Telefone, WhatsApp ou outro meio" />
                 <span asp-validation-for="contato" class="text-danger"></span>
             </div>
         </div>

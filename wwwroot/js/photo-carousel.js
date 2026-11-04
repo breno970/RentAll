@@ -14,7 +14,7 @@
       img.src = url;
       await img.decode();
       const scale = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight));
-      if (file.size < 1.5 * 1024 * 1024 && scale === 1) return file;
+      // Always re-encode, including small images: strips EXIF/GPS metadata before uploading.
       const canvas = document.createElement("canvas");
       canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
       canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
@@ -25,11 +25,10 @@
       const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", .78));
       if (!blob) throw new Error("Não foi possível otimizar a fotografia.");
       const output = new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
-      return output.size < file.size ? output : file;
+      return output;
     } catch (error) {
-      // If the browser cannot decode an otherwise valid file, allow upload only when small enough.
-      if (file.size <= MAX_BYTES) return file;
-      throw new Error("Não foi possível reduzir esta fotografia. Converte-a para JPG e tenta novamente.");
+      // Never upload the unprocessed original: it may contain precise GPS metadata.
+      throw new Error("Não foi possível preparar esta fotografia com privacidade. Converte-a para JPG e tenta novamente.");
     } finally { URL.revokeObjectURL(url); }
   }
   document.querySelectorAll("[data-photo-carousel-editor]").forEach(root => {

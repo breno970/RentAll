@@ -98,12 +98,11 @@ public class AnunciosController : Controller
             LocationCatalog.Portugal => System.Text.RegularExpressions.Regex.IsMatch(ad.CEP, @"^\d{4}-?\d{3}$"),
             _ => false
         };
-        if (!validPostal)
+        if (!string.IsNullOrWhiteSpace(ad.CEP) && !validPostal)
             ModelState.AddModelError(nameof(ad.CEP), "Código postal inválido para o país selecionado.");
         if (string.IsNullOrWhiteSpace(ad.Cidade))
             ModelState.AddModelError(nameof(ad.Cidade), "Informe a cidade em que o item está disponível.");
-        if (string.IsNullOrWhiteSpace(ad.Bairro))
-            ModelState.AddModelError(nameof(ad.Bairro), "Informe o bairro.");
+        // Bairro e morada não são necessários para anunciar.
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -137,10 +136,11 @@ public class AnunciosController : Controller
             vlitem = anuncio.vlitem, diasAluguel = anuncio.diasAluguel,
             modelo = anuncio.modelo, itemid = anuncio.itemid, iduser = UserId, Pais = anuncio.Pais,
             categoriaid = Categoria, tipoid = Tipo,
-            CEP = anuncio.CEP, Rua = anuncio.Rua, Numero = anuncio.Numero,
+            // Legacy ad wizard also avoids collecting exact address details.
+            CEP = "", Rua = "", Numero = null,
             Bairro = anuncio.Bairro, Cidade = anuncio.Cidade, Estado = anuncio.Estado,
-            Complemento = anuncio.Complemento, contato = anuncio.contato,
-            NomeFantasia = anuncio.NomeFantasia
+            Complemento = null, contato = "",
+            NomeFantasia = string.IsNullOrWhiteSpace(anuncio.NomeFantasia) ? "Anunciante RentAll" : anuncio.NomeFantasia
         };
         try
         {
@@ -189,14 +189,14 @@ public class AnunciosController : Controller
         existing.diasAluguel = anuncio.diasAluguel;
         existing.modelo = anuncio.modelo;
         existing.Pais = anuncio.Pais;
-        existing.CEP = anuncio.CEP;
-        existing.Rua = anuncio.Rua;
-        existing.Numero = anuncio.Numero;
+        existing.CEP = "";
+        existing.Rua = "";
+        existing.Numero = null;
         existing.Bairro = anuncio.Bairro;
         existing.Cidade = anuncio.Cidade;
         existing.Estado = anuncio.Estado;
-        existing.Complemento = anuncio.Complemento;
-        existing.contato = anuncio.contato;
+        existing.Complemento = null;
+        existing.contato = "";
         existing.NomeFantasia = anuncio.NomeFantasia;
 
         try

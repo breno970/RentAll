@@ -7,6 +7,7 @@ public static class RentalLocalization
 {
     public static string FormatPrice(float value, string? country)
     {
+        if (value <= 0) return "Preço a combinar";
         var locale = country == LocationCatalog.Portugal ? "pt-PT" : "pt-BR";
         return value.ToString("C2", CultureInfo.GetCultureInfo(locale));
     }
