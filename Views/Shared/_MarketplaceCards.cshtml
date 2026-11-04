@@ -1,0 +1,39 @@
+@model IEnumerable<aluguel.Models.Anuncio>
+@if (!Model.Any())
+{
+    <section class="ra-empty-results" aria-live="polite">
+        <h2>Nenhum item encontrado</h2>
+        <p>Tente mudar a região, o preço ou a palavra-chave. Também pode explorar todas as categorias.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark">Ver todos os itens</a>
+    </section>
+}
+else
+{
+    <div class="l-cards" aria-label="Itens disponíveis para aluguel">
+    @foreach (var item in Model)
+    {
+        <article class="c-card">
+            <a class="c-card__image" asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id" aria-label="Ver @(item.item?.nmitem ?? item.modelo)">
+                @if (!string.IsNullOrWhiteSpace(item.item?.imagem1))
+                {
+                    <img class="img" src="~/imagens/@item.item.imagem1" alt="@(item.item?.nmitem ?? item.modelo)" loading="lazy" decoding="async" />
+                }
+                else
+                {
+                    <div class="ra-image-empty"><i class="fas fa-camera" aria-hidden="true"></i></div>
+                }
+            </a>
+            <div class="c-card__content">
+                <h2 class="ra-item-title">@(item.item?.nmitem ?? item.modelo)</h2>
+                <p class="ra-item-model">@item.modelo</p>
+                <p class="ra-item-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> @item.Cidade, @item.Estado</p>
+                <p class="ra-item-availability">Até @item.diasAluguel dia(s) de aluguel</p>
+                <div class="ra-item-bottom">
+                    <strong class="ra-item-price">R$ @item.vlitem.ToString("N2", new System.Globalization.CultureInfo("pt-BR")) <small>/ dia</small></strong>
+                    <a asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id">Saiba+</a>
+                </div>
+            </div>
+        </article>
+    }
+    </div>
+}
