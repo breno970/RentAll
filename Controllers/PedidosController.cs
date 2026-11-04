@@ -70,7 +70,16 @@ public sealed class PedidosController : Controller
             Dias = dias, PrecoDia = daily, Pais = ad.Pais, TotalEstimado = gross,
             ComissaoIndicativa = indicativeFee, Estado = "Pendente", CriadoEm = DateTime.UtcNow
         });
-        await _db.SaveChangesAsync(ct);
+        try
+        {
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            // Unique index also prevents simultaneous duplicate requests.
+            TempData["Error"] = "Não foi possível registar este pedido. Verifica se já tens um pedido pendente.";
+            return RedirectToAction(nameof(Index));
+        }
         TempData["Success"] = "Pedido enviado. O anunciante pode aceitá-lo ou recusá-lo. Ainda não foi feito nenhum pagamento.";
         return RedirectToAction(nameof(Index));
     }
