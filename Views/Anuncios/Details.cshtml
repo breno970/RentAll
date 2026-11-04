@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var approximatePlace = string.Join(", ", new[] { Model.Cidade, Model.Estado, aluguel.Services.LocationCatalog.CountryName(Model.Pais) });
+    var mapLink = "https://www.google.com/maps/search/?api=1&query=" + Uri.EscapeDataString(approximatePlace);
 }
 
 <!DOCTYPE html>
@@ -189,7 +191,7 @@
         <div class="section col-md-6">
             <h3>Detalhes do Anúncio</h3>
             <div class="details">
-                <p><strong>Valor da Diaria: </strong>@Model.vlitem.ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("pt-BR"))</p>
+                <p><strong>Valor da Diaria: </strong>@aluguel.Services.RentalLocalization.FormatPrice(Model.vlitem, Model.Pais)</p>
                 <p><strong>Quantos dias posso usar: </strong>@Html.DisplayFor(model => model.diasAluguel)</p>
                 <!-- Adicione outros detalhes relacionados ao anúncio -->
             </div>
@@ -204,14 +206,13 @@
             <h3>Detalhes do Ofertante</h3>
             <div class="details">
                 <p><strong>Nome do Ofertante: </strong>@Html.DisplayFor(model => model.NomeFantasia)</p>
-                <p><strong>CEP: </strong>@Html.DisplayFor(model => model.CEP)</p>
-                <p><strong>Cidade: </strong>@Html.DisplayFor(model => model.Cidade)</p>
-                <p><strong>Bairro: </strong>@Html.DisplayFor(model => model.Bairro)</p>
-                <p><strong>Estado: </strong>@Html.DisplayFor(model => model.Estado)</p>
-                <p><strong>Número: </strong>@Html.DisplayFor(model => model.Numero)</p>
-                <p><strong>Rua: </strong>@Html.DisplayFor(model => model.Rua)</p>
-                <p><strong>Complemento: </strong>@Html.DisplayFor(model => model.Complemento)</p>
-                <p><strong>Contato: </strong>@Html.DisplayFor(model => model.contato)</p>
+                <p><strong>País: </strong>@aluguel.Services.LocationCatalog.CountryName(Model.Pais)</p>
+                <p><strong>Localidade: </strong>@Model.Cidade, @Model.Estado</p>
+                <p><strong>Bairro / Freguesia: </strong>@Model.Bairro</p>
+                <p><strong>Contato: </strong>@Model.contato</p>
+                <p class="ra-field-hint">Para segurança de quem anuncia, a morada completa não é divulgada nesta página.</p>
+                <p><a class="btn btn-outline-dark" href="@mapLink" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Ver localização aproximada no Google Maps</a></p>
+                <div class="ra-map-preview" data-ra-map data-place="@approximatePlace" hidden aria-label="Mapa aproximado de @Model.Cidade"></div>
                 <!-- Adicione outros detalhes relacionados ao anúncio -->
             </div>
         </div>
