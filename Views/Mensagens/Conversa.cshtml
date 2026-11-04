@@ -1,0 +1,34 @@
+@model aluguel.ViewModel.ConversaViewModel
+@{ ViewData["Title"] = "Conversa sobre " + Model.NomeArtigo; }
+<link rel="stylesheet" href="~/css/marketplace-messages.css" asp-append-version="true" />
+<div class="page-width ra-messages">
+    <div class="page-intro">
+        <div><p class="eyebrow"><a asp-action="Index">Mensagens</a> / Conversa</p>
+            <h1>@Model.NomeArtigo</h1><p>@(Model.SouAnunciante ? "Conversa com pessoa interessada" : "Conversa com anunciante")</p>
+        </div>
+        <a class="btn btn-outline" asp-controller="Anuncios" asp-action="Details" asp-route-id="@Model.AnuncioId">Ver anúncio</a>
+    </div>
+    <div class="ra-conversation">
+        <div class="ra-safety-chat"><i class="fas fa-shield-alt"></i> Para tua segurança, não partilhes telefone, e-mail, palavras-passe nem links. Não há pagamentos ativados na RentAll nesta fase.</div>
+        <div class="ra-chat-history" aria-label="Histórico da conversa">
+            @if (!Model.Mensagens.Any())
+            {
+                <p class="ra-chat-empty">Diz olá e pergunta sobre a disponibilidade do artigo.</p>
+            }
+            @foreach (var message in Model.Mensagens)
+            {
+                <article class="ra-chat-bubble @(message.RemetenteId == Model.MeuId ? "is-me" : "")">
+                    <p>@message.Texto</p>
+                    <time datetime="@message.CriadaEm.ToString("O")">@message.CriadaEm.ToString("dd/MM/yyyy HH:mm") UTC</time>
+                </article>
+            }
+        </div>
+        <form asp-action="Enviar" method="post" class="ra-chat-form">
+            <input type="hidden" name="anuncioId" value="@Model.AnuncioId" />
+            <input type="hidden" name="peerId" value="@Model.OutroUtilizadorId" />
+            <label for="messageText">A tua mensagem</label>
+            <textarea id="messageText" name="texto" required maxlength="2000" rows="3" class="form-control" placeholder="Olá! Este artigo está disponível no próximo fim de semana?"></textarea>
+            <button type="submit" class="btn btn-primary"><i class="far fa-paper-plane"></i> Enviar mensagem</button>
+        </form>
+    </div>
+</div>
