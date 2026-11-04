@@ -1,43 +1,47 @@
-﻿@model aluguel.Models.Anuncio
-
+@model aluguel.Models.Anuncio
 @{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.item?.nmitem ?? "Anúncio";
+    var images = new[] { Model.item?.imagem1, Model.item?.imagem2, Model.item?.imagem3, Model.item?.imagem4, Model.item?.imagem5 }
+        .Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 }
-
-<h1>Details</h1>
-
-<div>
-    <h4>Anuncio</h4>
-    <hr />
-    <div class=""
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.vlitem)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.vlitem)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.diasAluguel)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.diasAluguel)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.iduser)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.iduser)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.item)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.item.nmitem)
-        </dd>
-    </div>
+<div class="page-heading">
+    <div><div class="eyebrow"><a asp-controller="Home" asp-action="Index">Explorar</a> / Detalhes</div><h1>@(Model.item?.nmitem ?? Model.modelo)</h1><p>Confira as informações antes de entrar em contato com o anunciante.</p></div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline">← Voltar à busca</a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="detail-layout">
+    <div class="detail-card">
+        @if (images.Any())
+        {
+            <img class="detail-image" data-gallery-main src="@Url.Content("~/imagens/" + images[0])" alt="Fotografia principal de @(Model.item?.nmitem ?? Model.modelo)" />
+            @if (images.Count > 1)
+            {
+                <div class="thumb-row" aria-label="Mais fotografias">
+                    @for (var i = 0; i < images.Count; i++)
+                    {
+                        var src = Url.Content("~/imagens/" + images[i]);
+                        <button type="button" data-gallery-src="@src" data-gallery-alt="Fotografia @(i + 1) do item" aria-label="Ver fotografia @(i + 1)" aria-pressed="@(i == 0 ? "true" : "false")"><img src="@src" alt="" loading="lazy" /></button>
+                    }
+                </div>
+            }
+        }
+        else { <div class="detail-image image-placeholder" aria-label="Imagem indisponível">◇</div> }
+        <h3 style="margin-top:22px">Sobre o item</h3>
+        <p class="description">@(Model.item?.dsitem ?? "Sem descrição adicional.")</p>
+    </div>
+    <div class="detail-panel">
+        <span class="badge-pill">Disponível para aluguel</span>
+        <h1>@(Model.item?.nmitem ?? Model.modelo)</h1>
+        <p class="muted">@Model.modelo</p>
+        <div class="price">R$ @Model.vlitem.ToString("N2", new System.Globalization.CultureInfo("pt-BR")) <small style="font-size:.89rem;font-weight:500;color:var(--muted)">/dia</small></div>
+        <div class="detail-info">
+            <div><small>Período anunciado</small><strong>@Model.diasAluguel dias</strong></div>
+            <div><small>Categoria</small><strong>@(Model.categoria?.nmcategoria ?? "Diversos")</strong></div>
+            <div><small>Tipo</small><strong>@(Model.tipo?.nmtipo ?? "—")</strong></div>
+            <div><small>Localização</small><strong>@Model.Cidade, @Model.Estado</strong></div>
+        </div>
+        <h3>Entre em contato</h3>
+        <p>Publicado por <strong>@Model.NomeFantasia</strong></p>
+        <div class="alert-soft"><strong>Contato informado:</strong> @Model.contato</div>
+        <div class="form-actions"><a asp-controller="Home" asp-action="Index" class="btn btn-primary">Ver mais anúncios</a></div>
+    </div>
 </div>
