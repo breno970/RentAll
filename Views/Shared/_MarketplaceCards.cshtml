@@ -1,54 +1,52 @@
 @model IEnumerable<aluguel.Models.Anuncio>
 @{
-    var favoriteIds = ViewData["FavoriteIds"] as HashSet<int> ?? new HashSet<int>();
+    var saved = ViewData["FavoriteIds"] as HashSet<int> ?? new HashSet<int>();
 }
 @if (!Model.Any())
 {
-    <section class="ra-empty-results" aria-live="polite">
-        <h2>Nenhum item encontrado</h2>
-        <p>Tente mudar a região, o preço ou a palavra-chave. Também pode explorar todas as categorias.</p>
-        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark">Ver todos os itens</a>
-    </section>
+    <div class="empty-state">
+        <div class="empty-symbol"><i class="fas fa-search" aria-hidden="true"></i></div>
+        <h2>Ainda não há artigos por aqui</h2>
+        <p>Experimenta outra região ou filtros diferentes. Também podes ser o primeiro a anunciar um objeto em desuso.</p>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index"><i class="fas fa-th-large" aria-hidden="true"></i> Ver todos os artigos</a>
+    </div>
 }
 else
 {
-    <div class="l-cards" aria-label="Itens disponíveis para aluguel">
-    @foreach (var item in Model)
-    {
-        <article class="c-card">
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <form asp-controller="Favoritos" asp-action="Toggle" method="post" class="ra-favorite-form">
-                    <input type="hidden" name="anuncioId" value="@item.id" />
-                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                    <button type="submit" class="ra-favorite-button @(favoriteIds.Contains(item.id) ? "is-favorite" : "")"
-                        aria-label="@(favoriteIds.Contains(item.id) ? "Remover dos favoritos" : "Guardar nos favoritos")"
-                        title="@(favoriteIds.Contains(item.id) ? "Remover dos favoritos" : "Guardar nos favoritos")">
-                        <i class="@(favoriteIds.Contains(item.id) ? "fas" : "far") fa-heart" aria-hidden="true"></i>
-                    </button>
-                </form>
-            }
-            <a class="c-card__image" asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id" aria-label="Ver @(item.item?.nmitem ?? item.modelo)">
-                @if (!string.IsNullOrWhiteSpace(item.item?.imagem1))
+    <div class="listing-grid">
+        @foreach (var ad in Model)
+        {
+            <article class="listing-card">
+                @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <img class="img" src="~/imagens/@item.item.imagem1" alt="@(item.item?.nmitem ?? item.modelo)" loading="lazy" decoding="async" />
+                    <form class="fav-form" asp-controller="Favoritos" asp-action="Toggle" method="post">
+                        <input type="hidden" name="anuncioId" value="@ad.id" />
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        <button class="fav-button @(saved.Contains(ad.id) ? "active" : "")" type="submit" aria-label="@(saved.Contains(ad.id) ? "Remover dos favoritos" : "Adicionar aos favoritos")">
+                            <i class="@(saved.Contains(ad.id) ? "fas" : "far") fa-heart" aria-hidden="true"></i>
+                        </button>
+                    </form>
                 }
-                else
-                {
-                    <div class="ra-image-empty"><i class="fas fa-camera" aria-hidden="true"></i></div>
-                }
-            </a>
-            <div class="c-card__content">
-                <h2 class="ra-item-title">@(item.item?.nmitem ?? item.modelo)</h2>
-                <p class="ra-item-model">@item.modelo</p>
-                <p class="ra-item-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> @item.Cidade, @item.Estado · @aluguel.Services.LocationCatalog.CountryName(item.Pais)</p>
-                <p class="ra-item-availability">Até @item.diasAluguel dia(s) de aluguel</p>
-                <div class="ra-item-bottom">
-                    <strong class="ra-item-price">@aluguel.Services.RentalLocalization.FormatPrice(item.vlitem, item.Pais) <small>/ dia</small></strong>
-                    <a asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id">Saiba+</a>
+                <a class="listing-image" asp-controller="Anuncios" asp-action="Details" asp-route-id="@ad.id" aria-label="Ver @(ad.item?.nmitem ?? ad.modelo)">
+                    @if (!string.IsNullOrWhiteSpace(ad.item?.imagem1))
+                    {
+                        <img src="@Url.Content("~/imagens/" + ad.item.imagem1)" alt="@(ad.item?.nmitem ?? ad.modelo)" loading="lazy" decoding="async" />
+                    }
+                    else
+                    {
+                        <span class="image-empty" aria-hidden="true"><i class="far fa-image"></i></span>
+                    }
+                </a>
+                <div class="listing-body">
+                    <span class="listing-kicker">@(ad.categoria?.nmcategoria ?? "Objeto para alugar")</span>
+                    <h3><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@ad.id">@(ad.item?.nmitem ?? ad.modelo)</a></h3>
+                    <p class="listing-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> @ad.Cidade, @ad.Estado · @aluguel.Services.LocationCatalog.CountryName(ad.Pais)</p>
+                    <div class="listing-bottom">
+                        <div class="listing-price">@aluguel.Services.RentalLocalization.FormatPrice(ad.vlitem, ad.Pais)<small>por dia</small></div>
+                        <span class="listing-tag">@ad.diasAluguel dia(s)</span>
+                    </div>
                 </div>
-            </div>
-        </article>
-    }
+            </article>
+        }
     </div>
 }

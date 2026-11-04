@@ -2,107 +2,62 @@
 @using X.PagedList.Mvc.Core
 @using aluguel.ViewModel
 @{
-    ViewData["Title"] = "Itens para alugar";
+    ViewData["Title"] = "Aluga o que precisas, perto de ti";
     var filters = ViewData["Filters"] as MarketplaceFilters ?? new MarketplaceFilters();
 }
-<div class="ra-marketplace-heading">
-    <div>
-        <h1>Encontre o que precisa. Aproveite o que já existe.</h1>
-        <p>Alugue objetos em desuso perto de você, com os melhores preços da região.</p>
-    </div>
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <a asp-controller="Items" asp-action="Create" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Anunciar item</a>
-    }
-    else
-    {
-        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Quero anunciar</a>
-    }
+<div class="page-width">
+    <section class="hero" aria-labelledby="hero-heading">
+        <div>
+            <div class="eyebrow"><i class="fas fa-leaf" aria-hidden="true"></i> O futuro é partilhar</div>
+            <h1 id="hero-heading">Precisas de usar.<br /><em>Não de comprar.</em></h1>
+            <p>Descobre ferramentas, eletrónica e objetos em desuso para alugar perto de ti. Dá mais vida ao que já existe.</p>
+            <div class="hero-actions">
+                <a class="btn btn-brand" href="#procurar"><i class="fas fa-search" aria-hidden="true"></i> Explorar artigos</a>
+                <a class="btn btn-secondary" asp-controller="Items" asp-action="Create"><i class="fas fa-plus" aria-hidden="true"></i> Tenho algo para alugar</a>
+            </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+            <div class="hero-orbit"><img src="~/imagens/ico.png" alt="" /></div>
+            <span class="hero-mini one"><i class="fas fa-check-circle"></i> Partilha inteligente</span>
+            <span class="hero-mini two"><i class="fas fa-recycle"></i> Menos desperdício</span>
+        </div>
+    </section>
+
+    <section class="benefit-strip" aria-label="Benefícios da plataforma">
+        <div class="benefit"><i class="fas fa-wallet" aria-hidden="true"></i><span><b>Gasta menos</b><small>Aluga apenas quando precisas</small></span></div>
+        <div class="benefit"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span><b>Perto de ti</b><small>Brasil e Portugal</small></span></div>
+        <div class="benefit"><i class="fas fa-leaf" aria-hidden="true"></i><span><b>Usa melhor</b><small>Nova vida para objetos parados</small></span></div>
+    </section>
+
+    <section aria-labelledby="category-heading">
+        <div class="section-heading">
+            <div><p class="eyebrow">Inspira-te</p><h2 id="category-heading">O que procuras hoje?</h2></div>
+        </div>
+        <nav class="category-grid" aria-label="Categorias disponíveis">
+            <a class="category-link" asp-controller="Home" asp-action="VideoGame" asp-route-Pais="@filters.Pais"><i class="fas fa-gamepad" aria-hidden="true"></i> Consolas e jogos</a>
+            <a class="category-link" asp-controller="Home" asp-action="AudioVisual" asp-route-Pais="@filters.Pais"><i class="fas fa-camera" aria-hidden="true"></i> Áudio e vídeo</a>
+            <a class="category-link" asp-controller="Home" asp-action="MusicaHobbie" asp-route-Pais="@filters.Pais"><i class="fas fa-guitar" aria-hidden="true"></i> Música e hobbies</a>
+            <a class="category-link" asp-controller="Home" asp-action="EsporteGinastica" asp-route-Pais="@filters.Pais"><i class="fas fa-bicycle" aria-hidden="true"></i> Desporto e lazer</a>
+            <a class="category-link" asp-controller="Home" asp-action="Ferramentas" asp-route-Pais="@filters.Pais"><i class="fas fa-tools" aria-hidden="true"></i> Ferramentas</a>
+            <a class="category-link" asp-controller="Home" asp-action="Eletrodomesticos" asp-route-Pais="@filters.Pais"><i class="fas fa-blender" aria-hidden="true"></i> Casa e cozinha</a>
+        </nav>
+    </section>
+
+    <section id="procurar" style="scroll-margin-top:105px" aria-labelledby="search-heading">
+        <div class="section-heading">
+            <div><p class="eyebrow">Pesquisa inteligente</p><h2 id="search-heading">Encontra na tua região</h2></div>
+        </div>
+        <partial name="_MarketplaceFilters" model="filters" />
+        <div class="results-heading">
+            <div><p class="eyebrow">Artigos disponíveis</p><h2>@Model.TotalItemCount resultado(s)</h2></div>
+            <span class="pill"><i class="fas fa-globe-europe" aria-hidden="true"></i> @aluguel.Services.LocationCatalog.CountryName(filters.Pais)</span>
+        </div>
+        <partial name="_MarketplaceCards" model="Model" />
+        @if (Model.PageCount > 1)
+        {
+            <div class="pagination-wrap">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter, filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort }))
+            </div>
+        }
+    </section>
 </div>
-
-<partial name="_MarketplaceFilters" model="filters" />
-
-<div class="mil ra-categories" aria-label="Categorias de itens">
-    <div class="form">
-        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="VideoGame">VideoGame</a>
-        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="AudioVisual">ÁudioVisual</a>
-        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="MusicaHobbie">Música&amp;Hobbies</a>
-        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="EsporteGinastica">Esporte&amp;Ginástica</a>
-        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="Ferramentas">Ferramentas</a>
-        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="Eletrodomesticos">EletroDomésticos</a>
-    </div>
-</div>
-
-<div class="ra-results-heading">
-    <h2>Itens disponíveis</h2>
-    <p>@Model.TotalItemCount anúncio(s) encontrado(s)</p>
-</div>
-<partial name="_MarketplaceCards" model="Model" />
-@if (Model.PageCount > 1)
-{
-    <div class="mil">
-        <div class="pagination-container">
-            <span>Página @Model.PageNumber de @Model.PageCount</span>
-            @Html.PagedListPager(Model, page => Url.Action("Index", new {
-                page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter,
-                filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort
-            }))
-        </div>
-    </div>
-}
-<div class="footer-container">
-
-        <div class="footer-content-2">
-            <div>
-                <i class="fa fa-map-marker"></i>
-                <p>
-                    <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
-                        Visconde de Mauá, Resende - RJ
-                    </a>
-                </p>
-            </div>
-            <div>
-                <i class="fa fa-envelope"></i>
-                <p>
-                    <a href="mailto:rent.all.bn@gmail.com">
-                        rent.all.bn@gmail.com
-                    </a>
-                </p>
-            </div>
-            <div>
-                <i class="fa fa-phone"></i>
-                <p><a href="tel:2499965669">(24)999656679</a></p>
-            </div>
-            <div>
-                <i class="fa fa-whatsapp"></i>
-                <p>
-                    <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
-                        +55 24-999656679
-                    </a>
-                </p>
-            </div>
-        </div>
-
-
-        <div class="footer-content-3">
-            <p class="footer-empresa">
-                <span>Sobre a Empresa</span>
-                Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
-            </p>
-            <div class="footer-icons">
-
-                <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
-                <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
-                <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
-                <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
-
-            </div>
-            <hr>
-            <p>©2023 Rent All Ltda.</p>
-        </div>
-        <div class="copyright">
-            <hr>
-            <p>©Copyright. Todos os direitos reservados.</p>
-        </div>
-
-    </div>

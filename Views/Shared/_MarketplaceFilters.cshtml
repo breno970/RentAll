@@ -5,76 +5,76 @@
     var action = ViewData["FilterAction"] as string ?? "Index";
     var categories = ViewData["Categories"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
 }
-<form asp-controller="Home" asp-action="@action" method="get" class="ra-marketplace-filters" role="search" aria-label="Pesquisar e filtrar anúncios">
-    <div class="ra-filter-top">
-        <div class="ra-filter-field ra-filter-search">
-            <label for="ra-search">O que procura?</label>
-            <input id="ra-search" class="form-control" name="SearchString" type="search" placeholder="Furadeira, bicicleta, consola…" value="@Model.SearchString" />
+<form class="search-card" asp-controller="Home" asp-action="@action" method="get" role="search" aria-label="Pesquisar artigos">
+    <div class="search-main">
+        <div class="field search-query">
+            <label for="filter-search">O que procura?</label>
+            <input class="form-control" id="filter-search" type="search" name="SearchString" placeholder="Ferramenta, bicicleta, câmara..." value="@Model.SearchString" autocomplete="off" />
         </div>
-        <div class="ra-filter-field">
-            <label for="ra-country">País</label>
-            <select id="ra-country" name="Pais" class="form-control" data-region-country>
+        <div class="field">
+            <label for="filter-country">País</label>
+            <select class="form-select" id="filter-country" name="Pais" data-region-country>
                 <option value="BR" selected="@(Model.Pais == "BR")">Brasil</option>
                 <option value="PT" selected="@(Model.Pais == "PT")">Portugal</option>
             </select>
         </div>
-        <div class="ra-filter-field">
-            <label for="ra-region" data-region-label>@LocationCatalog.RegionLabel(Model.Pais)</label>
-            <select id="ra-region" name="Estado" class="form-control" data-region-uf data-clear-city-on-change="true">
-                <option value="">Toda a região</option>
+        <div class="field">
+            <label for="filter-region" data-region-label>@LocationCatalog.RegionLabel(Model.Pais)</label>
+            <select class="form-select" id="filter-region" name="Estado" data-region-uf>
+                <option value="">Todas as regiões</option>
                 @foreach (var region in LocationCatalog.RegionsFor(Model.Pais))
                 {
                     <option value="@region.Code" selected="@(region.Code == Model.Estado)">@region.Name</option>
                 }
             </select>
         </div>
-        <div class="ra-filter-field">
-            <label for="ra-city">Cidade / Município</label>
-            <input id="ra-city" class="form-control" name="RegionFilter" value="@Model.RegionFilter" placeholder="Qualquer cidade" list="ra-filter-cities" data-region-city />
-            <datalist id="ra-filter-cities"></datalist>
+        <div class="field search-city">
+            <label for="filter-city">Cidade / município</label>
+            <input class="form-control" id="filter-city" name="RegionFilter" value="@Model.RegionFilter" data-region-city list="filter-cities" placeholder="Todas as cidades" autocomplete="off" />
+            <datalist id="filter-cities"></datalist>
         </div>
-        <button type="submit" class="btn btn-primary ra-filter-submit">Buscar</button>
+        <button class="btn btn-brand search-submit" type="submit"><i class="fas fa-search" aria-hidden="true"></i> Pesquisar</button>
     </div>
-    <details class="ra-advanced-filters">
-        <summary><i class="fas fa-sliders-h" aria-hidden="true"></i> Mais filtros: categoria, bairro, preço e ordenação</summary>
-        <div class="ra-filter-extra">
+    <details class="advanced-filters">
+        <summary><i class="fas fa-sliders-h" aria-hidden="true"></i> Mais filtros: categoria, preço, bairro e ordenação</summary>
+        <div class="search-extra">
             @if (action == "Index")
             {
-                <div class="ra-filter-field">
-                    <label for="ra-category">Categoria</label>
-                    <select class="form-control" name="CategoriaId" id="ra-category">
-                        <option value="">Todas as categorias</option>
-                        @foreach (var category in categories)
+                <div class="field">
+                    <label for="filter-category">Categoria</label>
+                    <select class="form-select" name="CategoriaId" id="filter-category">
+                        <option value="">Todas</option>
+                        @foreach (var c in categories)
                         {
-                            <option value="@category.Value" selected="@(Model.CategoriaId?.ToString() == category.Value)">@category.Text</option>
+                            <option value="@c.Value" selected="@(Model.CategoriaId?.ToString() == c.Value)">@c.Text</option>
                         }
                     </select>
                 </div>
             }
-            <div class="ra-filter-field">
-                <label for="ra-neighborhood">Bairro / Freguesia</label>
-                <input class="form-control" id="ra-neighborhood" name="Bairro" placeholder="Todas as zonas" value="@Model.Bairro" />
+            <div class="field">
+                <label for="filter-bairro">Bairro / freguesia</label>
+                <input class="form-control" id="filter-bairro" name="Bairro" value="@Model.Bairro" placeholder="Qualquer zona" />
             </div>
-            <div class="ra-filter-field">
-                <label for="ra-price-min">Preço mínimo por dia</label>
-                <input class="form-control" id="ra-price-min" type="number" name="MinPrice" step="0.01" min="0" value="@(Model.MinPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="0,00" />
+            <div class="field">
+                <label for="filter-price-min" data-filter-min-price>Preço mínimo por dia</label>
+                <input class="form-control" id="filter-price-min" type="number" min="0" step="0.01" name="MinPrice" value="@(Model.MinPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
             </div>
-            <div class="ra-filter-field">
-                <label for="ra-price-max">Preço máximo por dia</label>
-                <input class="form-control" id="ra-price-max" type="number" name="MaxPrice" step="0.01" min="0" value="@(Model.MaxPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="Sem limite" />
+            <div class="field">
+                <label for="filter-price-max" data-filter-max-price>Preço máximo por dia</label>
+                <input class="form-control" id="filter-price-max" type="number" min="0" step="0.01" name="MaxPrice" value="@(Model.MaxPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
             </div>
-            <div class="ra-filter-field">
-                <label for="ra-sort">Ordenar resultados</label>
-                <select class="form-control" id="ra-sort" name="Sort">
+            <div class="field">
+                <label for="filter-sort">Ordenar por</label>
+                <select class="form-select" name="Sort" id="filter-sort">
                     <option value="recentes" selected="@(Model.Sort == "recentes")">Mais recentes</option>
                     <option value="preco-menor" selected="@(Model.Sort == "preco-menor")">Menor preço</option>
                     <option value="preco-maior" selected="@(Model.Sort == "preco-maior")">Maior preço</option>
                 </select>
             </div>
         </div>
-        <div class="ra-filter-actions">
-            <a asp-controller="Home" asp-action="@action" asp-route-Pais="@Model.Pais" class="btn btn-outline-dark">Limpar filtros</a>
-            <button class="btn btn-primary" type="submit">Aplicar filtros</button>
+        <div class="search-foot">
+            <a class="btn btn-outline" asp-controller="Home" asp-action="@action" asp-route-Pais="@Model.Pais"><i class="fas fa-undo-alt" aria-hidden="true"></i> Limpar</a>
+            <button class="btn btn-primary" type="submit"><i class="fas fa-check" aria-hidden="true"></i> Aplicar filtros</button>
         </div>
     </details>
 </form>
