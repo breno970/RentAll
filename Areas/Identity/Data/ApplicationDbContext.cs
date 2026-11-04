@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.Models;
 
 namespace aluguel.Areas.Identity.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataProtectionKeyContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -20,6 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 
         base.OnModelCreating(builder);
+        builder.HasDefaultSchema("rentall");
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
@@ -27,6 +30,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.ApplyConfiguration(new ApplicationUserEntityConfiguration());
     }
 
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
     public DbSet<Anuncio> Anuncios { get; set; }
     public DbSet<Avaliacao> Avaliacoes { get; set; }
     public DbSet<ImagensItem> ImagensItems { get; set; }
