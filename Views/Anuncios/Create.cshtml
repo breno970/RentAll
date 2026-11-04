@@ -36,7 +36,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label asp-for="vlitem">Valor do aluguel por dia (R$) *</label>
+                <label asp-for="vlitem" data-rental-currency>Valor do aluguel por dia (@(Model.Pais == "PT" ? "€" : "R$")) *</label>
                 <input asp-for="vlitem" class="form-control" type="number" min="0.01" step="0.01" inputmode="decimal" required />
                 <span asp-validation-for="vlitem" class="text-danger"></span>
             </div>
@@ -51,10 +51,18 @@
         <p class="ra-field-hint">A pesquisa mostra a sua cidade e bairro; o endereço exato não precisa de ser exposto ao público.</p>
         <div class="ra-form-grid">
             <div class="form-group">
-                <label asp-for="Estado">Estado (UF) *</label>
+                <label asp-for="Pais">País *</label>
+                <select asp-for="Pais" class="form-control" data-region-country required>
+                    <option value="BR">Brasil</option>
+                    <option value="PT">Portugal</option>
+                </select>
+                <span asp-validation-for="Pais" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Estado" data-region-label>@LocationCatalog.RegionLabel(Model.Pais) *</label>
                 <select asp-for="Estado" id="txtEstado" class="form-control" data-region-uf required>
                     <option value="">Selecione o estado</option>
-                    @foreach (var uf in LocationCatalog.States)
+                    @foreach (var uf in LocationCatalog.RegionsFor(Model.Pais))
                     {
                         <option value="@uf.Code">@uf.Name (@uf.Code)</option>
                     }
@@ -73,8 +81,8 @@
                 <span asp-validation-for="Bairro" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CEP">CEP *</label>
-                <input asp-for="CEP" id="txtCep" class="form-control" inputmode="numeric" maxlength="9" placeholder="00000-000" required autocomplete="postal-code" />
+                <label asp-for="CEP" data-postal-label>@LocationCatalog.PostalLabel(Model.Pais) *</label>
+                <input asp-for="CEP" id="txtCep" class="form-control" inputmode="numeric" maxlength="9" placeholder="@(Model.Pais == "PT" ? "0000-000" : "00000-000")" required autocomplete="postal-code" />
                 <small class="ra-field-hint">O CEP pode preencher automaticamente a cidade, o bairro e a UF.</small>
                 <span asp-validation-for="CEP" class="text-danger"></span>
             </div>
