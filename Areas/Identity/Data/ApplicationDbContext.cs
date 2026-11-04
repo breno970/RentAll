@@ -44,6 +44,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
     public DbSet<Favorito> Favoritos { get; set; } = null!;
     public DbSet<Mensagem> Mensagens { get; set; } = null!;
     public DbSet<PedidoAluguer> PedidosAluguer { get; set; } = null!;
+    public DbSet<DenunciaAnuncio> DenunciasAnuncio { get; set; } = null!;
     public DbSet<Anuncio> Anuncios { get; set; }
     public DbSet<Avaliacao> Avaliacoes { get; set; }
     public DbSet<ImagensItem> ImagensItems { get; set; }
