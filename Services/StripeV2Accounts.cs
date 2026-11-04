@@ -22,7 +22,7 @@ public sealed class StripeV2Accounts
         if (!_options.IsTestReady) throw new InvalidOperationException("Stripe sandbox desativada.");
         using var request = new HttpRequestMessage(method, path);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.SecretKey);
-        request.Headers.TryAddWithoutValidation("Stripe-Version", "2026-09-30.endive");
+        request.Headers.TryAddWithoutValidation("Stripe-Version", "2026-10-28.preview");
         if (key != null) request.Headers.TryAddWithoutValidation("Idempotency-Key", key);
         if (data != null) request.Content = JsonContent.Create(data);
         using var response = await _http.SendAsync(request, ct);
@@ -60,7 +60,7 @@ public sealed class StripeV2Accounts
                 type = "account_onboarding",
                 account_onboarding = new {
                     configurations = new[] { "recipient" },
-                    refresh_url = baseUrl + "/Pagamentos/Conta",
+                    refresh_url = baseUrl + "/Pagamentos/Reautorizar",
                     return_url = baseUrl + "/Pagamentos/Conta"
                 }
             }

@@ -69,6 +69,13 @@
                     @if (paymentStates.TryGetValue(request.Id, out var paymentState))
                     {
                         <p class="ra-request-note"><strong>Pagamento de teste:</strong> @paymentState. Não constitui pagamento real.</p>
+                        @if (!owner && paymentsReady && paymentState == "Checkout criado")
+                        {
+                            <form asp-controller="Pagamentos" asp-action="Checkout" method="post" style="margin-top:12px">
+                                <input type="hidden" name="pedidoId" value="@request.Id" />
+                                <button class="btn btn-outline" type="submit">Retomar pagamento de teste</button>
+                            </form>
+                        }
                     }
                     else if (paymentsReady && !owner && request.Pais == "PT")
                     {
