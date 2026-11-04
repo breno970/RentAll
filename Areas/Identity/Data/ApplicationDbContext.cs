@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
         builder.Entity<Avaliacao>()
             .HasOne(a => a.anuncio).WithMany()
             .HasForeignKey(a => a.idanuncio).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<PagamentoAluguer>().HasIndex(p => p.PedidoId).IsUnique();
+        builder.Entity<PagamentoAluguer>().HasIndex(p => p.StripeSessionId).IsUnique();
         builder.Entity<PedidoAluguer>().HasIndex(p => new { p.AnuncianteId, p.CriadoEm });
         builder.Entity<Mensagem>().HasIndex(m => new { m.DestinatarioId, m.AnuncioId, m.CriadaEm });
         builder.Entity<Favorito>()
@@ -44,6 +46,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
     public DbSet<Favorito> Favoritos { get; set; } = null!;
     public DbSet<Mensagem> Mensagens { get; set; } = null!;
     public DbSet<PedidoAluguer> PedidosAluguer { get; set; } = null!;
+    public DbSet<ContaStripeLocador> ContasStripeLocador { get; set; } = null!;
+    public DbSet<PagamentoAluguer> PagamentosAluguer { get; set; } = null!;
+    public DbSet<EventoStripeProcessado> EventosStripeProcessados { get; set; } = null!;
     public DbSet<DenunciaAnuncio> DenunciasAnuncio { get; set; } = null!;
     public DbSet<Anuncio> Anuncios { get; set; }
     public DbSet<Avaliacao> Avaliacoes { get; set; }

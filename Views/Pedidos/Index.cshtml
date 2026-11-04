@@ -4,6 +4,8 @@
     ViewData["Title"] = "Pedidos de aluguer";
     var names = ViewBag.AdNames as Dictionary<int, string> ?? new();
     var me = ViewBag.Me as string ?? "";
+    var paymentsReady = ViewBag.StripeSandboxReady == true;
+    var paymentStates = ViewBag.PaymentStates as Dictionary<int, string> ?? new();
 }
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true"/>
 <div class="page-width ra-request-page">
@@ -61,6 +63,24 @@
                         <input type="hidden" name="id" value="@request.Id"/>
                         <button class="btn btn-outline" type="submit">Cancelar pedido</button>
                     </form>
+                }
+                @if (request.Estado == "Aceite sem pagamento")
+                {
+                    @if (paymentStates.TryGetValue(request.Id, out var paymentState))
+                    {
+                        <p class="ra-request-note"><strong>Pagamento de teste:</strong> @paymentState. Não constitui pagamento real.</p>
+                    }
+                    else if (paymentsReady && !owner && request.Pais == "PT")
+                    {
+                        <form asp-controller="Pagamentos" asp-action="Checkout" method="post" style="margin-top:12px">
+                            <input name="pedidoId" type="hidden" value="@request.Id"/>
+                            <button class="btn btn-primary" type="submit">Simular pagamento seguro (Stripe)</button>
+                        </form>
+                    }
+                    else if (owner && request.Pais == "PT" && paymentsReady)
+                    {
+                        <p class="ra-request-note"><a asp-controller="Pagamentos" asp-action="Conta">Configurar recebimentos de teste Stripe</a></p>
+                    }
                 }
                 <p class="ra-request-note">@(request.Estado == "Aceite sem pagamento" ? "Pedido aceite, mas sem pagamento processado. Combina apenas os próximos passos nas mensagens." : "Este pedido não comprova pagamento nem garante disponibilidade.")</p>
             </article>
