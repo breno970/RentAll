@@ -42,18 +42,19 @@
         <aside class="panel">
             <span class="pill"><i class="fas fa-leaf"></i> Aluguer de objeto em desuso</span>
             <h1 class="detail-name" style="margin:18px 0 6px">@(Model.item?.nmitem ?? Model.modelo)</h1>
-            <p class="muted">@Model.modelo</p>
-            <div class="detail-price">@aluguel.Services.RentalLocalization.FormatPrice(Model.vlitem, Model.Pais) <small>/ dia</small></div>
+            @if (!string.IsNullOrWhiteSpace(Model.modelo)) { <p class="muted">@Model.modelo</p> }
+            <div class="detail-price">@aluguel.Services.RentalLocalization.FormatPrice(Model.vlitem, Model.Pais) @if (Model.vlitem > 0) { <small>/ dia</small> }</div>
             <div class="detail-facts">
-                <div><small>Período</small><strong>Até @Model.diasAluguel dia(s)</strong></div>
+                <div><small>Período</small><strong>@(Model.diasAluguel > 0 ? $"Até {Model.diasAluguel} dia(s)" : "A combinar")</strong></div>
                 <div><small>Categoria</small><strong>@(Model.categoria?.nmcategoria ?? "Outros")</strong></div>
                 <div><small>Tipo</small><strong>@(Model.tipo?.nmtipo ?? "Outros")</strong></div>
                 <div><small>Localização</small><strong>@Model.Cidade, @Model.Estado</strong></div>
             </div>
             <div class="contact-box">
                 <h2 style="font-size:1rem">Falar com o anunciante</h2>
-                <p class="muted" style="font-size:.88rem">Publicado por <strong>@Model.NomeFantasia</strong></p>
-                <p style="margin:0"><i class="fas fa-phone-alt" aria-hidden="true"></i> <strong>@Model.contato</strong></p>
+                <p class="muted" style="font-size:.88rem">Publicado por <strong>@(string.IsNullOrWhiteSpace(Model.NomeFantasia) ? "Anunciante RentAll" : Model.NomeFantasia)</strong></p>
+                <a asp-controller="Perfis" asp-action="Details" asp-route-id="@Model.iduser" class="btn btn-outline"><i class="far fa-user"></i> Ver perfil e outros anúncios</a>
+                <p class="muted" style="margin-top:12px">O contacto pessoal e a morada não são divulgados publicamente.</p>
             </div>
             @if (User.Identity?.IsAuthenticated == true)
             {
@@ -70,7 +71,7 @@
             {
                 <a class="btn btn-outline" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path"><i class="far fa-heart"></i> Entrar para guardar</a>
             }
-            <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>Por privacidade, a rua e a porta não são divulgadas. Combina a entrega diretamente com o anunciante.</span></div>
+            <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>Por privacidade, a rua e a porta não são divulgadas. Nunca partilhes palavras-passe, códigos de acesso ou documentos pessoais.</span></div>
             <a class="btn btn-outline" href="@mapsUrl" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt"></i> Ver zona no Google Maps</a>
             <div class="ra-map-preview" data-ra-map data-place="@place" hidden style="margin-top:12px"></div>
         </aside>
