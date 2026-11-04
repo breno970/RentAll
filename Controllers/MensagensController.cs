@@ -44,6 +44,10 @@ public sealed class MensagensController : Controller
                 AnuncioId = g.Key.AnuncioId, OutroUtilizadorId = g.Key.PeerId,
                 NomeArtigo = ad?.item?.nmitem ?? "Anúncio",
                 UltimaMensagem = g.Max(m => m.CriadaEm),
+                UltimoTexto = g.OrderByDescending(m => m.CriadaEm).First().Texto,
+                PedidoPendente = requests.Any(p => p.AnuncioId == g.Key.AnuncioId &&
+                    p.Estado == "Pendente" && p.AnuncianteId == me &&
+                    p.InteressadoId == g.Key.PeerId),
                 SouAnunciante = ad?.iduser == me
             };
         }).OrderByDescending(g => g.UltimaMensagem).ToList();
@@ -59,6 +63,8 @@ public sealed class MensagensController : Controller
                 OutroUtilizadorId = peer,
                 NomeArtigo = ad?.item?.nmitem ?? "Anúncio",
                 UltimaMensagem = request.CriadoEm,
+                UltimoTexto = "Pedido de aluguer registado",
+                PedidoPendente = request.AnuncianteId == me && request.Estado == "Pendente",
                 SouAnunciante = request.AnuncianteId == me
             });
         }
