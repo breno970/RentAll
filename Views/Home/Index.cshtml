@@ -24,12 +24,12 @@
 
 <div class="mil ra-categories" aria-label="Categorias de itens">
     <div class="form">
-        <a class="btn btn-primary" asp-action="VideoGame">VideoGame</a>
-        <a class="btn btn-primary" asp-action="AudioVisual">ÁudioVisual</a>
-        <a class="btn btn-primary" asp-action="MusicaHobbie">Música&amp;Hobbies</a>
-        <a class="btn btn-primary" asp-action="EsporteGinastica">Esporte&amp;Ginástica</a>
-        <a class="btn btn-primary" asp-action="Ferramentas">Ferramentas</a>
-        <a class="btn btn-primary" asp-action="Eletrodomesticos">EletroDomésticos</a>
+        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="VideoGame">VideoGame</a>
+        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="AudioVisual">ÁudioVisual</a>
+        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="MusicaHobbie">Música&amp;Hobbies</a>
+        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="EsporteGinastica">Esporte&amp;Ginástica</a>
+        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="Ferramentas">Ferramentas</a>
+        <a class="btn btn-primary" asp-route-Pais="@filters.Pais" asp-action="Eletrodomesticos">EletroDomésticos</a>
     </div>
 </div>
 
@@ -44,7 +44,7 @@
         <div class="pagination-container">
             <span>Página @Model.PageNumber de @Model.PageCount</span>
             @Html.PagedListPager(Model, page => Url.Action("Index", new {
-                page, filters.SearchString, filters.Estado, filters.RegionFilter,
+                page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter,
                 filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort
             }))
         </div>
