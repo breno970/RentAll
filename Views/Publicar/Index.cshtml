@@ -5,6 +5,7 @@
 }
 <link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/publish-experience.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
 <div class="page-width ra-publish">
     <header class="ra-publish-head">
         <p class="eyebrow">Publicar na RentAll</p>
@@ -85,9 +86,19 @@
                     <small>Não é necessário definir os dias agora.</small>
                 </div>
                 <div class="form-field full">
-                    <label asp-for="Visibilidade">Visibilidade</label>
-                    <select asp-for="Visibilidade" class="form-select"><option value="S">Publicar agora</option><option value="N">Guardar oculto</option></select>
+                    <label asp-for="Visibilidade">Visibilidade do anúncio</label>
+                    <select asp-for="Visibilidade" class="form-select">
+                        <option value="S">Ativo — publicar imediatamente (predefinição)</option>
+                        <option value="N">Oculto — guardar sem publicar</option>
+                    </select>
+                    <small>O anúncio fica ativo por predefinição. Só será ocultado se escolheres essa opção.</small>
                 </div>
+            </div>
+            <div class="ra-rental-motivation">
+                <strong><i class="fas fa-chart-line" aria-hidden="true"></i> Faz o teu artigo render</strong>
+                <p>Anunciar é gratuito. Um artigo disponível mais vezes pode gerar interesse sem teres de o vender. Publica boas fotografias e responde rapidamente aos pedidos.</p>
+                <p data-earnings-preview aria-live="polite">Indica um preço para veres uma simulação de ganhos.</p>
+                <small>Comissão de 10% apresentada apenas como exemplo de um futuro serviço de pagamentos. A RentAll não cobra nem processa pagamentos atualmente.</small>
             </div>
         </section>
         <section class="ra-publish-section" aria-labelledby="publish-area">
@@ -140,4 +151,5 @@
 @section Scripts {
     <script src="~/js/photo-carousel.js" asp-append-version="true"></script>
     <script src="~/js/publish-experience.js" asp-append-version="true"></script>
+    <script src="~/js/publish-earnings.js" asp-append-version="true"></script>
 }
