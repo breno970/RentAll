@@ -3,12 +3,25 @@ async function BuscaCep() {
   const campoCep = document.getElementById("txtCep");
   if (!campoCep) return;
   const cep = (campoCep.value || "").replace(/\D/g, "");
+  const country = campoCep.closest("form")?.querySelector("[data-region-country]")?.value || "BR";
   if (!cep) return;
+  if (country === "PT") {
+    if (cep.length !== 7) {
+      campoCep.setCustomValidity("Informe um código postal português com 7 dígitos (0000-000).");
+      campoCep.reportValidity();
+    } else {
+      campoCep.setCustomValidity("");
+      campoCep.value = cep.slice(0, 4) + "-" + cep.slice(4);
+    }
+    // O município e o distrito são preenchidos manualmente com sugestões da GEO API PT.
+    return;
+  }
   if (cep.length !== 8) {
-    campoCep.setCustomValidity("Informe um CEP com 8 dígitos.");
+    campoCep.setCustomValidity("Informe um CEP brasileiro com 8 dígitos.");
     campoCep.reportValidity();
     return;
   }
+  campoCep.value = cep.slice(0, 5) + "-" + cep.slice(5);
   campoCep.setCustomValidity("");
   campoCep.setAttribute("aria-busy", "true");
   try {
