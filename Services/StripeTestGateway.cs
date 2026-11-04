@@ -51,6 +51,14 @@ public sealed class StripeTestGateway
             new RequestOptions { IdempotencyKey = "rentall-payment-" + requestId }, ct);
     }
 
+    public async Task<string?> ResumeCheckoutUrlAsync(string sessionId, CancellationToken ct)
+    {
+        var session = await new SessionService(Client()).GetAsync(sessionId, cancellationToken: ct);
+        return session.Status == "open" && Uri.TryCreate(session.Url, UriKind.Absolute, out var url)
+            && url.Scheme == Uri.UriSchemeHttps && url.Host.EndsWith(".stripe.com", StringComparison.OrdinalIgnoreCase)
+            ? session.Url : null;
+    }
+
     public Stripe.Event VerifiedEvent(string payload, string signature)
     {
         if (!Available) throw new InvalidOperationException("Webhook não configurado.");
