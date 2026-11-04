@@ -33,7 +33,8 @@ async function BuscaCep() {
 }
 document.addEventListener("DOMContentLoaded", () => {
   const campoCep = document.getElementById("txtCep");
-  if (!campoCep) return;
+  if (!campoCep || campoCep.dataset.raCepBound === "true") return;
+  campoCep.dataset.raCepBound = "true";
   campoCep.addEventListener("blur", BuscaCep);
   campoCep.addEventListener("input", () => campoCep.setCustomValidity(""));
 });
