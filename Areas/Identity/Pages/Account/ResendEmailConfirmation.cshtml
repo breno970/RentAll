@@ -1,52 +1,14 @@
-﻿@page
+@page
 @model ResendEmailConfirmationModel
-
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tela de Edição</title>
-    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
-
-</head>
-<body>
-
-
-
-    <main id="container">
-
-        <form id="card-it" method="post">
-
-            <!-- FORM HEADER -->
-            <div class="card-it">
-                <h1>Reenviar email de confirmação</h1>
-             
-         
-            <div class="input-box">
-                <form method="post">
-
-                    <div class="input-field">
-
-                            <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="Endereço de e-mail" />
-
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
-                    </div>
-                    <button type="submit" class="w-50 btn btn-lg btn-primary">Reenviar</button>
-                    <div asp-validation-summary="All" class="form-control" role="alert"></div>
-                </form>
-            </div>
-            </div>
-
-
-            @section Scripts {
-                <partial name="_ValidationScriptsPartial" />
-            }
-        </form>
-    </main>
-</body>
-</html>
-
-<!-- JAVASCRIPT -->
-<script type="text/javascript" src="~/js/cadastro.js"></script>
+@{ ViewData["Title"] = "Confirmar e-mail"; }
+<div class="auth-wrap"><div class="auth-card">
+    <div class="eyebrow">Verificação de conta</div><h1>Reenviar confirmação</h1>
+    <p class="intro">Introduza o e-mail para solicitar um novo link de confirmação.</p>
+    <form method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="field"><label asp-for="Input.Email">E-mail</label><input asp-for="Input.Email" class="form-control" autocomplete="email" required placeholder="seu@email.com" /><span asp-validation-for="Input.Email" class="text-danger"></span></div>
+        <button class="btn btn-primary" type="submit">Reenviar confirmação</button>
+    </form>
+    <div class="auth-links center"><a asp-page="./Login">← Voltar ao login</a></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
