@@ -78,6 +78,14 @@ public sealed class PublicarController : Controller
             ModelState.AddModelError(nameof(vm.Nome), "Indica o nome do objeto (até 140 caracteres).");
         if (string.IsNullOrWhiteSpace(vm.Descricao) || vm.Descricao.Length > 6000)
             ModelState.AddModelError(nameof(vm.Descricao), "Descreve o objeto (até 6000 caracteres).");
+        // Public profiles and advert copy must not publish direct contact details.
+        // This is a privacy/anti-fraud safeguard; buyers can use the in-app chat.
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(vm.Nome))
+            ModelState.AddModelError(nameof(vm.Nome), "Não coloques contactos ou links no título. Usa as mensagens da RentAll.");
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(vm.Descricao))
+            ModelState.AddModelError(nameof(vm.Descricao), "Remove contactos, redes sociais ou links da descrição. Os interessados podem falar contigo na RentAll.");
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(vm.NomePublico))
+            ModelState.AddModelError(nameof(vm.NomePublico), "Usa um nome público sem contactos ou redes sociais.");
         if (!LocationCatalog.IsValidCountry(vm.Pais) || !LocationCatalog.IsValidRegion(vm.Pais, vm.Estado))
             ModelState.AddModelError(nameof(vm.Estado), "Seleciona um país e uma região válidos.");
         if (string.IsNullOrWhiteSpace(vm.Cidade) || vm.Cidade.Length > 120)
