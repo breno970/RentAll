@@ -11,6 +11,7 @@ public sealed class PedidoAluguer
     [Range(1, 365)] public int Dias { get; set; }
     // Snapshot of the agreed daily asking price when the request was created.
     public decimal PrecoDia { get; set; }
+    [MaxLength(2)] public string Pais { get; set; } = "PT";
     public decimal TotalEstimado { get; set; }
     // Indicative platform business model only. No payment is processed or collected.
     public decimal ComissaoIndicativa { get; set; }
