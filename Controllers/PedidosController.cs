@@ -31,8 +31,9 @@ public sealed class PedidosController : Controller
         ViewBag.AdNames = adNames;
         ViewBag.Me = me;
         ViewBag.StripeSandboxReady = _stripe.Available;
+        var requestIds = requests.Select(r => r.Id).ToArray();
         ViewBag.PaymentStates = await _db.PagamentosAluguer.AsNoTracking()
-            .Where(p => requests.Select(r => r.Id).Contains(p.PedidoId))
+            .Where(p => requestIds.Contains(p.PedidoId))
             .ToDictionaryAsync(p => p.PedidoId, p => p.Estado, ct);
         return View(requests);
     }
