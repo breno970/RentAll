@@ -9,7 +9,10 @@ public sealed class StripePaymentOptions
     public string PublicBaseUrl { get; set; } = "";
     // Tax activation requires verified registrations and legal tax-liability decision.
     public bool TaxEnabled { get; set; } = false;
-    public bool IsTestReady => Enabled && (SecretKey.StartsWith("rk_test_", StringComparison.Ordinal) ||
+    // Fail closed if tax is requested before registration/liability integration is finished.
+    public bool IsTestReady => Enabled && !TaxEnabled &&
+        WebhookSecret.StartsWith("whsec_", StringComparison.Ordinal) &&
+        (SecretKey.StartsWith("rk_test_", StringComparison.Ordinal) ||
         SecretKey.StartsWith("sk_test_", StringComparison.Ordinal))
         && !string.IsNullOrWhiteSpace(WebhookSecret) && PlatformCountry == "PT";
 }
