@@ -3,6 +3,7 @@
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -92,6 +93,12 @@
     <script src="~/js/cadastro.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
+    <script src="~/js/regions.js" asp-append-version="true"></script>
+    <script src="~/js/google-maps.js" asp-append-version="true"></script>
+    @if (!string.IsNullOrWhiteSpace(Configuration["GoogleMaps:BrowserApiKey"]))
+    {
+        <script async src="https://maps.googleapis.com/maps/api/js?key=@Configuration["GoogleMaps:BrowserApiKey"]&amp;loading=async&amp;callback=rentallGoogleMapsReady"></script>
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
