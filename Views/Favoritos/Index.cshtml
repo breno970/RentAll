@@ -1,0 +1,16 @@
+@model IEnumerable<aluguel.Models.Anuncio>
+@{
+    ViewData["Title"] = "Meus favoritos";
+}
+<div class="ra-marketplace-heading">
+    <div>
+        <h1>Os meus favoritos</h1>
+        <p>Anúncios guardados para consultar mais tarde.</p>
+    </div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark">Explorar anúncios</a>
+</div>
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-warning" role="alert">@error</div>
+}
+<partial name="_MarketplaceCards" model="Model" />
