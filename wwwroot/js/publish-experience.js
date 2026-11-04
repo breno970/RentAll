@@ -39,60 +39,70 @@
     price?.addEventListener("focus", () => { if (price.value.trim()) price.value = String(asNumber(price.value)).replace(".", ","); });
     updateCurrency();
 
-    button?.addEventListener("click", async () => {
-      if (!navigator.geolocation) { show("O navegador não suporta a deteção de localização. Escolhe a zona manualmente."); return; }
-      button.disabled = true;
-      if (!window.google?.maps?.Geocoder) {
-        try { await window.rentallLoadGoogleMaps?.(); }
-        catch (error) {
-          show(error.message || "Configura a API Google Maps para detetar a zona. Também podes selecionar a cidade manualmente.");
-          button.disabled = false;
-          return;
-        }
+    // Free reverse geocoding with explicit browser permission. No server proxy,
+    // no saved coordinates, no silent IP geolocation.
+    button?.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        show("Este navegador não suporta localização. Seleciona a cidade manualmente.");
+        return;
       }
-      show("A pedir permissão para obter a tua zona...");
+      button.disabled = true;
+      show("A pedir autorização para identificar a tua cidade...");
       navigator.geolocation.getCurrentPosition(async position => {
         try {
-          // Only used transiently for reverse geocoding; NEVER stored or added to the form.
-          const geocoder = new google.maps.Geocoder();
-          const { results } = await geocoder.geocode({
-            location: { lat: position.coords.latitude, lng: position.coords.longitude }
+          const params = new URLSearchParams({
+            latitude: String(position.coords.latitude),
+            longitude: String(position.coords.longitude),
+            localityLanguage: "pt"
           });
-          const components = results.flatMap(result => result.address_components || []);
-          const find = type => components.find(comp => comp.types.includes(type));
-          const code = find("country")?.short_name;
+          const response = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?" + params, {
+            method: "GET", mode: "cors", cache: "no-store",
+            credentials: "omit", referrerPolicy: "no-referrer"
+          });
+          if (!response.ok) throw new Error("O serviço gratuito de localização está temporariamente indisponível.");
+          const result = await response.json();
+          const code = String(result.countryCode || "").toUpperCase();
           if (code !== "PT" && code !== "BR") {
-            show("A RentAll está disponível apenas em Portugal e no Brasil. Seleciona a zona manualmente.");
+            show("A RentAll opera em Portugal e no Brasil. Seleciona a zona manualmente.");
             return;
           }
-          country.value = code;
-          country.dispatchEvent(new Event("change", { bubbles: true }));
-          const regionPart = find("administrative_area_level_1");
-          const candidates = [regionPart?.short_name, regionPart?.long_name].filter(Boolean);
-          const found = [...region.options].find(option => candidates.some(name =>
-            option.value.toLocaleLowerCase("pt") === name.toLocaleLowerCase("pt") ||
-            option.text.toLocaleLowerCase("pt") === name.toLocaleLowerCase("pt")));
-          if (found) {
-            region.value = found.value;
+
+          // regions.js repopulates the select synchronously when country changes.
+          if (country.value !== code) {
+            country.value = code;
+            country.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+          const ascii = value => String(value || "").normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+          const iso = String(result.principalSubdivisionCode || "");
+          const candidates = [iso, iso.slice(3), result.principalSubdivision];
+          const match = [...region.options].find(option => candidates.some(candidate =>
+            ascii(candidate) === ascii(option.value) || ascii(candidate) === ascii(option.text)));
+          if (match) {
+            region.value = match.value;
             region.dispatchEvent(new Event("change", { bubbles: true }));
           }
-          const municipality = find("locality")?.long_name || find("administrative_area_level_2")?.long_name
-            || find("postal_town")?.long_name;
+          // Return only municipal-level fields to the form. Do not use locality,
+          // street, postcode, GPS precision, or nearest-address data.
+          const municipality = String(result.city || "").trim();
           if (municipality) {
-            city.value = municipality;
+            city.value = municipality.slice(0, 120);
             city.dispatchEvent(new Event("input", { bubbles: true }));
           }
           if (neighborhood) neighborhood.value = "";
-          show(found && municipality
-            ? "Zona aproximada identificada. Confirma o distrito e a cidade antes de publicar."
-            : "Localização recebida. Confirma e completa manualmente a região e a cidade.");
-        } catch {
-          show("O Google Maps não conseguiu identificar a zona. Seleciona a cidade manualmente.");
-        } finally { button.disabled = false; }
+          show(match && municipality
+            ? "Encontrámos a tua zona aproximada. Confirma o distrito e a cidade."
+            : "Identificámos o país. Completa o distrito e a cidade manualmente.");
+        } catch (error) {
+          show(error.message || "Não foi possível identificar a zona. Podes introduzir a cidade manualmente.");
+        } finally {
+          button.disabled = false;
+        }
       }, error => {
         button.disabled = false;
-        show(error.code === 1 ? "Permissão recusada. Podes escolher a zona manualmente."
-          : "Não foi possível obter a localização. Verifica o GPS ou escolhe a zona manualmente.");
+        show(error.code === 1
+          ? "Não deste autorização para usar a localização. Podes selecionar a cidade manualmente."
+          : "Não conseguimos obter a posição do dispositivo. Verifica as permissões ou escolhe a cidade manualmente.");
       }, { enableHighAccuracy: false, maximumAge: 300000, timeout: 12000 });
     });
 
