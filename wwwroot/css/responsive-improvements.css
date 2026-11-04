@@ -1,0 +1,213 @@
+/*
+  RentAll • melhorias progressivas de responsividade
+  Mantém as imagens, os ícones, a tipografia Poppins e a paleta original.
+  Este ficheiro complementa site.css/caditem.css sem substituir a identidade.
+*/
+:root {
+  --ra-charcoal: #23232e;
+  --ra-charcoal-soft: #312d37;
+  --ra-grey: #797984;
+  --ra-card: #b5b9c1;
+  --ra-light: #f8fafc;
+  --ra-blue: #2579b7;
+  --ra-blue-dark: #071445;
+  --ra-border: #ccc;
+  --ra-elevation: 0 9px 30px rgba(35,35,46,.13);
+}
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { min-width: 0; line-height: 1.55; overflow-x: clip; }
+:where(img,video,svg,iframe){max-width:100%}
+img{height:auto}
+:where(h1,h2,h3,h4,h5,h6,p,span){overflow-wrap:break-word}
+:where(a,button,input,select,textarea){-webkit-tap-highlight-color:transparent}
+:where(a,button,input,select,textarea):focus-visible{outline:3px solid var(--ra-blue);outline-offset:3px}
+::selection { background: var(--ra-blue); color:#fff; }
+
+/* Navegação — o logótipo e o hambúrguer são os originais. */
+body > nav { position:relative; z-index:60; }
+body nav .nave{
+  height:auto; min-height:78px; padding:12px clamp(14px,3.5vw,48px);
+  justify-content:space-between; gap:20px; background:var(--ra-charcoal);
+}
+body nav .logo { display:inline-flex; align-items:center; flex:0 1 auto; min-width:0; }
+body nav .logo-img{ display:block; width:auto; height:auto; max-height:56px; max-width:min(220px,41vw); object-fit:contain; padding:0; }
+body nav .nav-list{ margin:0; padding:0; gap:clamp(5px,1.4vw,18px); justify-content:flex-end; min-width:0; }
+body nav .nav-list li{ margin:0; letter-spacing:normal; opacity:1; }
+body nav .nav-list a,
+body nav .nav-list form{display:flex;align-items:center;min-height:42px;padding:8px 11px;border-radius:9px;white-space:nowrap}
+body nav .nav-list a{color:#fff!important;font-weight:500}
+body nav .nav-list a:hover,body nav .nav-list a:focus-visible{background:rgba(255,255,255,.12);color:#fff!important;opacity:1}
+body nav .nav-list form{margin:0}
+body nav .nav-list form button{display:inline-flex;align-items:center;justify-content:center;min-width:38px;min-height:38px;padding:6px;margin:0;color:#fff;background:transparent;border:0;border-radius:8px;cursor:pointer}
+body nav .nav-list form button:hover{background:rgba(255,255,255,.12)}
+body nav .nav-list i{margin-right:7px}
+body nav .mobile-menu{background:transparent;border:0;padding:5px 6px;margin:0;flex-shrink:0;border-radius:9px}
+body nav .mobile-menu div{width:28px;height:2px;margin:6px 2px;background:#fff}
+body nav .mobile-menu:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* O contentor antigo continua o mesmo mas adapta-se à largura da janela. */
+body > .container{width:min(calc(100% - 32px),1240px);max-width:1240px;margin:0 auto;padding:clamp(18px,3vw,36px) 0}
+body > .container > main{min-width:0;min-height:calc(100svh - 180px)}
+body > .container main > :where(.card-it,.sobrecontainer,.-termoscontainer){max-width:100%}
+
+/* Pesquisas e filtros: mesma aparência cinza/azul, mas sem tabela estreita. */
+body .form-se{max-width:100%;margin:18px auto}
+body .form-se form,body form.ra-search{display:flex;align-items:stretch;justify-content:center;gap:12px;flex-wrap:wrap}
+body form.ra-search{width:min(100%,990px);margin:22px auto;padding:16px;background:#fff;border:1px solid var(--ra-border);border-radius:14px;box-shadow:0 5px 22px rgba(35,35,46,.08)}
+body form.ra-search :where(.form-control,input,select){width:auto;min-width:0;flex:1 1 190px;max-width:none}
+body form.ra-search :where(button,input[type=submit]){flex:0 0 auto;min-width:118px}
+body .form{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;padding:16px;max-width:100%;border:1px solid var(--ra-border);background:#eeeeee;box-shadow:0 4px 18px rgba(35,35,46,.055)}
+body .form .btn{margin:0;min-width:0;white-space:normal}
+body .mil{padding:clamp(10px,2.2vw,22px);width:100%}
+
+/* Cartões originais, com melhor escala de imagem, espaçamento e hover. */
+body .l-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:clamp(14px,2vw,26px);padding:clamp(8px,2.6vw,28px);align-items:stretch;justify-items:stretch}
+body .c-card{width:100%;max-width:none;min-width:0;height:100%;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;background:var(--ra-card);border-radius:14px;box-shadow:var(--ra-elevation);transition:transform .2s ease,box-shadow .2s ease;overflow:hidden}
+body .c-card:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(35,35,46,.2)}
+body .c-card__image{width:100%;aspect-ratio:4/3;display:block;overflow:hidden;background:var(--ra-light)}
+body .c-card__image .img,body .c-card .img{display:block;margin:0;padding:0;width:100%;height:100%;max-width:none;max-height:none;min-width:0;min-height:0;object-fit:cover;transition:transform .25s ease}
+body .c-card:hover .c-card__image .img{transform:scale(1.035)}
+body .c-card__content{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;flex:1;gap:9px;padding:17px}
+body .c-card__content h1{font-size:clamp(1.02rem,1.5vw,1.24rem);font-weight:700;line-height:1.35;color:var(--ra-charcoal);background:none;text-align:left;padding:0;margin:0;text-transform:none}
+body .c-card__content h3{font-size:.96rem;line-height:1.45;margin:0}
+body .c-card__content p{font-size:.9rem;line-height:1.5;margin:0;overflow-wrap:anywhere}
+body .c-card__content span{overflow-wrap:anywhere}
+body .c-card__content > a{align-self:flex-start;margin-top:auto;padding:8px 13px;border-radius:8px;background:var(--ra-charcoal);color:#fff;font-weight:600}
+body .c-card__content > a:hover{background:var(--ra-grey);color:#fff;opacity:1}
+body .c-card__content > span[class*="Dias de"]{display:none}
+
+/* Botões e campos: mantêm as cores e ícones antigos. */
+body :where(.btn,a.create,.item-actions a,input[type=submit],button[type=submit]){transition:transform .17s ease,box-shadow .17s ease,background-color .17s ease,border-color .17s ease}
+body :where(.btn,a.create,.item-actions a,input[type=submit],button[type=submit]):not(:disabled):hover{transform:translateY(-1px)}
+body .btn{border-radius:9px;padding:10px 16px;font-size:clamp(.87rem,1.1vw,1rem);line-height:1.35}
+body :where(input.form-control,textarea.form-control,select.form-control){max-width:100%;width:100%;min-height:43px;padding:9px 12px;line-height:1.5;border:1px solid var(--ra-border);border-radius:8px;background:#fff;color:var(--ra-charcoal);font-size:16px}
+body :where(textarea.form-control,textarea){height:auto;min-height:110px;resize:vertical}
+body :where(input.form-control,textarea.form-control,select.form-control):focus{border-color:var(--ra-blue);box-shadow:0 0 0 3px rgba(37,121,183,.15);outline:none}
+body .form-group{min-width:0;margin-bottom:18px}
+body .form-group label{font-size:.93rem;margin-bottom:7px;line-height:1.4}
+body .form-group .text-danger{display:block;font-size:.84rem;margin-top:4px}
+body :where(.btn-container,.item-actions){display:flex;gap:9px;flex-wrap:wrap;align-items:center;justify-content:flex-start}
+body :where(.btn-container,.item-actions) > *{min-height:40px;margin:0}
+body :where(input[type=file].form-control,input[type=file]){max-width:100%;font-size:.9rem}
+body input[type=file]::file-selector-button{border:1px solid var(--ra-border);border-radius:7px;background:var(--ra-light);color:var(--ra-charcoal);padding:7px 10px;margin-right:12px;cursor:pointer}
+body :where(.card-it,#card-it){min-width:0}
+body .card-it{width:min(100%,750px);max-width:100%;padding:clamp(20px,3vw,40px);margin:clamp(14px,3vw,36px) auto;border:1px solid var(--ra-border);border-radius:14px;background:#fff;box-shadow:var(--ra-elevation)}
+body .card-it h1{font-size:clamp(1.35rem,2.6vw,1.9rem);line-height:1.3;padding:12px 14px;margin:-8px -8px 24px;border-radius:9px;background:var(--ra-grey);color:#fff;text-transform:none}
+body .card-it form{max-width:100%;min-width:0}
+body #container{height:auto;min-height:min(65svh,620px);max-width:100%;padding:20px 0;display:flex;justify-content:center;align-items:flex-start}
+body #login_form{width:min(100%,490px);max-width:100%;height:auto;padding:clamp(19px,4vw,32px);margin:8px auto 22px;gap:16px;border-radius:13px;box-shadow:var(--ra-elevation)}
+body #form_header h1{font-size:clamp(1.5rem,3vw,2.25rem)}
+body .input-box{max-width:100%;min-width:0}
+body .input-field{max-width:100%;gap:12px;min-height:43px}
+body .input-field input{width:100%;min-width:0;font-size:16px;max-width:100%}
+body .input-box .text,body .input-box .password{overflow-wrap:anywhere}
+body #login_button{min-height:45px;width:100%;border-radius:9px;font-size:1rem}
+body .terms-container{gap:9px}
+body .terms-link{color:var(--ra-grey);text-align:center}
+body #external-account{height:auto;min-height:0;flex-wrap:wrap;justify-content:flex-start}
+
+/* Gestão: tabelas deixam de criar barras horizontais e tornam-se cartões discretos. */
+body main table{max-width:100%}
+body main table:has(.item-content){width:100%;border-collapse:separate;border-spacing:0 12px;margin:16px 0}
+body main table:has(.item-content) :where(thead,tbody,tr,td){min-width:0}
+body main table:has(.item-content) thead{display:none}
+body main table:has(.item-content) tr{display:block;background:#fff;border:1px solid var(--ra-border);border-radius:13px;box-shadow:0 4px 16px rgba(35,35,46,.075)}
+body main table:has(.item-content) td{display:block;border:0;text-align:left;padding:clamp(13px,2.6vw,22px)}
+body .item-content{display:flex;align-items:center;gap:18px;min-width:0}
+body .item-image{width:clamp(85px,12vw,148px);height:clamp(85px,12vw,148px);flex:0 0 auto;object-fit:cover;border-radius:10px;background:var(--ra-light)}
+body .item-details{display:flex;flex-direction:column;min-width:0;gap:8px;margin:0}
+body .item-name{font-size:clamp(1rem,1.6vw,1.25rem);line-height:1.4;margin:0;overflow-wrap:anywhere}
+body .item-actions a{font-size:.84rem;padding:9px 12px;border-radius:8px}
+body .create-container{display:flex;justify-content:flex-end;margin:18px 0 22px}
+body a.create{border-radius:9px;padding:11px 18px}
+
+/* Detalhes de anúncios: respeita o carousel/bootstrap e as mesmas imagens/ícones. */
+body #form_header.card{width:min(100%,650px)!important;max-width:100%!important;min-height:0!important;height:auto!important;margin:clamp(12px,3vw,30px) auto!important}
+body .carousel-container,body #imageCarousel,body #imageCarousel .carousel-inner{width:100%;max-width:100%;min-width:0}
+body #imageCarousel .carousel-item img{width:100%;height:auto;aspect-ratio:4/3;max-width:100%;max-height:min(70svh,530px);min-width:0;min-height:0;object-fit:contain;padding:0}
+body .anuncio-details.row{margin:14px auto;gap:0;max-width:100%}
+body .anuncio-details .section{min-width:0;margin-bottom:18px}
+body .anuncio-details .details{overflow-wrap:anywhere;background:#fff;padding:clamp(13px,2vw,22px);border-radius:12px;border:1px solid var(--ra-border);box-shadow:0 3px 14px rgba(35,35,46,.055)}
+body .anuncio-details .details p{line-height:1.6}
+body .anuncio-details > br{display:none}
+
+/* Footer continua com a disposição e cores originais. */
+body .footer-container{display:flex;flex-wrap:wrap;justify-content:space-between;gap:clamp(15px,2vw,30px);max-width:100%;padding:clamp(25px,4vw,48px);margin:24px 0 0;border-radius:8px}
+body .footer-container .footer-content-2{width:min(100%,390px);flex:1 1 280px}
+body .footer-container .footer-content-3{width:min(100%,500px);flex:1 1 300px}
+body .footer-container .footer-content-2 > div{display:flex;align-items:center;min-width:0;gap:8px;margin-bottom:9px}
+body .footer-container .footer-content-2 i{flex:0 0 35px;margin:0}
+body .footer-container .footer-content-2 p{margin:0;min-width:0;overflow-wrap:anywhere}
+body .footer-container .footer-empresa{overflow-wrap:anywhere}
+body .footer-container .footer-icons{display:flex;flex-wrap:wrap;gap:4px}
+body .footer-container .footer-icons .fa{margin:4px}
+body .footer-container .copyright{width:100%;flex-basis:100%;border-top:1px solid var(--ra-grey);padding-top:12px}
+body .footer-container .copyright hr{display:none}
+
+/* Paginação e pequenos espaços. */
+body .pagination-container{max-width:100%;display:flex;justify-content:center;flex-wrap:wrap;gap:10px;padding:12px;margin:22px 0;border-radius:12px}
+body .pagination{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+body .pagination li{margin:0}
+body .pagination-container a{margin:0}
+body .form-se td{border:none}
+body :where(.sobrecontainer,.-termoscontainer){max-width:100%;padding:clamp(15px,3vw,32px);border-radius:13px}
+body :where(.sobrecontainer,.-termoscontainer) h1{font-size:clamp(1.5rem,3vw,2.2rem)}
+body :where(.sobrecontainer,.-termoscontainer) h2{font-size:clamp(1.15rem,2vw,1.55rem)}
+
+@media(max-width:999px) {
+  body nav .nave{min-height:69px;padding:9px 17px}
+  body nav .logo-img{max-height:50px}
+  body nav .mobile-menu{display:block}
+  body nav .nav-list{
+    position:absolute;right:0;top:100%;width:min(360px,100vw);height:auto;max-height:calc(100svh - 69px);
+    padding:16px;background:var(--ra-charcoal);overflow-y:auto;overscroll-behavior:contain;
+    display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:5px;
+    transform:translateX(110%);opacity:0;visibility:hidden;pointer-events:none;
+    transition:transform .22s ease,opacity .2s ease,visibility .2s ease;
+    box-shadow:-12px 18px 30px rgba(0,0,0,.2);border-radius:0 0 0 13px;
+    z-index:1000
+  }
+  body nav .nav-list.active{transform:translateX(0);opacity:1;visibility:visible;pointer-events:auto}
+  body nav .nav-list li{width:100%;opacity:1;animation:none!important}
+  body nav .nav-list a,body nav .nav-list form{display:flex;width:100%;padding:12px;white-space:normal;min-height:45px}
+  body nav .nav-list form button{width:100%;justify-content:flex-start;padding:11px}
+}
+@media(max-width:800px){
+  body > .container{width:calc(100% - 24px);padding:17px 0}
+  body .l-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body .footer-container .footer-content-2,body .footer-container .footer-content-3{flex:1 1 260px}
+  body .anuncio-details.row > .section{flex:0 0 100%;max-width:100%}
+  body .card-it{padding:20px;margin:12px auto}
+  body .form{padding:13px}
+}
+@media(max-width:580px){
+  body nav .logo-img{max-width:46vw;max-height:44px}
+  body .l-cards{grid-template-columns:1fr;gap:16px;padding:10px 3px}
+  body .c-card__image{aspect-ratio:16/11}
+  body .form .btn{flex:1 1 calc(50% - 8px)}
+  body form.ra-search{padding:12px}
+  body form.ra-search :where(.form-control,input,select,button){width:100%;flex:1 1 100%}
+  body .item-content{align-items:flex-start;gap:12px}
+  body .item-image{width:83px;height:83px}
+  body .item-actions{gap:6px}
+  body .item-actions a{font-size:.79rem;padding:7px 9px}
+  body .footer-container{gap:20px;padding:22px 18px}
+  body .footer-container .footer-content-2,body .footer-container .footer-content-3{width:100%;flex-basis:100%;text-align:left}
+  body .footer-container .footer-content-2 > div{justify-content:flex-start}
+  body .footer-container .footer-icons{justify-content:flex-start}
+  body .card-it h1{font-size:1.3rem}
+  body .pagination-container{font-size:.82rem}
+  body .btn-container>*{flex:1 1 auto}
+}
+@media(max-width:380px){
+  body > .container{width:calc(100% - 20px)}
+  body nav .nave{padding-inline:11px}
+  body .item-content{flex-wrap:wrap}
+  body .item-details{width:100%}
+  body .form .btn{flex-basis:100%}
+}
+@media (hover:none) { body .c-card:hover{transform:none} body .c-card:hover .img{transform:none} }
+@media (prefers-reduced-motion:reduce) {
+  html{scroll-behavior:auto}
+  *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
