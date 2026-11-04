@@ -80,6 +80,16 @@ public sealed class PagamentosController : Controller
         }
     }
 
+    [HttpGet("Reautorizar")]
+    public async Task<IActionResult> Reautorizar(CancellationToken ct)
+    {
+        var current = await db.ContasStripeLocador.AsNoTracking()
+            .FirstOrDefaultAsync(a => a.UserId == Me, ct);
+        var origin = Origin();
+        if (!checkout.Available || origin == null || current == null) return RedirectToAction(nameof(Conta));
+        return Redirect(await accounts.OnboardingUrlAsync(current.AccountId, origin, ct));
+    }
+
     [HttpPost("Checkout")]
     [ValidateAntiForgeryToken]
     [EnableRateLimiting("rental-requests")]
