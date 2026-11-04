@@ -14,6 +14,7 @@ public sealed class SupabaseImageStorage : IImageStorage
     private readonly HttpClient _client;
     private readonly string _baseUrl;
     private readonly string _secretKey;
+    private readonly ILogger<SupabaseImageStorage> _logger;
     private static readonly Dictionary<string, string> Allowed = new(StringComparer.OrdinalIgnoreCase)
     {
         ["image/jpeg"] = ".jpg",
@@ -21,9 +22,10 @@ public sealed class SupabaseImageStorage : IImageStorage
         ["image/webp"] = ".webp"
     };
 
-    public SupabaseImageStorage(HttpClient client, IConfiguration config)
+    public SupabaseImageStorage(HttpClient client, IConfiguration config, ILogger<SupabaseImageStorage> logger)
     {
         _client = client;
+        _logger = logger;
         _baseUrl = (config["Supabase:Url"] ?? "").TrimEnd('/');
         _secretKey = config["Supabase:ServiceKey"] ?? "";
     }
@@ -51,7 +53,18 @@ public sealed class SupabaseImageStorage : IImageStorage
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
         using var response = await _client.SendAsync(request, ct);
         if (!response.IsSuccessStatusCode)
-            throw new IOException($"Falha no armazenamento de imagem (HTTP {(int)response.StatusCode}).");
+        {
+            var responseBody = await response.Content.ReadAsStringAsync(ct);
+            _logger.LogError("Supabase image upload returned HTTP {StatusCode}: {Details}", (int)response.StatusCode, responseBody);
+            var userMessage = response.StatusCode switch
+            {
+                System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden => "O serviço de imagens recusou a autorização. Verifica a configuração do Supabase.",
+                System.Net.HttpStatusCode.NotFound => "O bucket de fotografias não existe. Verifica o bucket rentall-images no Supabase.",
+                System.Net.HttpStatusCode.RequestEntityTooLarge => "A fotografia ultrapassa o limite do armazenamento. Tenta uma imagem menor.",
+                _ => $"O armazenamento de fotografias respondeu com erro HTTP {(int)response.StatusCode}. Tenta novamente."
+            };
+            throw new ImageStorageException(userMessage);
+        }
         return key;
     }
 
@@ -74,4 +87,10 @@ public sealed class SupabaseImageStorage : IImageStorage
         // Only generated keys are stored; the path is exactly owner-UUID/filename-UUID.ext.
         return $"{_baseUrl}/storage/v1/object/public/{Bucket}/{key}";
     }
+}
+
+public sealed class ImageStorageException : IOException
+{
+    public string UserMessage { get; }
+    public ImageStorageException(string userMessage) : base(userMessage) => UserMessage = userMessage;
 }
