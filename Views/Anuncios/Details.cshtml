@@ -8,7 +8,8 @@
 }
 <link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
-<div class="page-width">
+<link rel="stylesheet" href="~/css/rental-dashboard.css" asp-append-version="true" />
+<div class="page-width ra-detail-with-mobile-bar">
     <div class="page-intro">
         <div><p class="eyebrow"><a asp-controller="Home" asp-action="Index" asp-route-Pais="@Model.Pais">Explorar</a> / Detalhes do anúncio</p><h1>@(Model.item?.nmitem ?? Model.modelo)</h1><p><i class="fas fa-map-marker-alt"></i> @place</p></div>
         <a class="btn btn-outline" asp-controller="Home" asp-action="Index" asp-route-Pais="@Model.Pais"><i class="fas fa-arrow-left"></i> Voltar à pesquisa</a>
@@ -55,7 +56,7 @@
                  User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser &&
                  Model.vlitem > 0 && Model.item?.snativo != "N")
             {
-                <div class="ra-request-widget">
+                <div class="ra-request-widget" id="rental-request" style="scroll-margin-top:100px">
                     <h3><i class="far fa-calendar-check" aria-hidden="true"></i> Pedir aluguer</h3>
                     <p>Envia um pedido ao anunciante para confirmar a disponibilidade. Não é uma reserva paga.</p>
                     <form asp-controller="Pedidos" asp-action="Criar" method="post">
@@ -150,6 +151,27 @@
         </aside>
     </div>
 </div>
+
+
+@if (Model.item?.snativo != "N" &&
+     User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser)
+{
+    <nav class="ra-detail-mobile-bar" aria-label="Ações do anúncio">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            @if (Model.vlitem > 0)
+            {
+                <a class="btn btn-primary" href="#rental-request"><i class="far fa-calendar-check" aria-hidden="true"></i> Pedir aluguer</a>
+            }
+            <a class="btn btn-outline" asp-controller="Mensagens" asp-action="Conversa" asp-route-anuncioId="@Model.id"><i class="far fa-comments" aria-hidden="true"></i> Mensagem</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login"
+               asp-route-returnUrl="@Url.Action("Details", "Anuncios", new { id = Model.id })"><i class="far fa-user" aria-hidden="true"></i> Entrar para contactar</a>
+        }
+    </nav>
+}
 
 @section Scripts {
     <script src="~/js/photo-carousel.js" asp-append-version="true"></script>

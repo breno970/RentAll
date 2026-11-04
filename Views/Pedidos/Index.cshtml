@@ -6,9 +6,15 @@
     var me = ViewBag.Me as string ?? "";
     var paymentsReady = ViewBag.StripeSandboxReady == true;
     var paymentStates = ViewBag.PaymentStates as Dictionary<int, string> ?? new();
+    var selectedView = ViewBag.SelectedView as string ?? "todos";
+    var totalRequests = (int)(ViewBag.TotalRequests ?? 0);
+    var receivedCount = (int)(ViewBag.ReceivedCount ?? 0);
+    var sentCount = (int)(ViewBag.SentCount ?? 0);
+    var pendingToAnswer = (int)(ViewBag.PendingToAnswer ?? 0);
 }
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/css/in-platform-journey.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/rental-dashboard.css" asp-append-version="true"/>
 <div class="page-width ra-request-page">
     <div class="page-intro">
         <div><p class="eyebrow">RentAll · Alugueres</p><h1>Pedidos de aluguer</h1>
@@ -18,11 +24,34 @@
     <div class="ra-fee-disclosure"><i class="fas fa-info-circle" aria-hidden="true"></i>
         Os pedidos registam apenas interesse no aluguer. Não existem cobranças, reservas pagas nem proteção financeira ativadas nesta fase. A comissão indicativa não é cobrada.
     </div>
+    <section class="ra-pipeline-overview" aria-label="Resumo dos alugueres">
+        <div class="ra-pipeline-heading">
+            <div><h2>O teu painel de alugueres</h2><p>Vê rapidamente o que precisa de resposta e acompanha as conversas.</p></div>
+            @if (pendingToAnswer > 0)
+            {
+                <a class="btn btn-primary" asp-action="Index" asp-route-vista="pendentes">
+                    <i class="far fa-clock" aria-hidden="true"></i> Responder a pedidos (@pendingToAnswer)
+                </a>
+            }
+        </div>
+        <div class="ra-pipeline-kpis">
+            <div><span>Pedidos</span><strong>@totalRequests</strong><small>no teu histórico recente</small></div>
+            <div><span>Recebidos</span><strong>@receivedCount</strong><small>pelos teus artigos</small></div>
+            <div><span>Enviados</span><strong>@sentCount</strong><small>a anunciantes</small></div>
+            <div class="@(pendingToAnswer > 0 ? "needs-attention" : "")"><span>A aguardar resposta tua</span><strong>@pendingToAnswer</strong><small>@(pendingToAnswer == 0 ? "Tudo acompanhado" : "Pedidos por responder")</small></div>
+        </div>
+        <nav class="ra-pipeline-tabs" aria-label="Filtrar pedidos">
+            <a asp-action="Index" class="@(selectedView == "todos" ? "is-active" : "")" asp-route-vista="todos" aria-current="@(selectedView == "todos" ? "page" : null)">Todos</a>
+            <a asp-action="Index" class="@(selectedView == "recebidos" ? "is-active" : "")" asp-route-vista="recebidos" aria-current="@(selectedView == "recebidos" ? "page" : null)">Recebidos</a>
+            <a asp-action="Index" class="@(selectedView == "enviados" ? "is-active" : "")" asp-route-vista="enviados" aria-current="@(selectedView == "enviados" ? "page" : null)">Enviados</a>
+            <a asp-action="Index" class="@(selectedView == "pendentes" ? "is-active" : "")" asp-route-vista="pendentes" aria-current="@(selectedView == "pendentes" ? "page" : null)">Por responder @if (pendingToAnswer > 0) { <span class="ra-pipeline-count">@pendingToAnswer</span> }</a>
+        </nav>
+    </section>
     @if (!Model.Any())
     {
         <div class="empty-state"><i class="far fa-calendar-check"></i>
-            <h2>Ainda não existem pedidos</h2>
-            <p>Quando alguém demonstrar interesse num artigo, os pedidos aparecerão aqui.</p>
+            <h2>@(totalRequests == 0 ? "Ainda não existem pedidos" : "Sem pedidos neste filtro")</h2>
+            <p>@(totalRequests == 0 ? "Quando alguém demonstrar interesse num artigo, os pedidos aparecerão aqui." : "Experimenta outro separador para veres o restante histórico.")</p>
         </div>
     }
     else
@@ -35,7 +64,7 @@
             <article class="ra-request-card">
                 <div class="ra-request-top">
                     <span class="ra-request-kind">@(owner ? "Pedido recebido" : "Pedido enviado")</span>
-                    <span class="ra-request-status">@request.Estado</span>
+                    <span class="ra-request-status @(owner && request.Estado == "Pendente" ? "is-awaiting-action" : "")">@request.Estado</span>
                 </div>
                 <h2><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@request.AnuncioId">@name</a></h2>
                 <p class="muted">@request.Dias @(request.Dias == 1 ? "dia" : "dias") · @request.CriadoEm.ToString("dd/MM/yyyy")</p>
