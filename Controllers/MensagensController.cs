@@ -1,12 +1,12 @@
 using aluguel.Areas.Identity.Data;
 using aluguel.Models;
+using aluguel.Services;
 using aluguel.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 namespace aluguel.Controllers;
 
@@ -68,10 +68,21 @@ public sealed class MensagensController : Controller
                 ((m.RemetenteId == me && m.DestinatarioId == other) ||
                  (m.RemetenteId == other && m.DestinatarioId == me)))
             .OrderBy(m => m.CriadaEm).Take(250).ToListAsync(ct);
+        var latestRequest = await _db.PedidosAluguer.AsNoTracking()
+            .Where(p => p.AnuncioId == anuncioId &&
+                p.InteressadoId == (owner ? other : me) && p.AnuncianteId == ad.iduser)
+            .OrderByDescending(p => p.CriadoEm)
+            .Select(p => new { p.Id, p.Estado, p.TotalEstimado, p.Dias, p.Pais })
+            .FirstOrDefaultAsync(ct);
         return View(new ConversaViewModel {
             AnuncioId = ad.id, NomeArtigo = ad.item?.nmitem ?? ad.modelo,
             MeuId = me, OutroUtilizadorId = other,
-            SouAnunciante = owner, Mensagens = messages
+            SouAnunciante = owner, Mensagens = messages,
+            AnuncioAtivo = ad.item?.snativo != "N",
+            PrecoDia = ad.vlitem, PrazoMaximo = ad.diasAluguel > 0 ? ad.diasAluguel : 365,
+            Pais = ad.Pais, PedidoId = latestRequest?.Id,
+            EstadoPedido = latestRequest?.Estado, DiasPedido = latestRequest?.Dias,
+            TotalPedido = latestRequest?.TotalEstimado
         });
     }
 
@@ -101,8 +112,7 @@ public sealed class MensagensController : Controller
         }
         // Do not accept links, email addresses or telephone numbers, which can leak private
         // information and bypass any future buyer/seller protections.
-        if (Regex.IsMatch(body, @"\bhttps?://|\bwww\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}", RegexOptions.IgnoreCase)
-            || Regex.IsMatch(body, @"(?<!\d)(?:\+?\d[\s().-]?){9,15}(?!\d)"))
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(body))
         {
             TempData["Error"] = "Por segurança, não incluas contactos, números de telefone ou links. Combina tudo pela RentAll.";
             return RedirectToAction(nameof(Conversa), new { anuncioId, peerId = other });
