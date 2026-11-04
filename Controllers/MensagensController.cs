@@ -24,7 +24,11 @@ public sealed class MensagensController : Controller
         var messages = await _db.Mensagens.AsNoTracking()
             .Where(m => m.RemetenteId == me || m.DestinatarioId == me)
             .OrderByDescending(m => m.CriadaEm).Take(500).ToListAsync(ct);
-        var ids = messages.Select(m => m.AnuncioId).Distinct().ToArray();
+        var requests = await _db.PedidosAluguer.AsNoTracking()
+            .Where(p => p.AnuncianteId == me || p.InteressadoId == me)
+            .OrderByDescending(p => p.CriadoEm).Take(150).ToListAsync(ct);
+        var ids = messages.Select(m => m.AnuncioId)
+            .Concat(requests.Select(p => p.AnuncioId)).Distinct().ToArray();
         var ads = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .Where(a => ids.Contains(a.id))
             .ToDictionaryAsync(a => a.id, ct);
@@ -43,7 +47,22 @@ public sealed class MensagensController : Controller
                 SouAnunciante = ad?.iduser == me
             };
         }).OrderByDescending(g => g.UltimaMensagem).ToList();
-        return View(threads);
+        // Rental requests are a valid conversation context before the first message.
+        foreach (var request in requests)
+        {
+            var peer = request.AnuncianteId == me ? request.InteressadoId : request.AnuncianteId;
+            if (threads.Any(t => t.AnuncioId == request.AnuncioId && t.OutroUtilizadorId == peer))
+                continue;
+            ads.TryGetValue(request.AnuncioId, out var ad);
+            threads.Add(new ResumoConversa {
+                AnuncioId = request.AnuncioId,
+                OutroUtilizadorId = peer,
+                NomeArtigo = ad?.item?.nmitem ?? "Anúncio",
+                UltimaMensagem = request.CriadoEm,
+                SouAnunciante = request.AnuncianteId == me
+            });
+        }
+        return View(threads.OrderByDescending(t => t.UltimaMensagem).ToList());
     }
 
     public async Task<IActionResult> Conversa(int anuncioId, string? peerId, CancellationToken ct)
