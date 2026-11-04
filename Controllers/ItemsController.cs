@@ -79,6 +79,9 @@ public sealed class ItemsController : Controller
             };
             _db.Items.Add(item);
             await _db.SaveChangesAsync(ct);
+            TempData["Success"] = "Artigo guardado. Agora podes criar o anúncio.";
+            if (item.snativo != "N")
+                return RedirectToAction("Create", "Anuncios", new { itemId = item.id });
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException or HttpRequestException or InvalidOperationException or DbUpdateException)
@@ -135,8 +138,17 @@ public sealed class ItemsController : Controller
         if (item is null) return NotFound();
 
         var keys = new[] { item.imagem1, item.imagem2, item.imagem3, item.imagem4, item.imagem5 };
-        _db.Items.Remove(item);
-        await _db.SaveChangesAsync();
+        try
+        {
+            _db.Items.Remove(item);
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogWarning(ex, "Cannot remove item because related records still exist.");
+            TempData["Error"] = "Não foi possível excluir o artigo: existem registos associados.";
+            return RedirectToAction(nameof(Index));
+        }
         foreach (var key in keys.Where(x => !string.IsNullOrWhiteSpace(x)))
         {
             try { await _storage.DeleteAsync(key); }

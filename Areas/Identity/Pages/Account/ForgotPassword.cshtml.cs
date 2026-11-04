@@ -18,11 +18,13 @@ namespace aluguel.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _configuration;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -51,6 +53,11 @@ namespace aluguel.Areas.Identity.Pages.Account
         {
             if (ModelState.IsValid)
             {
+                if (string.IsNullOrWhiteSpace(_configuration["SendGridKey"]))
+                {
+                    ModelState.AddModelError(string.Empty, "A recuperação por e-mail está temporariamente indisponível. Contacta o suporte.");
+                    return Page();
+                }
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {

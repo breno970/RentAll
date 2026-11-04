@@ -1,51 +1,42 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace aluguel.Services
+namespace aluguel.Services;
+
+public sealed class EmailSender : IEmailSender
 {
-    public class EmailSender : IEmailSender
+    private readonly ILogger<EmailSender> _logger;
+    private readonly AuthMessageSenderOptions _options;
+
+    public EmailSender(IOptions<AuthMessageSenderOptions> options, ILogger<EmailSender> logger)
     {
-        private readonly ILogger _logger;
+        _options = options.Value;
+        _logger = logger;
+    }
 
-        public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
-                           ILogger<EmailSender> logger)
+    public async Task SendEmailAsync(string toEmail, string subject, string message)
+    {
+        if (string.IsNullOrWhiteSpace(_options.SendGridKey))
+            throw new InvalidOperationException("O serviço de e-mail ainda não está configurado.");
+
+        var client = new SendGridClient(_options.SendGridKey);
+        var mail = new SendGridMessage
         {
-            Options = optionsAccessor.Value;
-            _logger = logger;
-        }
-
-        public AuthMessageSenderOptions Options { get; } //Set with Secret Manager.
-
-        public async Task SendEmailAsync(string toEmail, string subject, string message)
+            From = new EmailAddress("rent.all.bn@gmail.com", "Equipa RentAll"),
+            Subject = subject,
+            PlainTextContent = System.Text.RegularExpressions.Regex.Replace(message, "<[^>]+>", " "),
+            HtmlContent = message
+        };
+        mail.AddTo(new EmailAddress(toEmail));
+        mail.SetClickTracking(false, false);
+        var response = await client.SendEmailAsync(mail);
+        if (!response.IsSuccessStatusCode)
         {
-            if (string.IsNullOrEmpty(Options.SendGridKey))
-            {
-                throw new Exception("Null SendGridKey");
-            }
-            await Execute(Options.SendGridKey, subject, message, toEmail);
+            _logger.LogWarning("Email provider returned HTTP {Code}.", (int)response.StatusCode);
+            throw new InvalidOperationException("Não foi possível enviar o e-mail.");
         }
-
-        public async Task Execute(string apiKey, string subject, string message, string toEmail)
-        {
-            var client = new SendGridClient(apiKey);
-            var msg = new SendGridMessage()
-            {
-                From = new EmailAddress("rent.all.bn@gmail.com"),
-                Subject = "Olá,\r\n\r\nEste é um email email automático, por favor não responda.\r\n\r\nAtenciosamente,\r\n[Equipe RentAll]",
-                PlainTextContent = message,
-                HtmlContent = message
-            };
-            msg.AddTo(new EmailAddress(toEmail));
-
-            // Disable click tracking.
-            // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
-            msg.SetClickTracking(false, false);
-            var response = await client.SendEmailAsync(msg);
-            _logger.LogInformation(response.IsSuccessStatusCode
-                                   ? $"Email to {toEmail} queued successfully!"
-                                   : $"Failure Email to {toEmail}");
-        }
+        _logger.LogInformation("Email notification successfully queued.");
     }
 }

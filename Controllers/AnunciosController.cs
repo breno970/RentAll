@@ -57,10 +57,10 @@ public class AnunciosController : Controller
         return View(ad);
     }
 
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Create(int? itemId)
     {
-        await PrepareCreateOptions();
-        return View(new Anuncio());
+        await PrepareCreateOptions(itemId);
+        return View(new Anuncio { itemid = itemId ?? 0 });
     }
 
     [AllowAnonymous]

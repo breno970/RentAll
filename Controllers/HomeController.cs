@@ -17,10 +17,9 @@ public class HomeController : Controller
 
     private IQueryable<Anuncio> AvailableAds()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return _db.Anuncios.AsNoTracking()
             .Include(a => a.item).Include(a => a.categoria).Include(a => a.tipo)
-            .Where(a => a.item != null && a.item.snativo != "N" && (userId == null || a.iduser != userId));
+            .Where(a => a.item != null && a.item.snativo != "N");
     }
 
     private async Task<IActionResult> Results(MarketplaceFilters filters, string view, int? categoryOverride = null)
@@ -87,11 +86,10 @@ public class HomeController : Controller
     public Task<IActionResult> Ferramentas([FromQuery] MarketplaceFilters filters) => Results(filters, "Ferramentas", 5);
     public Task<IActionResult> Eletrodomesticos([FromQuery] MarketplaceFilters filters) => Results(filters, "Eletrodomesticos", 6);
 
-    public async Task<IActionResult> Details(int? id)
+    public IActionResult Details(int? id)
     {
-        if (id == null) return NotFound();
-        var anuncio = await AvailableAds().FirstOrDefaultAsync(a => a.id == id);
-        return anuncio is null ? NotFound() : View(anuncio);
+        if (id is null) return NotFound();
+        return RedirectToAction("Details", "Anuncios", new { id });
     }
 
     public IActionResult Privacy() => View();
