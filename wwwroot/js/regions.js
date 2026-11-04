@@ -154,6 +154,11 @@
           const label = row.text ?? row.Text;
           if (value != null && label != null) type.add(new Option(label, value));
         }
+        const preferred = type.dataset.selectedType;
+        if (preferred && [...type.options].some(option => option.value === preferred)) {
+          type.value = preferred;
+          delete type.dataset.selectedType;
+        }
       } catch {
         type.replaceChildren(new Option("Não foi possível carregar os tipos", ""));
       }

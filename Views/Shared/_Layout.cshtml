@@ -114,7 +114,7 @@
     <script src="~/js/regions.js" asp-append-version="true" defer></script>
     <script src="~/js/cep.js" asp-append-version="true" defer></script>
     <script src="~/js/rentall-ui.js" asp-append-version="true" defer></script>
-    <script src="~/js/google-maps.js" asp-append-version="true" defer></script>
+    <script src="~/js/google-maps.js" asp-append-version="true"></script>
     @if (!string.IsNullOrWhiteSpace(Configuration["GoogleMaps:BrowserApiKey"]))
     {
         <script async src="https://maps.googleapis.com/maps/api/js?key=@Configuration["GoogleMaps:BrowserApiKey"]&amp;loading=async&amp;callback=rentallGoogleMapsReady"></script>
