@@ -89,7 +89,7 @@
 
     function updateCountry(clearDependentFields) {
       const selectedCountry = country.value === "PT" ? "PT" : "BR";
-      const previous = region.value;
+      const previous = region.value || region.dataset.initialValue || "";
       const options = [new Option(selectedCountry === "PT" ? "Todo o distrito" : "Todo o estado", "")];
       for (const [code, label] of REGIONS[selectedCountry]) options.push(new Option(label, code));
       region.replaceChildren(...options);
@@ -106,7 +106,7 @@
       for (const label of form.querySelectorAll("[data-postal-label]"))
         label.textContent = (selectedCountry === "PT" ? "Código postal" : "CEP") + " *";
       for (const label of form.querySelectorAll("[data-rental-currency]"))
-        label.textContent = "Valor por dia (" + (selectedCountry === "PT" ? "€" : "R$") + ") *";
+        label.textContent = "Preço por dia (" + (selectedCountry === "PT" ? "€" : "R$") + ") (opcional)";
       for (const label of form.querySelectorAll("[data-filter-min-price]"))
         label.textContent = "Preço mínimo por dia (" + (selectedCountry === "PT" ? "€" : "R$") + ")";
       for (const label of form.querySelectorAll("[data-filter-max-price]"))
