@@ -22,7 +22,7 @@ jobs:
         run: python3 scripts/check_ui.py
       - name: Validate frontend JavaScript
         run: |
-          for file in wwwroot/js/rentall-ui.js wwwroot/js/regions.js wwwroot/js/cep.js wwwroot/js/google-maps.js wwwroot/js/photo-carousel.js; do
+          for file in wwwroot/js/rentall-ui.js wwwroot/js/regions.js wwwroot/js/cep.js wwwroot/js/google-maps.js wwwroot/js/photo-carousel.js wwwroot/js/publish-experience.js wwwroot/js/maps-loader.js; do
             node --check "$file"
           done
       - name: Restore packages
