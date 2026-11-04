@@ -1,0 +1,70 @@
+@model IEnumerable<aluguel.Models.PedidoAluguer>
+@using aluguel.Services
+@{
+    ViewData["Title"] = "Pedidos de aluguer";
+    var names = ViewBag.AdNames as Dictionary<int, string> ?? new();
+    var me = ViewBag.Me as string ?? "";
+}
+<link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true"/>
+<div class="page-width ra-request-page">
+    <div class="page-intro">
+        <div><p class="eyebrow">RentAll · Alugueres</p><h1>Pedidos de aluguer</h1>
+            <p>Acompanha os pedidos dos teus artigos e os que enviaste a outros anunciantes.</p></div>
+        <a class="btn btn-outline" asp-controller="Home" asp-action="Index">Explorar artigos</a>
+    </div>
+    <div class="ra-fee-disclosure"><i class="fas fa-info-circle" aria-hidden="true"></i>
+        Os pedidos registam apenas interesse no aluguer. Não existem cobranças, reservas pagas nem proteção financeira ativadas nesta fase. A comissão indicativa não é cobrada.
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state"><i class="far fa-calendar-check"></i>
+            <h2>Ainda não existem pedidos</h2>
+            <p>Quando alguém demonstrar interesse num artigo, os pedidos aparecerão aqui.</p>
+        </div>
+    }
+    else
+    {
+        <div class="ra-requests-grid">
+        @foreach (var request in Model)
+        {
+            var owner = request.AnuncianteId == me;
+            var name = names.TryGetValue(request.AnuncioId, out var label) ? label : "Anúncio";
+            <article class="ra-request-card">
+                <div class="ra-request-top">
+                    <span class="ra-request-kind">@(owner ? "Pedido recebido" : "Pedido enviado")</span>
+                    <span class="ra-request-status">@request.Estado</span>
+                </div>
+                <h2><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@request.AnuncioId">@name</a></h2>
+                <p class="muted">@request.Dias @(request.Dias == 1 ? "dia" : "dias") · @request.CriadoEm.ToString("dd/MM/yyyy")</p>
+                <dl class="ra-request-values">
+                    <div><dt>Valor estimado</dt><dd>@RentalLocalization.FormatPrice((float)request.TotalEstimado, ViewData["Pais"] as string == "BR" ? "BR" : "PT")</dd></div>
+                    <div><dt>Comissão futura ilustrativa (10%)</dt><dd>@request.ComissaoIndicativa.ToString("N2")</dd></div>
+                </dl>
+                @if (request.Estado == "Pendente" && owner)
+                {
+                    <div class="ra-request-actions">
+                        <form asp-controller="Pedidos" asp-action="Responder" method="post">
+                            <input type="hidden" name="id" value="@request.Id"/>
+                            <input type="hidden" name="aceitar" value="true"/>
+                            <button class="btn btn-primary" type="submit">Aceitar pedido</button>
+                        </form>
+                        <form asp-controller="Pedidos" asp-action="Responder" method="post">
+                            <input type="hidden" name="id" value="@request.Id"/>
+                            <input type="hidden" name="aceitar" value="false"/>
+                            <button class="btn btn-outline" type="submit">Recusar</button>
+                        </form>
+                    </div>
+                }
+                else if (request.Estado == "Pendente" && !owner)
+                {
+                    <form asp-controller="Pedidos" asp-action="Cancelar" method="post">
+                        <input type="hidden" name="id" value="@request.Id"/>
+                        <button class="btn btn-outline" type="submit">Cancelar pedido</button>
+                    </form>
+                }
+                <p class="ra-request-note">@(request.Estado == "Aceite sem pagamento" ? "Pedido aceite, mas sem pagamento processado. Combina apenas os próximos passos nas mensagens." : "Este pedido não comprova pagamento nem garante disponibilidade.")</p>
+            </article>
+        }
+        </div>
+    }
+</div>
