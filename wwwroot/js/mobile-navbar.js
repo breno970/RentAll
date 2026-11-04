@@ -26,6 +26,8 @@ class MobileNavbar {
 
   init() {
     if (!this.mobileMenu || !this.navList) return this;
+    if (this.mobileMenu.dataset.raNavBound === "true") return this;
+    this.mobileMenu.dataset.raNavBound = "true";
     this.mobileMenu.addEventListener("click", this.handleClick);
     this.navList.addEventListener("click", event => {
       if (event.target.closest("a")) this.close();
