@@ -1,138 +1,122 @@
-﻿@model aluguel.Models.Anuncio
-
+@model aluguel.Models.Anuncio
+@using aluguel.Services
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar Anúncio";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
-    
-    <title>Rent All - Criar Anúncio</title>
-</head>
-
-
-<body>
-
-   
-    <!-- FORM HEADER -->
-    <div class="card-it">
-
-        <h1>Criar Anúncio </h1>
-
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="card-it ra-ad-editor">
+    <h1>Criar Anúncio</h1>
+    <p class="ra-field-hint">Transforme um objeto em desuso numa oportunidade de aluguel. Informe os detalhes e escolha onde ele está disponível.</p>
+    <form asp-action="Create" method="post" class="ra-ad-form">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <h2><i class="fas fa-box-open" aria-hidden="true"></i> Sobre o item</h2>
+        <div class="ra-form-grid">
             <div class="form-group">
-
-                <div class="form-group">
-                    <label asp-for="itemid" class="control-label">Nome do Item</label>
-                    <select asp-for="itemid" class="form-control" asp-items="ViewBag.itemid"></select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="vlitem" class="control-label">Valor</label>
-                    <input asp-for="vlitem" class="form-control" placeholder="Informe o valor" />
-                    <span asp-validation-for="vlitem" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="diasAluguel" class="control-label">Dias Oferecidos</label>
-                    <input asp-for="diasAluguel" class="form-control" placeholder="Dias oferecidos" />
-                    <span asp-validation-for="diasAluguel" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <input asp-for="iduser" type="hidden" value="@User.FindFirst(ClaimTypes.NameIdentifier).Value" class="form-control" />
-                    <span asp-validation-for="iduser" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label class="control-label">Categoria</label>
-                    <select asp-items="ViewBag.Categoria" id="Categoria" name="Categoria" class="form-control">
-                        <option value="">Selecione a categoria</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="control-label">Tipo</label>
-                    <select id="Tipo" class="form-control" name="Tipo"></select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="modelo" class="control-label"></label>
-                    <input asp-for="modelo" class="form-control" placeholder="Modelo do item" />
-                </div>
-
-                <div class="form-group">
-                    <label for="txtCep">CEP *</label>
-                    <input id="txtCep" type="text" name="Cep" placeholder="00000-000" class="form-control">
-                    <span asp-validation-for="CEP" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="txtCidade">Cidade *</label>
-                    <input id="txtCidade" type="text" name="Cidade" placeholder="Cidade" class="form-control">
-                    <span asp-validation-for="Cidade" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="txtBairro">Bairro *</label>
-                    <input id="txtBairro" type="text" name="Bairro" placeholder="Bairro" class="form-control">
-                    <span asp-validation-for="Bairro" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="txtEstado">Estado *</label>
-                    <input id="txtEstado" type="text" name="Estado" placeholder="UF" class="form-control">
-                    <span asp-validation-for="Estado" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="txtNumero">Número</label>
-                    <input id="txtNumero" type="text" name="Numero" placeholder="Número" class="form-control">
-                    <span asp-validation-for="Numero" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="txtRua">Rua *</label>
-                    <input id="txtRua" type="text" name="Rua" placeholder="Rua" class="form-control">
-                    <span asp-validation-for="Rua" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="Complemento">Complemento</label>
-                    <textarea id="Complemento" name="Complemento" placeholder="Complemento" class="form-control"></textarea>
-                    <span asp-validation-for="Complemento" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="contato" class="control-label">Contato</label>
-                    <input asp-for="contato" class="form-control" placeholder="Forma de comunicação" />
-                    <span asp-validation-for="contato" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="NomeFantasia" class="control-label">Como as pessoas devem te chamar?</label>
-                    <input asp-for="NomeFantasia" class="form-control" placeholder="Nome para contato" />
-                    <span asp-validation-for="NomeFantasia" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="Criar" class="btn btn-primary" />
-                    <a asp-action="Index" class="btn btn-primary">Voltar para lista</a>
-                </div>
+                <label asp-for="itemid">Escolha o item já cadastrado *</label>
+                <select asp-for="itemid" asp-items="ViewBag.itemid" class="form-control" required>
+                    <option value="">Selecione um item</option>
+                </select>
+                <small class="ra-field-hint">Ainda não cadastrou? <a asp-controller="Items" asp-action="Create">Cadastre um item com fotos.</a></small>
             </div>
-        </form>
+            <div class="form-group">
+                <label asp-for="modelo">Modelo ou referência *</label>
+                <input asp-for="modelo" class="form-control" maxlength="150" placeholder="Marca e modelo do item" required />
+                <span asp-validation-for="modelo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Categoria">Categoria *</label>
+                <select asp-items="ViewBag.Categoria" name="Categoria" id="Categoria" class="form-control" required>
+                    <option value="">Escolha a categoria</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="Tipo">Tipo *</label>
+                <select id="Tipo" name="Tipo" class="form-control" required disabled>
+                    <option value="">Selecione primeiro a categoria</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="vlitem">Valor do aluguel por dia (R$) *</label>
+                <input asp-for="vlitem" class="form-control" type="number" min="0.01" step="0.01" inputmode="decimal" required />
+                <span asp-validation-for="vlitem" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="diasAluguel">Quantidade de dias disponíveis *</label>
+                <input asp-for="diasAluguel" class="form-control" type="number" min="1" max="365" required />
+                <span asp-validation-for="diasAluguel" class="text-danger"></span>
+            </div>
+        </div>
 
-    </div>
+        <h2><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Região onde o item está disponível</h2>
+        <p class="ra-field-hint">A pesquisa mostra a sua cidade e bairro; o endereço exato não precisa de ser exposto ao público.</p>
+        <div class="ra-form-grid">
+            <div class="form-group">
+                <label asp-for="Estado">Estado (UF) *</label>
+                <select asp-for="Estado" id="txtEstado" class="form-control" data-region-uf required>
+                    <option value="">Selecione o estado</option>
+                    @foreach (var uf in LocationCatalog.States)
+                    {
+                        <option value="@uf.Code">@uf.Name (@uf.Code)</option>
+                    }
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cidade">Cidade *</label>
+                <input asp-for="Cidade" id="txtCidade" class="form-control" data-region-city list="ra-ad-cities" placeholder="Selecione ou escreva a cidade" required autocomplete="address-level2" />
+                <datalist id="ra-ad-cities"></datalist>
+                <span asp-validation-for="Cidade" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Bairro">Bairro *</label>
+                <input asp-for="Bairro" id="txtBairro" class="form-control" maxlength="120" required />
+                <span asp-validation-for="Bairro" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CEP">CEP *</label>
+                <input asp-for="CEP" id="txtCep" class="form-control" inputmode="numeric" maxlength="9" placeholder="00000-000" required autocomplete="postal-code" />
+                <small class="ra-field-hint">O CEP pode preencher automaticamente a cidade, o bairro e a UF.</small>
+                <span asp-validation-for="CEP" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rua">Rua *</label>
+                <input asp-for="Rua" id="txtRua" class="form-control" required autocomplete="address-line1" />
+                <span asp-validation-for="Rua" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Numero">Número (opcional)</label>
+                <input asp-for="Numero" id="txtNumero" class="form-control" inputmode="numeric" />
+                <span asp-validation-for="Numero" class="text-danger"></span>
+            </div>
+            <div class="form-group ra-full">
+                <label asp-for="Complemento">Complemento (opcional)</label>
+                <input asp-for="Complemento" class="form-control" />
+            </div>
+        </div>
+        <div class="ra-map-actions">
+            <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" data-region-map-link aria-disabled="true"><i class="fas fa-map-marked-alt" aria-hidden="true"></i> Ver região no Google Maps</a>
+            <div class="ra-map-preview" data-ra-map hidden aria-label="Mapa aproximado da região selecionada"></div>
+        </div>
 
-
-</body>
-
+        <h2><i class="fas fa-phone-alt" aria-hidden="true"></i> Contato</h2>
+        <div class="ra-form-grid">
+            <div class="form-group">
+                <label asp-for="NomeFantasia">Como as pessoas devem chamar você? *</label>
+                <input asp-for="NomeFantasia" class="form-control" required />
+                <span asp-validation-for="NomeFantasia" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="contato">Telefone ou outro contato *</label>
+                <input asp-for="contato" class="form-control" required />
+                <span asp-validation-for="contato" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="btn-container">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-check" aria-hidden="true"></i> Publicar anúncio</button>
+            <a asp-action="Index" class="btn btn-outline-dark">Voltar para lista</a>
+        </div>
+    </form>
+</div>
 <div class="footer-container">
 
     <div class="footer-content-2">
@@ -189,37 +173,4 @@
     </div>
 
 </div>
-</html>
-
-@if (ViewBag.SelectCategoria != null)
-{
-    <div>
-        You selected : @ViewBag.SelectCategoria <br />
-        You selected : @ViewBag.SelectTipo <br />
-    </div>
-}
-
-@section Scripts {
-
-    <script>
-        $(function () {
-            //jquery function to be called when country dropdown changes
-            $("#Categoria").change(function () {
-                var cid = $(this).val();
-                $("#Tipo").empty();
-                //call GetStates method to get states list
-                $.getJSON(`/Anuncios/GetTipos?id=${cid}`, function (data) {
-                    //console.log(data);
-                    $.each(data, function (i, item) {
-                        $("#Tipo").append(`<option value="${item.Value}">${item.Text}</option>`);
-                    });
-                });
-            })
-        });
-    </script>
-
-    @{
-
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
