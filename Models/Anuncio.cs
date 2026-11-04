@@ -14,23 +14,22 @@ namespace aluguel.Models
         public int id { get; set; }
 
       
-        [Range(0.01, 10000000, ErrorMessage = "Informe um valor positivo para a diária.") ]
+        [Range(0, 10000000, ErrorMessage = "O valor não pode ser negativo.") ]
         public float vlitem { get; set; }
 
-        [Range(1, 365, ErrorMessage = "Informe um período entre 1 e 365 dias.") ]
+        [Range(0, 365, ErrorMessage = "Informe até 365 dias, ou deixe em aberto.") ]
         public int diasAluguel { get; set; }
 
-        [Required(ErrorMessage = "O modelo é obrigatório.")]
+        
         public string modelo { get; set; } = "";
 
 
-        [Required(ErrorMessage = "Informe o CEP ou código postal.")]
+        
         public string CEP { get; set; } = "";
         public string Rua { get; set; } = "";
 
         public string? Numero { get; set; }
 
-        [Required]
         public string Bairro { get; set; } = "";
         [Required]
         public string Cidade { get; set; } = "";
@@ -38,10 +37,8 @@ namespace aluguel.Models
         public string Estado { get; set; } = "";
         public string? Complemento { get; set; }
 
-        [Required]
         public string contato { get; set; } = "";
 
-        [Required]
         public string NomeFantasia { get; set; } = "";
 
         // Brasil (BR) ou Portugal (PT). Registos históricos são Brasil.
