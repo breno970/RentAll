@@ -1,284 +1,147 @@
-﻿using aluguel.Areas.Identity.Data;
+using aluguel.Areas.Identity.Data;
 using aluguel.Models;
+using aluguel.Services;
 using aluguel.ViewModel;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace aluguel.Controllers
+namespace aluguel.Controllers;
+
+[Authorize]
+public sealed class ItemsController : Controller
 {
-    [Authorize]
-    public class ItemsController : Controller
+    private readonly ApplicationDbContext _db;
+    private readonly IImageStorage _storage;
+    private readonly ILogger<ItemsController> _logger;
+
+    public ItemsController(ApplicationDbContext db, IImageStorage storage, ILogger<ItemsController> logger)
     {
-        private readonly ILogger<ItemsController> _logger;
-        private readonly ApplicationDbContext Context;
-        private readonly IWebHostEnvironment WebHostEnvironment;
+        _db = db;
+        _storage = storage;
+        _logger = logger;
+    }
 
-        public ItemsController(ILogger<ItemsController> logger, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? throw new UnauthorizedAccessException();
+
+    public async Task<IActionResult> Index()
+        => View(await _db.Items.Where(x => x.iduser == CurrentUserId).ToListAsync());
+
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id is null) return NotFound();
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        return item is null ? NotFound() : View(item);
+    }
+
+    public IActionResult Create() => View();
+
+    public IActionResult GetTipos(int id)
+        => Json(_db.Tipos.Where(x => x.categoriaid == id)
+            .Select(x => new SelectListItem { Value = x.id.ToString(), Text = x.nmtipo }).ToList());
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(30_000_000)]
+    public async Task<IActionResult> Create(ItemViewModel vm, CancellationToken ct)
+    {
+        if (vm.imagem1 is null || string.IsNullOrWhiteSpace(vm.nmitem) || string.IsNullOrWhiteSpace(vm.dsitem))
         {
-            _logger = logger;
-            Context = context;
-            WebHostEnvironment = webHostEnvironment;
+            ModelState.AddModelError("", "Nome, descrição e a primeira imagem são obrigatórios.");
+            return View(vm);
         }
 
-        public async Task<IActionResult> Index()
+        var uploaded = new List<string>();
+        try
         {
-            var model = await Context.Items
-                            .Where(a => a.iduser == HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value)
-                            .ToListAsync();
-            return View(model);
-
-        }
-
-        // GET: Items/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || Context.Items == null)
+            foreach (var image in new[] { vm.imagem1, vm.imagem2, vm.imagem3, vm.imagem4, vm.imagem5 })
             {
-                return NotFound();
+                if (image is not null)
+                    uploaded.Add(await _storage.UploadAsync(image, CurrentUserId, ct));
+                else
+                    uploaded.Add("");
             }
-
-            var item = await Context.Items
-                .FirstOrDefaultAsync(m => m.id == id && m.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            return View(item);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        public IActionResult GetTipos(int id)
-        {
-            //get state list as SelectListItem
-            var statesList = Context.Tipos.Where(s => s.categoriaid == id).ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmtipo }).ToList();
-            return Json(statesList);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(ItemViewModel vm)
-        {
-            string imagem1 = Imagem1(vm);
-            string? imagem2 = Imagem2(vm);
-            string? imagem3 = Imagem3(vm);
-            string? imagem4 = Imagem4(vm);
-            string? imagem5 = Imagem5(vm);
             var item = new Item
             {
                 nmitem = vm.nmitem,
                 dsitem = vm.dsitem,
-                dtcriacao = vm.dtcriacao = DateTime.Now,
-                snativo = vm.snativo,
-                iduser = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
-                imagem1 = imagem1,
-                imagem2 = imagem2,
-                imagem3 = imagem3,
-                imagem4 = imagem4,
-                imagem5 = imagem5
-
+                dtcriacao = DateTime.UtcNow,
+                snativo = vm.snativo == "N" ? "N" : "S",
+                iduser = CurrentUserId,
+                imagem1 = uploaded[0],
+                imagem2 = string.IsNullOrEmpty(uploaded[1]) ? null : uploaded[1],
+                imagem3 = string.IsNullOrEmpty(uploaded[2]) ? null : uploaded[2],
+                imagem4 = string.IsNullOrEmpty(uploaded[3]) ? null : uploaded[3],
+                imagem5 = string.IsNullOrEmpty(uploaded[4]) ? null : uploaded[4]
             };
-            ViewBag.Categoria = Context.Categorias.ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmcategoria }).ToList();
-
-            Context.Items.Add(item);
-            Context.SaveChanges();
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: Items/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || Context.Items == null)
-            {
-                return NotFound();
-            }
-
-            var item = await Context.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (item == null)
-            {
-                return NotFound();
-            }
-            return View(item);
-        }
-
-        // POST: Items/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,nmitem,dsitem,dtcriacao,snativo,imagem1,imagem2,imagem3,imagem4,imagem5,iduser")] Item item)
-        {
-            if (id != item.id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var existing = await Context.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-                    if (existing == null) return NotFound();
-                    // Never accept the owner or image paths from form fields.
-                    existing.nmitem = item.nmitem;
-                    existing.dsitem = item.dsitem;
-                    existing.snativo = item.snativo;
-                    await Context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ItemExists(item.id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(item);
-        }
-
-        // GET: Items/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || Context.Items == null)
-            {
-                return NotFound();
-            }
-
-            var item = await Context.Items
-                .FirstOrDefaultAsync(m => m.id == id && m.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            return View(item);
-        }
-
-        // POST: Items/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (Context.Items == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Items'  is null.");
-            }
-            var item = await Context.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (item != null)
-            {
-                Context.Items.Remove(item);
-            }
-
-            await Context.SaveChangesAsync();
+            _db.Items.Add(item);
+            await _db.SaveChangesAsync(ct);
             return RedirectToAction(nameof(Index));
         }
-
-        private string Imagem1(ItemViewModel vm)
+        catch (Exception ex) when (ex is InvalidDataException or IOException or HttpRequestException or InvalidOperationException or DbUpdateException)
         {
-            string imagem = null;
-            if (vm.imagem1 != null)
+            _logger.LogError(ex, "Failed to create item or upload photos.");
+            foreach (var key in uploaded.Where(k => !string.IsNullOrEmpty(k)))
             {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem1.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem1.CopyTo(fileStream);
-                }
-
+                try { await _storage.DeleteAsync(key, ct); }
+                catch (Exception cleanupError) { _logger.LogWarning(cleanupError, "Could not clean up orphaned item image."); }
             }
-            return imagem;
-
+            ModelState.AddModelError("", "Não foi possível guardar o item. Verifica o tamanho das imagens e tenta novamente.");
+            return View(vm);
         }
+    }
 
-        private string Imagem2(ItemViewModel vm)
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id is null) return NotFound();
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        return item is null ? NotFound() : View(item);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [Bind("id,nmitem,dsitem,snativo,imagem1,imagem2,imagem3,imagem4,imagem5,iduser,dtcriacao")] Item posted)
+    {
+        if (id != posted.id) return NotFound();
+        var existing = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        if (existing is null) return NotFound();
+        if (string.IsNullOrWhiteSpace(posted.nmitem) || string.IsNullOrWhiteSpace(posted.dsitem))
         {
-            string imagem = null;
-            if (vm.imagem2 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem2.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem2.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
+            ModelState.AddModelError("", "Nome e descrição são obrigatórios.");
+            return View(existing);
         }
+        existing.nmitem = posted.nmitem;
+        existing.dsitem = posted.dsitem;
+        existing.snativo = posted.snativo == "N" ? "N" : "S";
+        await _db.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
 
-        private string Imagem3(ItemViewModel vm)
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id is null) return NotFound();
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        return item is null ? NotFound() : View(item);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        if (item is null) return NotFound();
+
+        var keys = new[] { item.imagem1, item.imagem2, item.imagem3, item.imagem4, item.imagem5 };
+        _db.Items.Remove(item);
+        await _db.SaveChangesAsync();
+        foreach (var key in keys.Where(x => !string.IsNullOrWhiteSpace(x)))
         {
-            string imagem = null;
-            if (vm.imagem3 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem3.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem3.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
+            try { await _storage.DeleteAsync(key); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Image cleanup failed after item deletion."); }
         }
-
-        private string Imagem4(ItemViewModel vm)
-        {
-            string imagem = null;
-            if (vm.imagem4 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem4.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem4.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
-        }
-
-        private string Imagem5(ItemViewModel vm)
-        {
-            string imagem = null;
-            if (vm.imagem5 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem5.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem5.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
-        }
-
-        private bool ItemExists(int id)
-        {
-            return (Context.Items?.Any(e => e.id == id)).GetValueOrDefault();
-        }
+        return RedirectToAction(nameof(Index));
     }
 }
