@@ -45,7 +45,15 @@ public sealed class DenunciasController : Controller
             AnuncioId = anuncioId, AutorId = user, Motivo = motivo,
             Detalhes = detalhes?.Trim(), CriadaEm = DateTime.UtcNow
         });
-        await _db.SaveChangesAsync(ct);
+        try
+        {
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            TempData["Error"] = "Não foi possível registar outra denúncia para este anúncio.";
+            return RedirectToAction("Details", "Anuncios", new { id = anuncioId });
+        }
         TempData["Success"] = "Denúncia recebida. A equipa responsável poderá analisá-la. Não significa que o anúncio tenha sido removido.";
         return RedirectToAction("Details", "Anuncios", new { id = anuncioId });
     }
