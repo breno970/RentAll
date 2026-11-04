@@ -48,7 +48,10 @@ public sealed class SupabaseImageStorage : IImageStorage
         using var request = new HttpRequestMessage(HttpMethod.Post,
             $"{_baseUrl}/storage/v1/object/{Bucket}/{key}");
         request.Headers.Add("apikey", _secretKey);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _secretKey);
+        // Modern sb_secret_* keys are opaque API keys, not JWTs. Never send them as Bearer tokens.
+        // Keep legacy service_role JWT compatibility for installations that still use it.
+        if (!_secretKey.StartsWith("sb_secret_", StringComparison.Ordinal))
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _secretKey);
         request.Content = new StreamContent(image.OpenReadStream());
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
         using var response = await _client.SendAsync(request, ct);
@@ -75,7 +78,10 @@ public sealed class SupabaseImageStorage : IImageStorage
         using var request = new HttpRequestMessage(HttpMethod.Delete,
             $"{_baseUrl}/storage/v1/object/{Bucket}/{key}");
         request.Headers.Add("apikey", _secretKey);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _secretKey);
+        // Modern sb_secret_* keys are opaque API keys, not JWTs. Never send them as Bearer tokens.
+        // Keep legacy service_role JWT compatibility for installations that still use it.
+        if (!_secretKey.StartsWith("sb_secret_", StringComparison.Ordinal))
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _secretKey);
         using var response = await _client.SendAsync(request, ct);
         if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NotFound)
             throw new IOException($"Falha ao eliminar imagem (HTTP {(int)response.StatusCode}).");
