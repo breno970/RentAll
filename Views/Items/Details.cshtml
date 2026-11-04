@@ -1,16 +1,28 @@
 @model aluguel.Models.Item
 @{ ViewData["Title"] = Model.nmitem; }
+<link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
 <div class="page-width">
     <div class="page-intro"><div><p class="eyebrow">Meus itens / Detalhes</p><h1>@Model.nmitem</h1><p>Consulta os dados do teu artigo.</p></div><a asp-action="Index" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Voltar</a></div>
     <div class="detail-layout">
         <div class="panel">
-            @if (!string.IsNullOrWhiteSpace(Model.imagem1))
-            { <img class="detail-main-image" src="@Url.Content("~/imagens/" + Model.imagem1)" alt="@Model.nmitem" /> }
+            @{
+                var photos = new[] { Model.imagem1, Model.imagem2, Model.imagem3, Model.imagem4, Model.imagem5 }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+            }
+            @if (photos.Length > 0)
+            {
+                <div class="ra-photo-view" data-photo-carousel-view>
+                    @foreach (var photo in photos)
+                    {
+                        <span data-view-photo="@Url.Content("~/imagens/" + photo)" hidden></span>
+                    }
+                    <div class="ra-photo-stage">
+                        <button type="button" data-view-prev aria-label="Fotografia anterior"><i class="fas fa-chevron-left"></i></button>
+                        <div class="ra-photo-frame"><img class="detail-main-image" data-view-main alt="Fotografia do artigo" /><p data-view-counter></p></div>
+                        <button type="button" data-view-next aria-label="Próxima fotografia"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            }
             else { <div class="detail-main-image image-empty"><i class="far fa-image"></i></div> }
-            <div class="gallery-thumbs">
-                @foreach (var photo in new[] { Model.imagem2, Model.imagem3, Model.imagem4, Model.imagem5 }.Where(p => !string.IsNullOrWhiteSpace(p)))
-                { <img src="@Url.Content("~/imagens/" + photo)" width="75" height="65" alt="Fotografia adicional de @Model.nmitem" loading="lazy" style="object-fit:cover;border-radius:10px" /> }
-            </div>
         </div>
         <div class="panel">
             <span class="pill @(Model.snativo == "N" ? "pill-warning" : "")">@(Model.snativo == "N" ? "Oculto" : "Ativo")</span>
@@ -29,3 +41,5 @@
         </div>
     </div>
 </div>
+
+@section Scripts { <script src="~/js/photo-carousel.js" asp-append-version="true"></script> }
