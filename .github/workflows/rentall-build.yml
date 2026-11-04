@@ -17,6 +17,13 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Validate Razor page structure
+        run: python3 scripts/check_ui.py
+      - name: Validate frontend JavaScript
+        run: |
+          for file in wwwroot/js/rentall-ui.js wwwroot/js/regions.js wwwroot/js/cep.js wwwroot/js/google-maps.js; do
+            node --check "$file"
+          done
       - name: Restore packages
         run: dotnet restore aluguel.csproj
       - name: Compile application
