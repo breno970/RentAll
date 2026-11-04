@@ -6,6 +6,7 @@
     var mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + Uri.EscapeDataString(place);
     var isSaved = ViewData["IsFavorite"] is bool value && value;
 }
+<link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
 <div class="page-width">
     <div class="page-intro">
         <div><p class="eyebrow"><a asp-controller="Home" asp-action="Index" asp-route-Pais="@Model.Pais">Explorar</a> / Detalhes do anúncio</p><h1>@(Model.item?.nmitem ?? Model.modelo)</h1><p><i class="fas fa-map-marker-alt"></i> @place</p></div>
@@ -16,19 +17,20 @@
             <div class="panel">
                 @if (photos.Length > 0)
                 {
-                    <img class="detail-main-image" src="@Url.Content("~/imagens/" + photos[0])" alt="Fotografia de @(Model.item?.nmitem ?? Model.modelo)" data-gallery-main />
-                    @if (photos.Length > 1)
-                    {
-                        <div class="gallery-thumbs" aria-label="Galeria de fotografias">
-                            @for (var i = 0; i < photos.Length; i++)
-                            {
-                                var url = Url.Content("~/imagens/" + photos[i]);
-                                <button class="gallery-thumb" type="button" data-gallery-image="@url" data-gallery-alt="Fotografia @(i + 1) do artigo" aria-label="Ver fotografia @(i + 1)" aria-pressed="@(i == 0 ? "true" : "false")">
-                                    <img src="@url" alt="" loading="lazy" />
-                                </button>
-                            }
+                    <div class="ra-photo-view" data-photo-carousel-view>
+                        @foreach (var photo in photos)
+                        {
+                            <span data-view-photo="@Url.Content("~/imagens/" + photo)" hidden></span>
+                        }
+                        <div class="ra-photo-stage">
+                            <button type="button" data-view-prev aria-label="Fotografia anterior"><i class="fas fa-chevron-left"></i></button>
+                            <div class="ra-photo-frame">
+                                <img class="detail-main-image" data-view-main alt="Fotografia de @(Model.item?.nmitem ?? Model.modelo)" />
+                                <p data-view-counter aria-live="polite"></p>
+                            </div>
+                            <button type="button" data-view-next aria-label="Próxima fotografia"><i class="fas fa-chevron-right"></i></button>
                         </div>
-                    }
+                    </div>
                 }
                 else { <div class="detail-main-image image-empty"><i class="far fa-image"></i></div> }
             </div>
@@ -74,3 +76,5 @@
         </aside>
     </div>
 </div>
+
+@section Scripts { <script src="~/js/photo-carousel.js" asp-append-version="true"></script> }

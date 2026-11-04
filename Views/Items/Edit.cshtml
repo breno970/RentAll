@@ -1,16 +1,46 @@
 @model aluguel.Models.Item
 @{ ViewData["Title"] = "Editar item"; }
+<link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
 <div class="page-width"><div class="form-shell">
-    <div class="page-intro"><div><p class="eyebrow">Meus itens / Edição</p><h1>Editar artigo</h1><p>Atualiza os dados e a visibilidade de <strong>@Model.nmitem</strong>.</p></div><a class="btn btn-outline" asp-action="Index"><i class="fas fa-arrow-left"></i> Voltar</a></div>
-    <form asp-action="Edit" method="post" class="form-panel" data-submit-lock>
-        <input asp-for="id" type="hidden" />
-        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    <div class="page-intro"><div><p class="eyebrow">Meus itens / Edição</p><h1>Editar artigo</h1><p>Atualiza os dados e as fotografias de <strong>@Model.nmitem</strong>.</p></div><a class="btn btn-outline" asp-action="Index"><i class="fas fa-arrow-left"></i> Voltar</a></div>
+    <form asp-action="Edit" asp-route-id="@Model.id" method="post" enctype="multipart/form-data" class="form-panel" data-submit-lock>
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
         <div class="form-grid">
-            <div class="form-field full"><label asp-for="nmitem">Nome do artigo *</label><input asp-for="nmitem" class="form-control" required /><span asp-validation-for="nmitem" class="text-danger"></span></div>
-            <div class="form-field full"><label asp-for="dsitem">Descrição *</label><textarea asp-for="dsitem" rows="5" class="form-control" required></textarea><span asp-validation-for="dsitem" class="text-danger"></span></div>
-            <div class="form-field full"><label asp-for="snativo">Visibilidade</label><select asp-for="snativo" class="form-select"><option value="S">Ativo</option><option value="N">Oculto</option></select></div>
+            <div class="form-field full"><label for="nmitem">Nome do artigo *</label><input id="nmitem" name="nmitem" value="@Model.nmitem" class="form-control" required maxlength="140" /></div>
+            <div class="form-field full"><label for="dsitem">Descrição *</label><textarea id="dsitem" name="dsitem" rows="5" class="form-control" required>@Model.dsitem</textarea></div>
+            <div class="form-field full"><label for="snativo">Visibilidade</label><select id="snativo" name="snativo" class="form-select"><option value="S" selected="@(Model.snativo == "S")">Ativo</option><option value="N" selected="@(Model.snativo == "N")">Oculto</option></select></div>
         </div>
-        <div class="helper-banner"><i class="fas fa-images"></i><span>As fotografias atuais permanecem guardadas. Para publicar o artigo, utiliza a opção «Anunciar» na tua lista.</span></div>
+        <h2>Fotografias</h2>
+        <p class="muted">Adiciona, remove ou altera a ordem. A primeira fotografia será a capa do anúncio.</p>
+        <div class="ra-photo-editor" data-photo-carousel-editor>
+    @foreach (var key in new[] { Model.imagem1, Model.imagem2, Model.imagem3, Model.imagem4, Model.imagem5 }.Where(x => !string.IsNullOrWhiteSpace(x))) {
+        <span data-photo-existing="@key" data-photo-url="@Url.Content("~/imagens/" + key)" hidden></span>
+    }
+    <div class="ra-photo-toolbar">
+        <button class="btn btn-outline" type="button" data-photo-add><i class="fas fa-plus"></i> Adicionar fotografias</button>
+        <span data-photo-counter aria-live="polite">0 de 5</span>
+    </div>
+    <input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple data-photo-files hidden />
+    <input name="photoOrder" type="hidden" data-photo-order />
+    <div class="ra-photo-stage">
+        <button type="button" data-photo-prev aria-label="Fotografia anterior"><i class="fas fa-chevron-left"></i></button>
+        <div class="ra-photo-frame">
+            <img data-photo-preview alt="Pré-visualização da fotografia" hidden />
+            <div data-photo-empty class="ra-photo-placeholder">Escolhe até 5 fotografias para o teu artigo.</div>
+        </div>
+        <button type="button" data-photo-next aria-label="Próxima fotografia"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="ra-photo-actions">
+        <button type="button" data-photo-cover>Definir como capa</button>
+        <button type="button" data-photo-left aria-label="Mover fotografia para trás"><i class="fas fa-arrow-left"></i> Mover</button>
+        <button type="button" data-photo-right aria-label="Mover fotografia para a frente">Mover <i class="fas fa-arrow-right"></i></button>
+        <button type="button" data-photo-remove><i class="far fa-trash-alt"></i> Remover</button>
+    </div>
+    <p data-photo-status role="alert" class="ra-photo-status" hidden></p>
+</div>
         <div class="form-actions"><button class="btn btn-primary" type="submit">Guardar alterações</button><a class="btn btn-outline" asp-action="Index">Cancelar</a></div>
     </form>
 </div></div>
+@section Scripts {
+    <script src="~/js/photo-carousel.js" asp-append-version="true"></script>
+}
