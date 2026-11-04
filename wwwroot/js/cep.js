@@ -15,14 +15,23 @@ async function BuscaCep() {
     const resposta = await fetch("https://brasilapi.com.br/api/cep/v1/" + encodeURIComponent(cep));
     if (!resposta.ok) throw new Error(resposta.status === 404 ? "CEP não encontrado." : "Falha ao consultar o CEP.");
     const endereco = await resposta.json();
+    // Estado deve ser preenchido antes da cidade para o seletor do IBGE
+    // não limpar o município automaticamente selecionado via CEP.
+    const uf = document.getElementById("txtEstado");
+    if (uf && typeof endereco.state === "string" && endereco.state) {
+      uf.value = endereco.state.toUpperCase();
+      uf.dispatchEvent(new Event("change", { bubbles: true }));
+    }
     for (const [id, value] of Object.entries({
-      txtRua: endereco.street,
-      txtBairro: endereco.neighborhood,
       txtCidade: endereco.city,
-      txtEstado: endereco.state
+      txtBairro: endereco.neighborhood,
+      txtRua: endereco.street
     })) {
       const field = document.getElementById(id);
-      if (field && typeof value === "string" && value) field.value = value;
+      if (field && typeof value === "string" && value) {
+        field.value = value;
+        field.dispatchEvent(new Event("input", { bubbles: true }));
+      }
     }
   } catch (error) {
     campoCep.setCustomValidity(error.message || "Não foi possível consultar o CEP.");
