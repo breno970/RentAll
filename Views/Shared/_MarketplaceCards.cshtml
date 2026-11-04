@@ -42,8 +42,8 @@ else
                     <h3><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@ad.id">@(ad.item?.nmitem ?? ad.modelo)</a></h3>
                     <p class="listing-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> @ad.Cidade, @ad.Estado · @aluguel.Services.LocationCatalog.CountryName(ad.Pais)</p>
                     <div class="listing-bottom">
-                        <div class="listing-price">@aluguel.Services.RentalLocalization.FormatPrice(ad.vlitem, ad.Pais)<small>por dia</small></div>
-                        <span class="listing-tag">@ad.diasAluguel dia(s)</span>
+                        <div class="listing-price">@aluguel.Services.RentalLocalization.FormatPrice(ad.vlitem, ad.Pais)@if (ad.vlitem > 0) { <small>por dia</small> }</div>
+                        <span class="listing-tag">@(ad.diasAluguel > 0 ? $"{ad.diasAluguel} dia(s)" : "A combinar")</span>
                     </div>
                 </div>
             </article>
