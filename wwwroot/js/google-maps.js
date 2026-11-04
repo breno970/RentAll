@@ -8,10 +8,12 @@ window.rentallGoogleMapsReady = function () {
   for (const target of maps) {
     const form = target.closest("form") || document;
     const state = form.querySelector("[data-region-uf]");
+    const country = form.querySelector("[data-region-country]");
     const city = form.querySelector("[data-region-city]");
     const staticPlace = target.dataset.place || "";
+    const countryName = country?.value === "PT" || staticPlace.includes("Portugal") ? "Portugal" : "Brasil";
     const map = new google.maps.Map(target, {
-      center: { lat: -14.235, lng: -51.9253 },
+      center: countryName === "Portugal" ? { lat: 39.5, lng: -8 } : { lat: -14.235, lng: -51.9253 },
       zoom: 4, mapTypeControl: false, streetViewControl: false,
       fullscreenControl: false, gestureHandling: "cooperative"
     });
@@ -20,7 +22,7 @@ window.rentallGoogleMapsReady = function () {
     let scheduled = null;
     let current = 0;
     async function update() {
-      const place = staticPlace || [city?.value, state?.value, "Brasil"].filter(Boolean).join(", ");
+      const place = staticPlace || [city?.value, state?.value, country?.value === "PT" ? "Portugal" : "Brasil"].filter(Boolean).join(", ");
       if (!place || (!staticPlace && (!city?.value || !state?.value))) return;
       const request = ++current;
       try {
@@ -45,6 +47,7 @@ window.rentallGoogleMapsReady = function () {
     }
     target.hidden = false;
     if (staticPlace) void update();
+    if (country) country.addEventListener("change", schedule);
     if (state) state.addEventListener("change", schedule);
     if (city) city.addEventListener("change", schedule);
     if (city) city.addEventListener("blur", schedule);
