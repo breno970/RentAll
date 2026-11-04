@@ -1,29 +1,40 @@
 using aluguel.Areas.Identity.Data;
 using aluguel.IServices;
 using aluguel.Services;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
+var connectionString = configuration.GetConnectionString("ApplicationDbContextConnection")
+    ?? throw new InvalidOperationException("Configure ConnectionStrings__ApplicationDbContextConnection.");
 
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
+services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+services.AddDataProtection().SetApplicationName("RentAll")
+    .PersistKeysToDbContext<ApplicationDbContext>();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+// Email verification is enabled when a functioning provider is configured.
+// On the free prototype without email service, registration remains usable.
+var hasEmailProvider = !string.IsNullOrWhiteSpace(configuration["SendGridKey"]);
+services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = hasEmailProvider;
+    options.User.RequireUniqueEmail = true;
+}).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
-
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
-builder.Services.AddScoped<IItemService, ItemService>();
-// Add services to the container.
-builder.Services.AddControllersWithViews()
-    .AddJsonOptions(o =>
-    {
-        o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-        o.JsonSerializerOptions.PropertyNamingPolicy = null;
-    });
+services.AddTransient<IEmailSender, EmailSender>();
+services.Configure<AuthMessageSenderOptions>(configuration);
+services.AddScoped<IItemService, ItemService>();
+services.AddHttpClient<IImageStorage, SupabaseImageStorage>();
+services.AddControllersWithViews().AddJsonOptions(o =>
+{
+    o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    o.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
+services.AddRazorPages();
 
 var googleClientId = configuration["Authentication:Google:ClientId"];
 var googleClientSecret = configuration["Authentication:Google:ClientSecret"];
@@ -35,34 +46,26 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
         options.ClientSecret = googleClientSecret;
     });
 }
-//services.AddAuthentication().AddFacebook(facebookOptions =>
-//{
-//    facebookOptions.AppId = configuration["Authentication:Facebook:AppId"];
-//    facebookOptions.AppSecret = configuration["Authentication:Facebook:AppSecret"];
-//});
-
 
 var app = builder.Build();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto,
+    // Render's ingress proxy supplies this header. Do not expose the container port directly.
+    KnownNetworks = { },
+    KnownProxies = { }
+});
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
-
 app.Run();
