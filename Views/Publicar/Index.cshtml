@@ -8,14 +8,14 @@
 <div class="page-width ra-publish">
     <header class="ra-publish-head">
         <p class="eyebrow">Publicar na RentAll</p>
-        <h1>O teu objeto merece uma nova vida.</h1>
-        <p>Um único formulário. Sem revelar a tua morada, localização exata ou número de telefone.</p>
+        <h1>Publica o teu artigo.</h1>
+        <p>Fotografias, preço e localização num único formulário. Não precisas de partilhar a tua morada nem o telefone.</p>
     </header>
     <form asp-controller="Publicar" asp-action="Index" class="ra-publish-form" method="post"
           enctype="multipart/form-data" data-submit-lock data-single-publish>
         <div asp-validation-summary="All" class="text-danger" role="alert"></div>
         <section class="ra-publish-section" aria-labelledby="publish-object">
-            <div class="ra-publish-step"><span>01</span><div><h2 id="publish-object">O que vais partilhar?</h2><p>Dá um nome simples ao objeto e explica em que estado está.</p></div></div>
+            <div class="ra-publish-step"><span>01</span><div><h2 id="publish-object">Dados do artigo</h2><p>Dá um nome simples ao objeto e explica em que estado está.</p></div></div>
             <div class="form-grid">
                 <div class="form-field full">
                     <label asp-for="Nome">Nome do objeto *</label>
@@ -72,7 +72,7 @@
             </div>
         </section>
         <section class="ra-publish-section" aria-labelledby="publish-terms">
-            <div class="ra-publish-step"><span>02</span><div><h2 id="publish-terms">Como funciona o aluguer?</h2><p>O preço e o período podem ser combinados com quem estiver interessado.</p></div></div>
+            <div class="ra-publish-step"><span>02</span><div><h2 id="publish-terms">Preço e disponibilidade</h2><p>O preço e o período podem ser combinados com quem estiver interessado.</p></div></div>
             <div class="form-grid">
                 <div class="form-field">
                     <label asp-for="Preco" data-rental-currency>Preço por dia (opcional)</label>
@@ -91,7 +91,7 @@
             </div>
         </section>
         <section class="ra-publish-section" aria-labelledby="publish-area">
-            <div class="ra-publish-step"><span>03</span><div><h2 id="publish-area">Em que zona está disponível?</h2><p>Só a cidade e a região são mostradas aos outros utilizadores.</p></div></div>
+            <div class="ra-publish-step"><span>03</span><div><h2 id="publish-area">Localização aproximada</h2><p>Só a cidade e a região são mostradas aos outros utilizadores.</p></div></div>
             <div class="ra-location-privacy"><i class="fas fa-shield-alt" aria-hidden="true"></i>
                 <span>Não pedimos morada, número de porta, código postal nem coordenadas exatas. Podes selecionar a zona manualmente.</span></div>
             <div class="ra-location-action">
@@ -124,7 +124,7 @@
             </div>
         </section>
         <section class="ra-publish-section" aria-labelledby="publish-profile">
-            <div class="ra-publish-step"><span>04</span><div><h2 id="publish-profile">Como te queres apresentar?</h2><p>Usa um nome público ou alcunha. Não é necessário partilhar o telemóvel.</p></div></div>
+            <div class="ra-publish-step"><span>04</span><div><h2 id="publish-profile">Perfil público</h2><p>Usa um nome público ou alcunha. Não é necessário partilhar o telemóvel.</p></div></div>
             <div class="form-field">
                 <label asp-for="NomePublico">Nome público (opcional)</label>
                 <input asp-for="NomePublico" class="form-control" maxlength="100" placeholder="Ex.: João · Aluga ferramentas" />
