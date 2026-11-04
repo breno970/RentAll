@@ -19,12 +19,11 @@ public sealed class StripeTestGateway
         return new StripeClient(_settings.SecretKey);
     }
 
-    public async Task<Account> CreateAccountAsync(string ownerId, CancellationToken ct)
-    {
-        return await new AccountService(Client()).CreateAsync(
-            new AccountCreateOptions { Type = "express", Country = "PT" },
-            new RequestOptions { IdempotencyKey = "rentall-connect-" + ownerId }, ct);
-    }
+    // Connected account creation must use the Accounts v2 API with explicit
+    // recipient configuration, Express dashboard, and platform fee/loss ownership.
+    // The v1 account creation endpoint was intentionally removed.
+    public Task<Account> CreateAccountAsync(string ownerId, CancellationToken ct)
+        => throw new NotSupportedException("Onboarding requer Stripe Accounts v2; ainda não integrado.");
 
     public async Task<Account> GetAccountAsync(string id, CancellationToken ct) =>
         await new AccountService(Client()).GetAsync(id, cancellationToken: ct);
@@ -46,7 +45,6 @@ public sealed class StripeTestGateway
             ClientReferenceId = requestId.ToString(System.Globalization.CultureInfo.InvariantCulture),
             SuccessUrl = origin + "/Pedidos?resultado=checkout",
             CancelUrl = origin + "/Pedidos?resultado=cancelado",
-            PaymentMethodTypes = new List<string> { "card" },
             LineItems = new List<SessionLineItemOptions>
             {
                 new() {
