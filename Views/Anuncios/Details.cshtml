@@ -7,6 +7,7 @@
     var isSaved = ViewData["IsFavorite"] is bool value && value;
 }
 <link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
 <div class="page-width">
     <div class="page-intro">
         <div><p class="eyebrow"><a asp-controller="Home" asp-action="Index" asp-route-Pais="@Model.Pais">Explorar</a> / Detalhes do anúncio</p><h1>@(Model.item?.nmitem ?? Model.modelo)</h1><p><i class="fas fa-map-marker-alt"></i> @place</p></div>
@@ -50,6 +51,43 @@
                 <div><small>Tipo</small><strong>@(Model.tipo?.nmtipo ?? "Outros")</strong></div>
                 <div><small>Localização</small><strong>@Model.Cidade, @Model.Estado</strong></div>
             </div>
+            @if (User.Identity?.IsAuthenticated == true &&
+                 User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser &&
+                 Model.vlitem > 0 && Model.item?.snativo != "N")
+            {
+                <div class="ra-request-widget">
+                    <h3><i class="far fa-calendar-check" aria-hidden="true"></i> Pedir aluguer</h3>
+                    <p>Envia um pedido ao anunciante para confirmar a disponibilidade. Não é uma reserva paga.</p>
+                    <form asp-controller="Pedidos" asp-action="Criar" method="post">
+                        <input type="hidden" name="anuncioId" value="@Model.id"/>
+                        <label for="rental-days">Número de dias
+                            <input id="rental-days" type="number" name="dias" class="form-control" min="1" max="@(Model.diasAluguel > 0 ? Model.diasAluguel : 365)" value="1" required data-rental-days/>
+                        </label>
+                        <button class="btn btn-primary" type="submit">Enviar pedido</button>
+                    </form>
+                    <div class="ra-money-calc" data-rental-calculator data-daily-price="@Model.vlitem.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-country="@Model.Pais" aria-live="polite">Valor estimado a partir do preço indicado no anúncio.</div>
+                    <p>Nenhum pagamento é realizado agora. A comissão ilustrativa de 10% é apenas uma proposta para uma futura modalidade de pagamento na RentAll.</p>
+                </div>
+            }
+            else if (User.Identity?.IsAuthenticated == true &&
+                     User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == Model.iduser)
+            {
+                <div class="ra-rental-motivation">
+                    <strong><i class="far fa-calendar-check"></i> Organiza os teus alugueres</strong>
+                    <p>Responde aos pedidos e mantém um histórico das negociações sem divulgar o teu telefone.</p>
+                    <a asp-controller="Pedidos" asp-action="Index" class="btn btn-outline" style="margin-top:10px">Consultar pedidos</a>
+                </div>
+            }
+            <div class="ra-rental-safety">
+                <h3><i class="fas fa-shield-alt" aria-hidden="true"></i> Aluguer com mais confiança</h3>
+                <ul>
+                    <li>Combina uma entrega em local público e verifica a identidade do artigo presencialmente.</li>
+                    <li>Guarda fotografias do estado do objeto antes e depois do aluguer.</li>
+                    <li>Não entregues códigos, documentos, dados bancários ou depósitos a desconhecidos.</li>
+                    <li>Conserva o histórico do pedido e da conversa na RentAll.</li>
+                </ul>
+                <p class="muted" style="font-size:.8rem;margin-top:12px">A RentAll ainda não oferece pagamento protegido, seguro ou garantias financeiras.</p>
+            </div>
             <div class="contact-box">
                 <h2 style="font-size:1rem">Falar com o anunciante</h2>
                 <p class="muted" style="font-size:.88rem">Publicado por <strong>@(string.IsNullOrWhiteSpace(Model.NomeFantasia) ? "Anunciante RentAll" : Model.NomeFantasia)</strong></p>
@@ -92,4 +130,7 @@
     </div>
 </div>
 
-@section Scripts { <script src="~/js/photo-carousel.js" asp-append-version="true"></script> }
+@section Scripts {
+    <script src="~/js/photo-carousel.js" asp-append-version="true"></script>
+    <script src="~/js/rental-confidence.js" asp-append-version="true"></script>
+}
