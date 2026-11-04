@@ -50,6 +50,10 @@ public class AnunciosController : Controller
         if (ad == null || ad.item == null) return NotFound();
         if (ad.item.snativo == "N" && ad.iduser != User.FindFirstValue(ClaimTypes.NameIdentifier))
             return NotFound();
+        var viewerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!string.IsNullOrWhiteSpace(viewerId))
+            ViewData["IsFavorite"] = await _db.Favoritos.AsNoTracking()
+                .AnyAsync(f => f.UserId == viewerId && f.AnuncioId == ad.id);
         return View(ad);
     }
 
