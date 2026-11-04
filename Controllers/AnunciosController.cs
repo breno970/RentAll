@@ -73,7 +73,9 @@ public class AnunciosController : Controller
 
     private void NormalizeLocation(Anuncio ad)
     {
-        ad.Estado = (ad.Estado ?? "").Trim().ToUpperInvariant();
+        ad.Pais = (ad.Pais ?? "").Trim().ToUpperInvariant();
+        ad.Estado = (ad.Estado ?? "").Trim();
+        if (ad.Pais == LocationCatalog.Brazil) ad.Estado = ad.Estado.ToUpperInvariant();
         ad.Cidade = (ad.Cidade ?? "").Trim();
         ad.Bairro = (ad.Bairro ?? "").Trim();
         ad.Rua = (ad.Rua ?? "").Trim();
@@ -82,8 +84,18 @@ public class AnunciosController : Controller
         ad.contato = (ad.contato ?? "").Trim();
         ad.NomeFantasia = (ad.NomeFantasia ?? "").Trim();
 
-        if (!LocationCatalog.IsValidUf(ad.Estado))
-            ModelState.AddModelError(nameof(ad.Estado), "Selecione um estado brasileiro válido.");
+        if (!LocationCatalog.IsValidCountry(ad.Pais))
+            ModelState.AddModelError(nameof(ad.Pais), "Selecione Brasil ou Portugal.");
+        if (!LocationCatalog.IsValidRegion(ad.Pais, ad.Estado))
+            ModelState.AddModelError(nameof(ad.Estado), "Selecione um estado ou distrito válido para o país.");
+        bool validPostal = ad.Pais switch
+        {
+            LocationCatalog.Brazil => System.Text.RegularExpressions.Regex.IsMatch(ad.CEP, @"^\d{5}-?\d{3}$"),
+            LocationCatalog.Portugal => System.Text.RegularExpressions.Regex.IsMatch(ad.CEP, @"^\d{4}-?\d{3}$"),
+            _ => false
+        };
+        if (!validPostal)
+            ModelState.AddModelError(nameof(ad.CEP), "Código postal inválido para o país selecionado.");
         if (string.IsNullOrWhiteSpace(ad.Cidade))
             ModelState.AddModelError(nameof(ad.Cidade), "Informe a cidade em que o item está disponível.");
         if (string.IsNullOrWhiteSpace(ad.Bairro))
@@ -94,6 +106,7 @@ public class AnunciosController : Controller
     public async Task<IActionResult> Create(int Categoria, int Tipo, Anuncio anuncio)
     {
         anuncio.iduser = UserId;
+        anuncio.Pais = (anuncio.Pais ?? "").Trim().ToUpperInvariant();
         anuncio.categoriaid = Categoria;
         anuncio.tipoid = Tipo;
         ModelState.Remove(nameof(Anuncio.iduser));
@@ -118,7 +131,7 @@ public class AnunciosController : Controller
         var ad = new Anuncio
         {
             vlitem = anuncio.vlitem, diasAluguel = anuncio.diasAluguel,
-            modelo = anuncio.modelo, itemid = anuncio.itemid, iduser = UserId,
+            modelo = anuncio.modelo, itemid = anuncio.itemid, iduser = UserId, Pais = anuncio.Pais,
             categoriaid = Categoria, tipoid = Tipo,
             CEP = anuncio.CEP, Rua = anuncio.Rua, Numero = anuncio.Numero,
             Bairro = anuncio.Bairro, Cidade = anuncio.Cidade, Estado = anuncio.Estado,
@@ -156,6 +169,7 @@ public class AnunciosController : Controller
         if (existing is null) return NotFound();
 
         anuncio.iduser = existing.iduser;
+        anuncio.Pais = (anuncio.Pais ?? "").Trim().ToUpperInvariant();
         anuncio.itemid = existing.itemid;
         anuncio.categoriaid = existing.categoriaid;
         anuncio.tipoid = existing.tipoid;
@@ -170,6 +184,7 @@ public class AnunciosController : Controller
         existing.vlitem = anuncio.vlitem;
         existing.diasAluguel = anuncio.diasAluguel;
         existing.modelo = anuncio.modelo;
+        existing.Pais = anuncio.Pais;
         existing.CEP = anuncio.CEP;
         existing.Rua = anuncio.Rua;
         existing.Numero = anuncio.Numero;
