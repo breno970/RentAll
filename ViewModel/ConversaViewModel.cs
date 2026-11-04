@@ -24,5 +24,7 @@ public sealed class ResumoConversa
     public string OutroUtilizadorId { get; init; } = "";
     public string NomeArtigo { get; init; } = "";
     public DateTime UltimaMensagem { get; init; }
+    public string UltimoTexto { get; init; } = "";
+    public bool PedidoPendente { get; init; }
     public bool SouAnunciante { get; init; }
 }
