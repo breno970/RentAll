@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS rentall."PedidosAluguer" (
   "InteressadoId" text NOT NULL REFERENCES rentall."AspNetUsers"("Id") ON DELETE CASCADE,
   "AnuncianteId" text NOT NULL REFERENCES rentall."AspNetUsers"("Id") ON DELETE CASCADE,
   "Dias" integer NOT NULL CHECK ("Dias" BETWEEN 1 AND 365),
+  "Pais" varchar(2) NOT NULL CHECK ("Pais" IN ('PT','BR')),
   "PrecoDia" numeric(12,2) NOT NULL CHECK ("PrecoDia" > 0),
   "TotalEstimado" numeric(14,2) NOT NULL CHECK ("TotalEstimado" > 0),
   "ComissaoIndicativa" numeric(14,2) NOT NULL CHECK ("ComissaoIndicativa" >= 0),
