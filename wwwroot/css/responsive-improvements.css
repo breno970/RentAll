@@ -221,3 +221,21 @@ body .ra-empty-state{padding:clamp(23px,4vw,46px);margin:24px auto;max-width:750
 body .ra-empty-state h2{font-size:1.3rem;color:var(--ra-charcoal);margin:0 0 12px}
 body .ra-empty-state p{color:var(--ra-grey);margin:0 0 17px}
 body .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+/* Rodapé original sempre ocupa a largura inteira da janela, mesmo dentro de .container. */
+body .footer-container {
+  width: 100vw;
+  width: 100dvw;
+  max-width: none;
+  margin: clamp(24px,4vw,52px) 0 0 calc(50% - 50vw);
+  margin-left: calc(50% - 50dvw);
+  border-radius: 0;
+  box-sizing: border-box;
+  padding-inline: max(18px, calc((100vw - 1160px)/2));
+  padding-inline: max(18px, calc((100dvw - 1160px)/2));
+}
+body .footer-container .footer-content-2,
+body .footer-container .footer-content-3{max-width: min(100%, 510px)}
+@media(max-width:880px){
+ body .footer-container{padding:28px clamp(16px,4vw,30px)}
+}
