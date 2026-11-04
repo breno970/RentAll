@@ -55,13 +55,17 @@ public sealed class MensagensController : Controller
         bool owner = ad.iduser == me;
         var other = owner ? peerId : ad.iduser;
         if (string.IsNullOrWhiteSpace(other) || other == me) return BadRequest();
-        if (owner && !await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
+        // A rental request itself establishes a legitimate owner/interested-party
+        // conversation, even if neither user has sent the first message yet.
+        var hasMessage = await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
             ((m.RemetenteId == me && m.DestinatarioId == other) ||
-             (m.RemetenteId == other && m.DestinatarioId == me)), ct)) return NotFound();
-        if (!owner && ad.item?.snativo == "N" &&
-            !await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
-                ((m.RemetenteId == me && m.DestinatarioId == other) ||
-                 (m.RemetenteId == other && m.DestinatarioId == me)), ct)) return NotFound();
+             (m.RemetenteId == other && m.DestinatarioId == me)), ct);
+        var hasRequest = await _db.PedidosAluguer.AnyAsync(p => p.AnuncioId == anuncioId &&
+            p.AnuncianteId == ad.iduser &&
+            p.InteressadoId == (owner ? other : me), ct);
+        if (owner && !hasMessage && !hasRequest) return NotFound();
+        if (!owner && ad.item?.snativo == "N" && !hasMessage && !hasRequest)
+            return NotFound();
 
         var messages = await _db.Mensagens.AsNoTracking()
             .Where(m => m.AnuncioId == anuncioId &&
@@ -101,8 +105,11 @@ public sealed class MensagensController : Controller
         var previous = await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
             ((m.RemetenteId == me && m.DestinatarioId == other) ||
              (m.RemetenteId == other && m.DestinatarioId == me)), ct);
-        if (owner && !previous) return Forbid();
-        if (ad.item?.snativo == "N" && !previous) return NotFound();
+        var hasRequest = await _db.PedidosAluguer.AnyAsync(p =>
+            p.AnuncioId == anuncioId && p.AnuncianteId == ad.iduser &&
+            p.InteressadoId == (owner ? other : me), ct);
+        if (owner && !previous && !hasRequest) return Forbid();
+        if (ad.item?.snativo == "N" && !previous && !hasRequest) return NotFound();
 
         var body = texto?.Trim() ?? "";
         if (body.Length is < 1 or > 2000)
