@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
-using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.Models;
 
 namespace aluguel.Areas.Identity.Data;
 
@@ -23,6 +22,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
 
         base.OnModelCreating(builder);
         builder.HasDefaultSchema("rentall");
+        // Connect evaluations to their explicit foreign-key properties.
+        builder.Entity<Avaliacao>()
+            .HasOne(a => a.item).WithMany()
+            .HasForeignKey(a => a.iditem).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Avaliacao>()
+            .HasOne(a => a.anuncio).WithMany()
+            .HasForeignKey(a => a.idanuncio).OnDelete(DeleteBehavior.Restrict);
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
