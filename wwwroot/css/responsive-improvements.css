@@ -309,3 +309,14 @@ body .c-card__content .ra-item-availability{font-size:.8rem;color:#797984}
  .ra-results-heading p{margin-top:5px}
  .ra-item-bottom{flex-wrap:wrap}
 }
+
+
+/* Favoritos — mesma paleta e ícones Font Awesome do RentAll. */
+body .c-card{position:relative}
+.ra-favorite-form{position:absolute;top:11px;right:11px;z-index:5;margin:0}
+.ra-favorite-button{display:grid;place-items:center;width:38px;height:38px;background:rgba(255,255,255,.96);color:#23232e;border:1px solid #ccc;border-radius:50%;box-shadow:0 2px 12px rgba(35,35,46,.19);cursor:pointer;font-size:1rem;line-height:1}
+.ra-favorite-button:hover,.ra-favorite-button:focus-visible{background:#fff;transform:translateY(-1px);box-shadow:0 4px 14px rgba(35,35,46,.2)}
+.ra-favorite-button.is-favorite{color:#2579b7}
+.ra-detail-favorite{margin:14px 0}
+.ra-detail-favorite .btn{display:inline-flex;align-items:center;gap:7px}
+@media(max-width:580px){.ra-favorite-button{width:42px;height:42px}}
