@@ -17,7 +17,7 @@ public sealed class PedidosController : Controller
     private string Me => User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? throw new UnauthorizedAccessException();
 
-    public async Task<IActionResult> Index(CancellationToken ct)
+    public async Task<IActionResult> Index(string? vista, CancellationToken ct)
     {
         var me = Me;
         var requests = await _db.PedidosAluguer.AsNoTracking()
@@ -28,6 +28,24 @@ public sealed class PedidosController : Controller
             .Include(a => a.item).Where(a => adIds.Contains(a.id))
             .Select(a => new { a.id, Nome = a.item != null ? a.item.nmitem : a.modelo })
             .ToDictionaryAsync(a => a.id, a => a.Nome, ct);
+        // Dashboard filters work server-side and never expose other accounts.
+        vista = vista switch {
+            "recebidos" => "recebidos",
+            "enviados" => "enviados",
+            "pendentes" => "pendentes",
+            _ => "todos"
+        };
+        ViewBag.SelectedView = vista;
+        ViewBag.TotalRequests = requests.Count;
+        ViewBag.ReceivedCount = requests.Count(p => p.AnuncianteId == me);
+        ViewBag.SentCount = requests.Count(p => p.InteressadoId == me);
+        ViewBag.PendingToAnswer = requests.Count(p => p.AnuncianteId == me && p.Estado == "Pendente");
+        var visible = vista switch {
+            "recebidos" => requests.Where(p => p.AnuncianteId == me).ToList(),
+            "enviados" => requests.Where(p => p.InteressadoId == me).ToList(),
+            "pendentes" => requests.Where(p => p.AnuncianteId == me && p.Estado == "Pendente").ToList(),
+            _ => requests
+        };
         ViewBag.AdNames = adNames;
         ViewBag.Me = me;
         ViewBag.StripeSandboxReady = _stripe.Available;
@@ -35,7 +53,7 @@ public sealed class PedidosController : Controller
         ViewBag.PaymentStates = await _db.PagamentosAluguer.AsNoTracking()
             .Where(p => requestIds.Contains(p.PedidoId))
             .ToDictionaryAsync(p => p.PedidoId, p => p.Estado, ct);
-        return View(requests);
+        return View(visible);
     }
 
     [HttpPost]
