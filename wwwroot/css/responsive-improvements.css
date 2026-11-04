@@ -44,7 +44,7 @@ body nav .nav-list form button{display:inline-flex;align-items:center;justify-co
 body nav .nav-list form button:hover{background:rgba(255,255,255,.12)}
 body nav .nav-list i{margin-right:7px}
 body nav .mobile-menu{background:transparent;border:0;padding:5px 6px;margin:0;flex-shrink:0;border-radius:9px}
-body nav .mobile-menu div{width:28px;height:2px;margin:6px 2px;background:#fff}
+body nav .mobile-menu > span{display:block;width:28px;height:2px;margin:6px 2px;background:#fff;transition:transform .3s,opacity .3s}
 body nav .mobile-menu:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
 /* O contentor antigo continua o mesmo mas adapta-se à largura da janela. */
