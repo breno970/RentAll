@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/css/site.css" rel="stylesheet">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
   
     <title>Rent All - Detalhes do Anúncio</title>
 
@@ -116,7 +116,7 @@
     <div class="card" id="form_header">
         <div class="l-cards">
             <div class="carousel-container">
-                <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
                             <img src="/imagens/@Html.DisplayFor(model => model.item.imagem1)" class="d-block" alt="Imagem 1">
@@ -147,11 +147,11 @@
                             </div>
                         }
                     </div>
-                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="sr-only">Anterior</span>
                     </a>
-                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="sr-only">Próximo</span>
                     </a>
@@ -219,21 +219,6 @@
 
         <!-- Outras seções para informações adicionais do anúncio -->
     </div>
-
-
-
-
-
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <script type="text/javascript" src="~/js/cadastro.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
-
-
 
 </body>
 
