@@ -12,8 +12,8 @@
             <div asp-validation-summary="All" class="text-danger" role="alert"></div>
             <h2>O artigo</h2>
             <div class="form-grid">
-                <div class="form-field full"><label for="nmitem">Nome do artigo *</label><input id="nmitem" name="nmitem" value="@Context.Request.Form["nmitem"]" class="form-control" maxlength="140" required placeholder="Ex.: Furadeira Bosch, câmara fotográfica, bicicleta..." /></div>
-                <div class="form-field full"><label for="dsitem">Descrição *</label><textarea id="dsitem" name="dsitem" class="form-control" rows="5" required placeholder="Estado de conservação, acessórios e condições de utilização">@Context.Request.Form["dsitem"]</textarea></div>
+                <div class="form-field full"><label for="nmitem">Nome do artigo *</label><input id="nmitem" name="nmitem" value="@(Model?.nmitem ?? "")" class="form-control" maxlength="140" required placeholder="Ex.: Furadeira Bosch, câmara fotográfica, bicicleta..." /></div>
+                <div class="form-field full"><label for="dsitem">Descrição *</label><textarea id="dsitem" name="dsitem" class="form-control" rows="5" required placeholder="Estado de conservação, acessórios e condições de utilização">@(Model?.dsitem ?? "")</textarea></div>
                 <div class="form-field full"><label for="snativo">Visibilidade inicial</label>
                     <select id="snativo" name="snativo" class="form-select"><option value="S">Ativo — pronto a anunciar</option><option value="N">Oculto — guardar para mais tarde</option></select>
                 </div>
