@@ -1,20 +1,40 @@
-@{ViewData["Title"]="Pagamentos de teste";}
-<div class="page-width" style="max-width:820px;padding:38px 0 72px">
- <div class="page-intro"><div><p class="eyebrow">RentAll · Stripe Connect</p><h1>Recebimentos</h1>
- <p>Verifica a tua conta de recebimento para futuros alugueres.</p></div></div>
- <div class="panel">
-  <h2>Integração de pagamentos</h2>
-  @if(ViewBag.Enabled != true) {
-   <p>Os pagamentos estão desativados. Estamos a preparar o ambiente de teste com a Stripe; não serão cobrados valores reais.</p>
-  } else if(ViewBag.Ready == true) {
-   <p><i class="fas fa-check-circle"></i> Conta de teste verificada para receber transferências.</p>
-  } else {
-   <p>@(ViewBag.Connected == true ? "A tua conta de teste ainda precisa de verificação." : "Liga uma conta de teste para simular recebimentos.")</p>
-   <form asp-controller="Pagamentos" asp-action="Conectar" method="post">
-      <button class="btn btn-primary" type="submit">@(ViewBag.Connected == true ? "Continuar verificação na Stripe" : "Ligar conta de teste Stripe")</button>
-   </form>
-  }
-  <p class="muted" style="margin-top:16px">Este processo só usa o ambiente de testes. A verificação comercial e os pagamentos reais não estão disponíveis nesta fase.</p>
-  <a asp-controller="Pedidos" asp-action="Index" class="btn btn-outline">Ver pedidos de aluguer</a>
- </div>
+@{
+    ViewData["Title"] = "Recebimentos na RentAll";
+    var enabled = ViewBag.Enabled == true;
+    var connected = ViewBag.Connected == true;
+    var ready = ViewBag.Ready == true;
+}
+<link rel="stylesheet" href="~/css/stripe-sandbox.css" asp-append-version="true" />
+<div class="page-width ra-billing">
+    <header class="ra-billing-header">
+        <p class="eyebrow">RentAll · Contas e pagamentos</p>
+        <h1>Recebimentos</h1>
+        <p>Prepara a tua conta para receber alugueres através da RentAll, sem partilhares dados bancários com outros utilizadores.</p>
+    </header>
+    <div class="ra-billing-status">
+        <div class="ra-billing-icon"><i class="fas fa-shield-alt" aria-hidden="true"></i></div>
+        <div>
+            <strong>@(enabled ? ready ? "Conta de teste preparada" : connected ? "Verificação de teste pendente" : "Verifica a conta de teste" : "Pagamentos ainda não disponíveis")</strong>
+            <p>@(enabled ? "Esta funcionalidade opera exclusivamente com a sandbox Stripe. Não movimenta dinheiro real." : "A RentAll ainda não aceita pagamentos reais. Os anúncios, mensagens e pedidos continuam disponíveis.")</p>
+        </div>
+    </div>
+    @if (enabled && !ready)
+    {
+        <div class="ra-billing-panel">
+            <h2>Verifica a tua conta de teste</h2>
+            <p>A Stripe recolhe diretamente os dados de verificação exigidos. A RentAll não recebe números de cartão nem documentos de identificação através deste formulário.</p>
+            <form asp-controller="Pagamentos" asp-action="Conectar" method="post">
+                <button class="btn btn-primary" type="submit">
+                    @(connected ? "Continuar verificação" : "Iniciar verificação") <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+    }
+    <div class="ra-billing-steps">
+        <div><span>01</span><div><strong>Publica um artigo</strong><p>Os anúncios continuam gratuitos e ativos por predefinição.</p></div></div>
+        <div><span>02</span><div><strong>Recebe um pedido</strong><p>Confirma o preço e os dias antes de aceitar.</p></div></div>
+        <div><span>03</span><div><strong>Pagamento seguro</strong><p>Checkout Stripe e divisão de 10% para a RentAll serão testados antes da ativação comercial.</p></div></div>
+    </div>
+    <p class="ra-billing-note"><i class="fas fa-info-circle" aria-hidden="true"></i> Não existe proteção financeira, seguro ou garantia de pagamento ativa. A comissão apresentada na RentAll é ilustrativa enquanto a cobrança real estiver desativada.</p>
+    <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Voltar aos pedidos</a>
 </div>
