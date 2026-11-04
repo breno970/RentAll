@@ -1,6 +1,7 @@
 ﻿using aluguel.Areas.Identity.Data;
 using aluguel.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -22,6 +23,7 @@ namespace aluguel.Controllers
 
 
         // GET: Anuncios
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var model = await _context.Anuncios
@@ -56,6 +58,7 @@ namespace aluguel.Controllers
         }
 
         // GET: Anuncios/Create
+        [Authorize]
         public IActionResult Create()
         {
             ViewBag.Categoria = _context.Categorias.ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmcategoria }).ToList();
@@ -76,16 +79,23 @@ namespace aluguel.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
         public IActionResult Create(int Categoria, int Tipo, Anuncio anuncio)
         {
-            ViewBag.SelectCategoria = _context.Categorias.Where(a => a.id == Categoria).FirstOrDefault().nmcategoria;
-            ViewBag.SelectTipo = _context.Tipos.Where(a => a.id == Tipo).FirstOrDefault().nmtipo;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            if (!_context.Items.Any(x => x.id == anuncio.itemid && x.iduser == userId && x.snativo != "N"))
+                return BadRequest("O artigo não pertence a este utilizador.");
+            if (!_context.Categorias.Any(x => x.id == Categoria) || !_context.Tipos.Any(x => x.id == Tipo && x.categoriaid == Categoria))
+                return BadRequest("Categoria ou tipo inválido.");
+            ViewBag.SelectCategoria = _context.Categorias.Where(a => a.id == Categoria).Select(a => a.nmcategoria).FirstOrDefault();
+            ViewBag.SelectTipo = _context.Tipos.Where(a => a.id == Tipo).Select(a => a.nmtipo).FirstOrDefault();
 
             var item = new Anuncio
             {
                 vlitem = anuncio.vlitem,
                 diasAluguel = anuncio.diasAluguel,
-                iduser = anuncio.iduser,
+                iduser = userId,
                 itemid = anuncio.itemid,
                 modelo = anuncio.modelo,
                 CEP = anuncio.CEP,
@@ -110,6 +120,7 @@ namespace aluguel.Controllers
         }
 
         // GET: Anuncios/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Anuncios == null)
@@ -117,7 +128,7 @@ namespace aluguel.Controllers
                 return NotFound();
             }
 
-            var anuncio = await _context.Anuncios.FindAsync(id);
+            var anuncio = await _context.Anuncios.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (anuncio == null)
             {
                 return NotFound();
@@ -133,6 +144,7 @@ namespace aluguel.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("id,vlitem,diasAluguel,iduser,itemid,categoriaid,CEP,Rua,Numero,Bairro,Cidade,Estado,Complemento,tipoid,modelo,estado,cidade,bairro,contato,NomeFantasia")] Anuncio anuncio)
         {
 
@@ -145,7 +157,21 @@ namespace aluguel.Controllers
             {
                 try
                 {
-                    _context.Update(anuncio);
+                    var existing = await _context.Anuncios.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
+                    if (existing == null) return NotFound();
+                    // Preserve owner and foreign keys from the database, never from hidden form inputs.
+                    existing.vlitem = anuncio.vlitem;
+                    existing.diasAluguel = anuncio.diasAluguel;
+                    existing.modelo = anuncio.modelo;
+                    existing.CEP = anuncio.CEP;
+                    existing.Rua = anuncio.Rua;
+                    existing.Numero = anuncio.Numero;
+                    existing.Bairro = anuncio.Bairro;
+                    existing.Cidade = anuncio.Cidade;
+                    existing.Estado = anuncio.Estado;
+                    existing.Complemento = anuncio.Complemento;
+                    existing.contato = anuncio.contato;
+                    existing.NomeFantasia = anuncio.NomeFantasia;
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -166,6 +192,7 @@ namespace aluguel.Controllers
         }
 
         // GET: Anuncios/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Anuncios == null)
@@ -175,7 +202,7 @@ namespace aluguel.Controllers
 
             var anuncio = await _context.Anuncios
                 .Include(a => a.item)
-                .FirstOrDefaultAsync(m => m.id == id);
+                .FirstOrDefaultAsync(m => m.id == id && m.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (anuncio == null)
             {
                 return NotFound();
@@ -187,13 +214,14 @@ namespace aluguel.Controllers
         // POST: Anuncios/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Anuncios == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Anuncios'  is null.");
             }
-            var anuncio = await _context.Anuncios.FindAsync(id);
+            var anuncio = await _context.Anuncios.FirstOrDefaultAsync(x => x.id == id && x.iduser == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (anuncio != null)
             {
                 _context.Anuncios.Remove(anuncio);
