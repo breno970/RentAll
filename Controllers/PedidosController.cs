@@ -12,7 +12,8 @@ namespace aluguel.Controllers;
 public sealed class PedidosController : Controller
 {
     private readonly ApplicationDbContext _db;
-    public PedidosController(ApplicationDbContext db) => _db = db;
+    private readonly aluguel.Services.StripeTestGateway _stripe;
+    public PedidosController(ApplicationDbContext db, aluguel.Services.StripeTestGateway stripe) { _db = db; _stripe = stripe; }
     private string Me => User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? throw new UnauthorizedAccessException();
 
@@ -29,6 +30,10 @@ public sealed class PedidosController : Controller
             .ToDictionaryAsync(a => a.id, a => a.Nome, ct);
         ViewBag.AdNames = adNames;
         ViewBag.Me = me;
+        ViewBag.StripeSandboxReady = _stripe.Available;
+        ViewBag.PaymentStates = await _db.PagamentosAluguer.AsNoTracking()
+            .Where(p => requests.Select(r => r.Id).Contains(p.PedidoId))
+            .ToDictionaryAsync(p => p.PedidoId, p => p.Estado, ct);
         return View(requests);
     }
 
