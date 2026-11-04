@@ -21,7 +21,8 @@ services.AddDataProtection().SetApplicationName("RentAll")
 
 // Email verification is enabled when a functioning provider is configured.
 // On the free prototype without email service, registration remains usable.
-var hasEmailProvider = !string.IsNullOrWhiteSpace(configuration["SendGridKey"]);
+var hasEmailProvider = !string.IsNullOrWhiteSpace(configuration["SendGridKey"]) &&
+    !string.IsNullOrWhiteSpace(configuration["EmailFromAddress"]);
 services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = hasEmailProvider;
@@ -30,6 +31,7 @@ services.AddDefaultIdentity<ApplicationUser>(options =>
 
 services.AddTransient<IEmailSender, EmailSender>();
 services.Configure<AuthMessageSenderOptions>(configuration);
+services.Configure<Microsoft.AspNetCore.Identity.DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(3));
 services.AddScoped<IItemService, ItemService>();
 services.AddHttpClient<IImageStorage, SupabaseImageStorage>();
 services.AddControllersWithViews().AddJsonOptions(o =>
@@ -40,6 +42,9 @@ services.AddControllersWithViews().AddJsonOptions(o =>
 services.AddRazorPages();
 services.AddRateLimiter(options =>
 {
+    options.AddPolicy("account-email", context =>
+        RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(15), QueueLimit = 0, AutoReplenishment = true }));
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     options.AddPolicy("publish", context =>
         RateLimitPartition.GetFixedWindowLimiter(

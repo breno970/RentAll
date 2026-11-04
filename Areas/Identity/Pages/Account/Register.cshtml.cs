@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.RateLimiting;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
@@ -122,6 +123,7 @@ namespace aluguel.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+        [EnableRateLimiting("account-email")]
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -162,8 +164,16 @@ namespace aluguel.Areas.Identity.Pages.Account
                             pageHandler: null,
                             values: new { area = "Identity", userId, code, returnUrl },
                             protocol: Request.Scheme);
-                        await _emailSender.SendEmailAsync(Input.Email, "Valide Sua Conta",
-                            $"Valide sua conta RentAll clicando <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>NESTE LINK</a>.");
+                        try
+                        {
+                            await _emailSender.SendEmailAsync(Input.Email, "Confirma o teu email na RentAll",
+                                $"<p>Confirma o teu endereço de email para começares a usar a RentAll.</p><p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='display:inline-block;background:#135c47;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:bold'>Confirmar email</a></p><p>O link é válido por um período limitado.</p>");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "New-account confirmation could not be sent.");
+                            TempData["Error"] = "A conta foi criada, mas o email de confirmação não foi enviado. Usa a opção Reenviar confirmação.";
+                        }
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
                     }
 
