@@ -37,8 +37,8 @@
                 <h2><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@request.AnuncioId">@name</a></h2>
                 <p class="muted">@request.Dias @(request.Dias == 1 ? "dia" : "dias") · @request.CriadoEm.ToString("dd/MM/yyyy")</p>
                 <dl class="ra-request-values">
-                    <div><dt>Valor estimado</dt><dd>@RentalLocalization.FormatPrice((float)request.TotalEstimado, ViewData["Pais"] as string == "BR" ? "BR" : "PT")</dd></div>
-                    <div><dt>Comissão futura ilustrativa (10%)</dt><dd>@request.ComissaoIndicativa.ToString("N2")</dd></div>
+                    <div><dt>Valor estimado</dt><dd>@RentalLocalization.FormatPrice((float)request.TotalEstimado, request.Pais)</dd></div>
+                    <div><dt>Comissão futura ilustrativa (10%)</dt><dd>@RentalLocalization.FormatPrice((float)request.ComissaoIndicativa, request.Pais)</dd></div>
                 </dl>
                 @if (request.Estado == "Pendente" && owner)
                 {
