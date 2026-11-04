@@ -1,0 +1,25 @@
+@model IEnumerable<aluguel.Models.DenunciaAnuncio>
+@{ ViewData["Title"] = "Denúncias de anúncios"; }
+<div class="page-width" style="padding:36px 0 70px">
+    <div class="page-intro"><div><p class="eyebrow">Acesso restrito · Moderação</p><h1>Denúncias</h1>
+    <p>Analisa conteúdo sinalizado antes de tomar qualquer medida. Uma denúncia isolada não prova infração.</p></div></div>
+    <div class="ra-requests-grid">
+        @foreach (var item in Model)
+        {
+            <article class="ra-request-card">
+                <span class="ra-request-status">@item.Estado</span>
+                <h2>Denúncia #@item.Id</h2>
+                <p><strong>Motivo:</strong> @item.Motivo</p>
+                @if (!string.IsNullOrEmpty(item.Detalhes)) { <p>@item.Detalhes</p> }
+                <p class="muted">Recebida em @item.CriadaEm.ToString("dd/MM/yyyy HH:mm") UTC</p>
+                <a class="btn btn-outline" asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.AnuncioId">Consultar anúncio #@item.AnuncioId</a>
+                <form asp-action="Rever" method="post" style="margin-top:12px">
+                    <input type="hidden" name="id" value="@item.Id"/>
+                    <input type="hidden" name="resolvida" value="@(item.Estado != "Revista" ? "true" : "false")"/>
+                    <button class="btn btn-primary" type="submit">@(item.Estado == "Revista" ? "Reabrir" : "Marcar revista")</button>
+                </form>
+            </article>
+        }
+    </div>
+    @if (!Model.Any()) { <p class="muted">Não existem denúncias.</p> }
+</div>
