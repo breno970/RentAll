@@ -39,13 +39,17 @@
     price?.addEventListener("focus", () => { if (price.value.trim()) price.value = String(asNumber(price.value)).replace(".", ","); });
     updateCurrency();
 
-    button?.addEventListener("click", () => {
+    button?.addEventListener("click", async () => {
       if (!navigator.geolocation) { show("O navegador não suporta a deteção de localização. Escolhe a zona manualmente."); return; }
-      if (!window.google?.maps?.Geocoder) {
-        show("A identificação automática precisa da API Google Maps configurada. Podes selecionar o distrito e a cidade manualmente.");
-        return;
-      }
       button.disabled = true;
+      if (!window.google?.maps?.Geocoder) {
+        try { await window.rentallLoadGoogleMaps?.(); }
+        catch (error) {
+          show(error.message || "Configura a API Google Maps para detetar a zona. Também podes selecionar a cidade manualmente.");
+          button.disabled = false;
+          return;
+        }
+      }
       show("A pedir permissão para obter a tua zona...");
       navigator.geolocation.getCurrentPosition(async position => {
         try {
