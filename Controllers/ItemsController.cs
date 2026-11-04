@@ -79,6 +79,9 @@ public sealed class ItemsController : Controller
         photos ??= new List<IFormFile>();
         if (string.IsNullOrWhiteSpace(nmitem) || string.IsNullOrWhiteSpace(dsitem))
             ModelState.AddModelError("", "Preenche o nome e a descrição do artigo.");
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(nmitem) ||
+            MarketplaceContactSafety.ContainsContactOrRedirect(dsitem))
+            ModelState.AddModelError("", "Retira telefones, links e redes sociais do artigo. Os interessados devem contactar-te pela RentAll.");
         if (!ModelState.IsValid) return View();
         var uploaded = new List<string>();
         try
@@ -131,6 +134,12 @@ public sealed class ItemsController : Controller
         if (string.IsNullOrWhiteSpace(nmitem) || string.IsNullOrWhiteSpace(dsitem))
         {
             ModelState.AddModelError("", "Nome e descrição são obrigatórios.");
+            return View(item);
+        }
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(nmitem) ||
+            MarketplaceContactSafety.ContainsContactOrRedirect(dsitem))
+        {
+            ModelState.AddModelError("", "Retira contactos pessoais, links e redes sociais. As negociações devem ficar na RentAll.");
             return View(item);
         }
         var uploaded = new List<string>();

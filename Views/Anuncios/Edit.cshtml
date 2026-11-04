@@ -2,7 +2,7 @@
 @using aluguel.Services
 @{ ViewData["Title"] = "Editar anúncio"; }
 <div class="page-width"><div class="form-shell">
-    <div class="page-intro"><div><p class="eyebrow">Meus anúncios / Edição</p><h1>Editar anúncio</h1><p>Atualiza o preço, a localização e os teus contactos.</p></div><a class="btn btn-outline" asp-action="Index"><i class="fas fa-arrow-left"></i> Voltar</a></div>
+    <div class="page-intro"><div><p class="eyebrow">Meus anúncios / Edição</p><h1>Editar anúncio</h1><p>Atualiza o preço e a localização. Os interessados contactam-te pela RentAll.</p></div><a class="btn btn-outline" asp-action="Index"><i class="fas fa-arrow-left"></i> Voltar</a></div>
     <form class="form-panel" asp-action="Edit" method="post" data-submit-lock>
         <input asp-for="id" type="hidden" />
         <div asp-validation-summary="All" class="text-danger" role="alert"></div>
@@ -24,10 +24,10 @@
             <div class="form-field"><label asp-for="Complemento">Complemento</label><input asp-for="Complemento" class="form-control" /></div>
         </div>
         <div class="inline-map"><a data-region-map-link class="btn btn-outline" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps"><i class="fas fa-map-marked-alt"></i> Ver região no Maps</a><div class="ra-map-preview" data-ra-map hidden></div></div>
-        <h2>Contacto</h2>
+        <h2>Perfil público</h2>
         <div class="form-grid">
             <div class="form-field"><label asp-for="NomeFantasia">Nome público (opcional)</label><input asp-for="NomeFantasia" class="form-control" /></div>
-            <div class="form-field"><label asp-for="contato">Contacto (opcional, não divulgado)</label><input asp-for="contato" class="form-control" /></div>
+            
         </div>
         <div class="form-actions"><button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Guardar alterações</button><a class="btn btn-outline" asp-action="Index">Cancelar</a></div>
     </form>

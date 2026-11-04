@@ -1,6 +1,7 @@
 @model aluguel.ViewModel.ConversaViewModel
 @{ ViewData["Title"] = "Conversa sobre " + Model.NomeArtigo; }
 <link rel="stylesheet" href="~/css/marketplace-messages.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/in-platform-journey.css" asp-append-version="true" />
 <div class="page-width ra-messages">
     <div class="page-intro">
         <div><p class="eyebrow"><a asp-action="Index">Mensagens</a> / Conversa</p>
@@ -8,8 +9,42 @@
         </div>
         <a class="btn btn-outline" asp-controller="Anuncios" asp-action="Details" asp-route-id="@Model.AnuncioId">Ver anúncio</a>
     </div>
+    <section class="ra-chat-journey" aria-label="Próximo passo do aluguer">
+        <div class="ra-journey-intro">
+            <span class="ra-journey-tag"><i class="fas fa-lock" aria-hidden="true"></i> Negociação na RentAll</span>
+            <h2>Do interesse ao pedido, sem sair da conversa.</h2>
+            <p>Combina a disponibilidade aqui. Os pedidos guardam o valor e os dias acordados para ambos consultarem.</p>
+        </div>
+        @if (Model.PedidoId.HasValue)
+        {
+            <div class="ra-request-linked">
+                <div><small>Último pedido</small><strong>@Model.EstadoPedido</strong>
+                    <p>@Model.DiasPedido @(Model.DiasPedido == 1 ? "dia" : "dias") · @aluguel.Services.RentalLocalization.FormatPrice((float)(Model.TotalPedido ?? 0), Model.Pais)</p>
+                </div>
+                <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Acompanhar pedido</a>
+            </div>
+        }
+        else if (!Model.SouAnunciante && Model.AnuncioAtivo && Model.PrecoDia > 0)
+        {
+            <form asp-controller="Pedidos" asp-action="Criar" method="post" class="ra-request-inline">
+                <input type="hidden" name="anuncioId" value="@Model.AnuncioId" />
+                <label for="chat-rental-days">Quantos dias precisas?
+                    <input id="chat-rental-days" name="dias" type="number" min="1" max="@Model.PrazoMaximo" value="1" required class="form-control" />
+                </label>
+                <button class="btn btn-primary" type="submit">Enviar pedido de aluguer</button>
+            </form>
+        }
+        else if (Model.SouAnunciante)
+        {
+            <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Gerir pedidos recebidos</a>
+        }
+        else
+        {
+            <p class="ra-journey-note">Podes continuar a conversar e combinar os próximos passos. O pedido formal depende de um anúncio ativo com preço definido.</p>
+        }
+    </section>
     <div class="ra-conversation">
-        <div class="ra-safety-chat"><i class="fas fa-shield-alt"></i> Para tua segurança, não partilhes telefone, e-mail, palavras-passe nem links. Não há pagamentos ativados na RentAll nesta fase.</div>
+        <div class="ra-safety-chat"><i class="fas fa-shield-alt" aria-hidden="true"></i> Mantém a negociação nesta conversa para consultares as condições acordadas. Não partilhes contactos, links ou dados bancários. Não existem pagamentos reais ativados na RentAll.</div>
         <div class="ra-chat-history" aria-label="Histórico da conversa">
             @if (!Model.Mensagens.Any())
             {
@@ -27,8 +62,15 @@
             <input type="hidden" name="anuncioId" value="@Model.AnuncioId" />
             <input type="hidden" name="peerId" value="@Model.OutroUtilizadorId" />
             <label for="messageText">A tua mensagem</label>
-            <textarea id="messageText" name="texto" required maxlength="2000" rows="3" class="form-control" placeholder="Olá! Este artigo está disponível no próximo fim de semana?"></textarea>
+            <div class="ra-chat-prompts" aria-label="Sugestões de mensagem">
+                <button type="button" data-chat-suggestion="Olá! O artigo está disponível para os dias que pretendo?" >Perguntar disponibilidade</button>
+                <button type="button" data-chat-suggestion="Podemos combinar um local público para a entrega?" >Combinar entrega</button>
+                <button type="button" data-chat-suggestion="Podes confirmar o estado do artigo e os acessórios incluídos?" >Confirmar condições</button>
+            </div>
+            <textarea id="messageText" name="texto" required maxlength="2000" rows="3" class="form-control" placeholder="Escreve aqui a tua pergunta sobre o artigo..."></textarea>
+            <small class="ra-chat-help">Os contactos externos não são necessários para combinar um aluguer. Se houver um acordo, utiliza «Enviar pedido de aluguer» para registar as condições.</small>
             <button type="submit" class="btn btn-primary"><i class="far fa-paper-plane"></i> Enviar mensagem</button>
         </form>
     </div>
 </div>
+@section Scripts {<script src="~/js/in-platform-journey.js" asp-append-version="true"></script>}

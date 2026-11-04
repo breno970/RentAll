@@ -8,6 +8,7 @@
     var paymentStates = ViewBag.PaymentStates as Dictionary<int, string> ?? new();
 }
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/in-platform-journey.css" asp-append-version="true"/>
 <div class="page-width ra-request-page">
     <div class="page-intro">
         <div><p class="eyebrow">RentAll · Alugueres</p><h1>Pedidos de aluguer</h1>
@@ -38,6 +39,11 @@
                 </div>
                 <h2><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@request.AnuncioId">@name</a></h2>
                 <p class="muted">@request.Dias @(request.Dias == 1 ? "dia" : "dias") · @request.CriadoEm.ToString("dd/MM/yyyy")</p>
+                <div class="ra-request-steps" aria-label="Etapas do pedido">
+                    <span class="is-current"><i class="fas fa-check" aria-hidden="true"></i> Pedido registado</span>
+                    <span class="@(request.Estado == "Pendente" ? "is-current" : "")">@(request.Estado == "Pendente" ? "Aguardar resposta" : request.Estado == "Recusado" ? "Recusado" : request.Estado == "Cancelado" ? "Cancelado" : "Resposta recebida")</span>
+                    <span>Pagamento na RentAll: ainda indisponível</span>
+                </div>
                 <dl class="ra-request-values">
                     <div><dt>Valor estimado</dt><dd>@RentalLocalization.FormatPrice((float)request.TotalEstimado, request.Pais)</dd></div>
                     <div><dt>Comissão futura ilustrativa (10%)</dt><dd>@RentalLocalization.FormatPrice((float)request.ComissaoIndicativa, request.Pais)</dd></div>
@@ -89,6 +95,14 @@
                         <p class="ra-request-note"><a asp-controller="Pagamentos" asp-action="Conta">Configurar recebimentos de teste Stripe</a></p>
                     }
                 }
+                <div class="ra-journey-banner">
+                    <i class="far fa-comments" aria-hidden="true"></i>
+                    <span>Guarda o acordo numa conversa da RentAll.</span>
+                    <a asp-controller="Mensagens" asp-action="Conversa"
+                       asp-route-anuncioId="@request.AnuncioId"
+                       asp-route-peerId="@(owner ? request.InteressadoId : request.AnuncianteId)"
+                       class="btn btn-outline btn-sm">Abrir conversa</a>
+                </div>
                 <p class="ra-request-note">@(request.Estado == "Aceite sem pagamento" ? "Pedido aceite, mas sem pagamento processado. Combina apenas os próximos passos nas mensagens." : "Este pedido não comprova pagamento nem garante disponibilidade.")</p>
             </article>
         }

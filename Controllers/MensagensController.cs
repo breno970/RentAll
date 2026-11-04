@@ -1,12 +1,12 @@
 using aluguel.Areas.Identity.Data;
 using aluguel.Models;
+using aluguel.Services;
 using aluguel.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 namespace aluguel.Controllers;
 
@@ -24,7 +24,11 @@ public sealed class MensagensController : Controller
         var messages = await _db.Mensagens.AsNoTracking()
             .Where(m => m.RemetenteId == me || m.DestinatarioId == me)
             .OrderByDescending(m => m.CriadaEm).Take(500).ToListAsync(ct);
-        var ids = messages.Select(m => m.AnuncioId).Distinct().ToArray();
+        var requests = await _db.PedidosAluguer.AsNoTracking()
+            .Where(p => p.AnuncianteId == me || p.InteressadoId == me)
+            .OrderByDescending(p => p.CriadoEm).Take(150).ToListAsync(ct);
+        var ids = messages.Select(m => m.AnuncioId)
+            .Concat(requests.Select(p => p.AnuncioId)).Distinct().ToArray();
         var ads = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .Where(a => ids.Contains(a.id))
             .ToDictionaryAsync(a => a.id, ct);
@@ -43,7 +47,22 @@ public sealed class MensagensController : Controller
                 SouAnunciante = ad?.iduser == me
             };
         }).OrderByDescending(g => g.UltimaMensagem).ToList();
-        return View(threads);
+        // Rental requests are a valid conversation context before the first message.
+        foreach (var request in requests)
+        {
+            var peer = request.AnuncianteId == me ? request.InteressadoId : request.AnuncianteId;
+            if (threads.Any(t => t.AnuncioId == request.AnuncioId && t.OutroUtilizadorId == peer))
+                continue;
+            ads.TryGetValue(request.AnuncioId, out var ad);
+            threads.Add(new ResumoConversa {
+                AnuncioId = request.AnuncioId,
+                OutroUtilizadorId = peer,
+                NomeArtigo = ad?.item?.nmitem ?? "Anúncio",
+                UltimaMensagem = request.CriadoEm,
+                SouAnunciante = request.AnuncianteId == me
+            });
+        }
+        return View(threads.OrderByDescending(t => t.UltimaMensagem).ToList());
     }
 
     public async Task<IActionResult> Conversa(int anuncioId, string? peerId, CancellationToken ct)
@@ -55,23 +74,38 @@ public sealed class MensagensController : Controller
         bool owner = ad.iduser == me;
         var other = owner ? peerId : ad.iduser;
         if (string.IsNullOrWhiteSpace(other) || other == me) return BadRequest();
-        if (owner && !await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
+        // A rental request itself establishes a legitimate owner/interested-party
+        // conversation, even if neither user has sent the first message yet.
+        var hasMessage = await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
             ((m.RemetenteId == me && m.DestinatarioId == other) ||
-             (m.RemetenteId == other && m.DestinatarioId == me)), ct)) return NotFound();
-        if (!owner && ad.item?.snativo == "N" &&
-            !await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
-                ((m.RemetenteId == me && m.DestinatarioId == other) ||
-                 (m.RemetenteId == other && m.DestinatarioId == me)), ct)) return NotFound();
+             (m.RemetenteId == other && m.DestinatarioId == me)), ct);
+        var hasRequest = await _db.PedidosAluguer.AnyAsync(p => p.AnuncioId == anuncioId &&
+            p.AnuncianteId == ad.iduser &&
+            p.InteressadoId == (owner ? other : me), ct);
+        if (owner && !hasMessage && !hasRequest) return NotFound();
+        if (!owner && ad.item?.snativo == "N" && !hasMessage && !hasRequest)
+            return NotFound();
 
         var messages = await _db.Mensagens.AsNoTracking()
             .Where(m => m.AnuncioId == anuncioId &&
                 ((m.RemetenteId == me && m.DestinatarioId == other) ||
                  (m.RemetenteId == other && m.DestinatarioId == me)))
             .OrderBy(m => m.CriadaEm).Take(250).ToListAsync(ct);
+        var latestRequest = await _db.PedidosAluguer.AsNoTracking()
+            .Where(p => p.AnuncioId == anuncioId &&
+                p.InteressadoId == (owner ? other : me) && p.AnuncianteId == ad.iduser)
+            .OrderByDescending(p => p.CriadoEm)
+            .Select(p => new { p.Id, p.Estado, p.TotalEstimado, p.Dias, p.Pais })
+            .FirstOrDefaultAsync(ct);
         return View(new ConversaViewModel {
             AnuncioId = ad.id, NomeArtigo = ad.item?.nmitem ?? ad.modelo,
             MeuId = me, OutroUtilizadorId = other,
-            SouAnunciante = owner, Mensagens = messages
+            SouAnunciante = owner, Mensagens = messages,
+            AnuncioAtivo = ad.item?.snativo != "N",
+            PrecoDia = ad.vlitem, PrazoMaximo = ad.diasAluguel > 0 ? ad.diasAluguel : 365,
+            Pais = ad.Pais, PedidoId = latestRequest?.Id,
+            EstadoPedido = latestRequest?.Estado, DiasPedido = latestRequest?.Dias,
+            TotalPedido = latestRequest?.TotalEstimado
         });
     }
 
@@ -90,8 +124,11 @@ public sealed class MensagensController : Controller
         var previous = await _db.Mensagens.AnyAsync(m => m.AnuncioId == anuncioId &&
             ((m.RemetenteId == me && m.DestinatarioId == other) ||
              (m.RemetenteId == other && m.DestinatarioId == me)), ct);
-        if (owner && !previous) return Forbid();
-        if (ad.item?.snativo == "N" && !previous) return NotFound();
+        var hasRequest = await _db.PedidosAluguer.AnyAsync(p =>
+            p.AnuncioId == anuncioId && p.AnuncianteId == ad.iduser &&
+            p.InteressadoId == (owner ? other : me), ct);
+        if (owner && !previous && !hasRequest) return Forbid();
+        if (ad.item?.snativo == "N" && !previous && !hasRequest) return NotFound();
 
         var body = texto?.Trim() ?? "";
         if (body.Length is < 1 or > 2000)
@@ -101,8 +138,7 @@ public sealed class MensagensController : Controller
         }
         // Do not accept links, email addresses or telephone numbers, which can leak private
         // information and bypass any future buyer/seller protections.
-        if (Regex.IsMatch(body, @"\bhttps?://|\bwww\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}", RegexOptions.IgnoreCase)
-            || Regex.IsMatch(body, @"(?<!\d)(?:\+?\d[\s().-]?){9,15}(?!\d)"))
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(body))
         {
             TempData["Error"] = "Por segurança, não incluas contactos, números de telefone ou links. Combina tudo pela RentAll.";
             return RedirectToAction(nameof(Conversa), new { anuncioId, peerId = other });

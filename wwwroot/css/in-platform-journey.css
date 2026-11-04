@@ -1,0 +1,29 @@
+/* RentAll / in-platform negotiation: editorial, purposeful, responsive. */
+.ra-chat-journey{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.78fr);gap:18px;align-items:center;border:1px solid #cddfd2;background:#f1f6f2;border-radius:11px;padding:20px 23px;margin:0 0 17px}
+.ra-journey-intro h2{font-size:1.16rem;margin:9px 0 7px}
+.ra-journey-intro p{font-size:.86rem;color:#4f6357;line-height:1.6;margin:0}
+.ra-journey-tag{font-size:.73rem;color:#1d644a;font-weight:750;letter-spacing:.025em}
+.ra-journey-tag i{margin-right:6px}
+.ra-request-linked{display:flex;align-items:center;gap:12px;justify-content:space-between;background:#fff;border:1px solid #d9e5db;padding:12px 14px;border-radius:9px}
+.ra-request-linked small{display:block;color:var(--muted);font-size:.73rem}
+.ra-request-linked strong{font-size:.94rem}
+.ra-request-linked p{font-size:.8rem;margin:5px 0 0;color:var(--muted)}
+.ra-request-inline{display:flex;align-items:end;gap:9px;flex-wrap:wrap}
+.ra-request-inline label{display:grid;gap:6px;font-size:.79rem;font-weight:700;color:#34483b}
+.ra-request-inline .form-control{width:96px;min-height:40px}
+.ra-request-inline .btn{min-height:40px;flex:1}
+.ra-journey-note{font-size:.85rem;margin:0;color:var(--ink-soft)}
+.ra-chat-prompts{display:flex;flex-wrap:wrap;gap:7px}
+.ra-chat-prompts button{border:1px solid #d5dfd7;background:#fff;color:#3a5848;border-radius:7px;padding:7px 10px;font-size:.76rem;line-height:1.35;text-align:left;cursor:pointer;transition:background .15s,border-color .15s}
+.ra-chat-prompts button:hover,.ra-chat-prompts button:focus-visible{background:#edf5ee;border-color:#8cb09a}
+.ra-chat-help{font-size:.76rem;color:var(--muted);line-height:1.5}
+.ra-conversation .ra-safety-chat{background:#f2f6f3;border-bottom:1px solid var(--border);color:#435f50}
+.ra-journey-banner{display:flex;align-items:center;gap:10px;background:#eff5ef;border:1px solid #d8e4d9;border-radius:9px;padding:12px 15px;margin:15px 0;font-size:.84rem;color:#3b604a}
+.ra-journey-banner i{color:#237154}
+.ra-request-steps{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 15px;color:var(--muted);font-size:.75rem}
+.ra-request-steps span{border:1px solid var(--border);border-radius:6px;padding:5px 9px;background:#fff}
+.ra-request-steps span.is-current{border-color:#9ac6a8;background:#edf5ee;color:#1a6545;font-weight:750}
+.ra-request-note a{font-weight:700}
+@media(max-width:760px){.ra-chat-journey{grid-template-columns:1fr;padding:17px;gap:15px}.ra-request-linked{flex-wrap:wrap}.ra-request-inline label{width:100%}.ra-request-inline .form-control{width:100%}.ra-request-inline .btn{width:100%;flex:auto}.ra-chat-prompts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:430px){.ra-chat-prompts{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.ra-chat-prompts button{transition:none}}

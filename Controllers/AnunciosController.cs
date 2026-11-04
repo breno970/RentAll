@@ -131,6 +131,9 @@ public class AnunciosController : Controller
         if (!await _db.Tipos.AnyAsync(x => x.id == Tipo && x.categoriaid == Categoria))
             ModelState.AddModelError(nameof(Tipo), "Selecione um tipo válido para esta categoria.");
 
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(anuncio.modelo) ||
+            MarketplaceContactSafety.ContainsContactOrRedirect(anuncio.NomeFantasia))
+            ModelState.AddModelError("", "Não incluas contactos, links ou redes sociais nos campos públicos do anúncio.");
         if (!ModelState.IsValid)
         {
             await PrepareCreateOptions(anuncio.itemid);
@@ -189,6 +192,9 @@ public class AnunciosController : Controller
         ModelState.Remove(nameof(Anuncio.categoriaid));
         ModelState.Remove(nameof(Anuncio.tipoid));
         NormalizeLocation(anuncio);
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(anuncio.modelo) ||
+            MarketplaceContactSafety.ContainsContactOrRedirect(anuncio.NomeFantasia))
+            ModelState.AddModelError("", "Remove contactos pessoais e links do anúncio. Comunica através da RentAll.");
         if (!ModelState.IsValid) return View(anuncio);
 
         // The owner, linked item, category and type cannot be changed via hidden fields.
