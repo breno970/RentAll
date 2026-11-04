@@ -21,7 +21,7 @@
 <body>
     <main id="container">
 
-        <form id="card-it" method="post">
+        <div class="ra-form-wrapper">
 
             <a href="c:\users\valda\source\repos\aluguel\aluguel\views\items\details.cshtml"></a>
 
@@ -43,13 +43,13 @@
 
 
 
-                <form asp-action="Delete">
+                <form asp-action="Delete" method="post">
                     <input type="hidden" asp-for="id" />
                     <input type="submit" value="Excluir" class="btn btn-danger" />
                     <a asp-action="Index">Voltar para lista</a>
                 </form>
             </div>
-        </form>
+        </div>
     </main>
 </body>
 
