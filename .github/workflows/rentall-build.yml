@@ -1,0 +1,23 @@
+name: RentAll .NET build
+on:
+  push:
+    branches:
+      - recovery/supabase-render
+  pull_request:
+    branches:
+      - Master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore packages
+        run: dotnet restore aluguel.csproj
+      - name: Compile application
+        run: dotnet build aluguel.csproj --no-restore -c Release
