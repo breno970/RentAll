@@ -22,6 +22,8 @@ public sealed class PagamentoAluguer
     [MaxLength(3)] public string Moeda { get; set; } = "eur";
     public long TotalCentimos { get; set; }
     public long ComissaoCentimos { get; set; }
+    public long ReembolsadoCentimos { get; set; }
+    public bool DisputaAberta { get; set; }
     [MaxLength(24)] public string Estado { get; set; } = "Checkout criado";
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
     public DateTime? PagoEm { get; set; }
