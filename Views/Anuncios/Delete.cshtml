@@ -1,104 +1,14 @@
-﻿@model aluguel.Models.Anuncio
-
-@{
-    ViewData["Title"] = "Delete";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
-    <title>Rent All - Excluir Anúncio</title>
-
-</head>
-<body>
-    <main id="container">
-
-        <div class="ra-form-wrapper">
-
-            <!-- FORM HEADER -->
-            <div class="card-it">
-
-                <h1>
-                    Tem certeza que deseja excluir este Anúncio?
-                </h1>
-
-                <div class="form-group">
-                    <label for="nmitem">Nome</label>
-                    <input type="text" id="nmitem" name="nmitem" class="form-control" value="@Model.item.nmitem" readonly />
-                </div>
-
-                <form asp-action="Delete" method="post">
-                    <input type="hidden" asp-for="id" />
-                    <input type="submit" value="Excluir" class="btn btn-danger" />
-                    <a asp-action="Index">Voltar para lista</a>
-                </form>
-            </div>
-
-
-
-        </div>
-    </main>
-</body>
-
-<div class="footer-container">
-
-    <div class="footer-content-2">
-        <div>
-            <i class="fa fa-map-marker"></i>
-            <p>
-                <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
-                    Visconde de Mauá, Resende - RJ
-                </a>
-            </p>
-        </div>
-        <div>
-            <i class="fa fa-envelope"></i>
-            <p>
-                <a href="mailto:rent.all.bn@gmail.com">
-                    rent.all.bn@gmail.com
-                </a>
-            </p>
-        </div>
-        <div>
-            <i class="fa fa-phone"></i>
-            <p><a href="tel:2499965669">(24)999656679</a></p>
-        </div>
-        <div>
-            <i class="fa fa-whatsapp"></i>
-            <p>
-                <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
-                    +55 24-999656679
-                </a>
-            </p>
-        </div>
+@model aluguel.Models.Anuncio
+@{ ViewData["Title"] = "Excluir anúncio"; }
+<div class="page-width"><div class="form-shell">
+    <div class="page-intro"><div><p class="eyebrow">Meus anúncios / Exclusão</p><h1>Excluir anúncio</h1><p>Esta ação vai retirar o anúncio da pesquisa pública.</p></div></div>
+    <div class="panel danger-panel">
+        <span class="danger-icon"><i class="fas fa-exclamation-triangle"></i></span>
+        <h2>Excluir «@(Model.item?.nmitem ?? Model.modelo)»?</h2>
+        <p class="muted">O artigo original continuará guardado em «Meus itens». Podes criar outro anúncio mais tarde.</p>
+        <form asp-action="Delete" method="post" data-submit-lock>
+            <input asp-for="id" type="hidden" />
+            <div class="form-actions"><button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i> Sim, excluir anúncio</button><a class="btn btn-outline" asp-action="Index">Cancelar</a></div>
+        </form>
     </div>
-
-
-    <div class="footer-content-3">
-        <p class="footer-empresa">
-            <span>Sobre a Empresa</span>
-            Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
-        </p>
-        <div class="footer-icons">
-
-            <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
-            <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
-            <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
-            <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
-
-        </div>
-        <hr>
-        <p>©2023 Rent All Ltda.</p>
-    </div>
-    <div class="copyright">
-        <hr>
-        <p>©Copyright. Todos os direitos reservados.</p>
-    </div>
-
-</div>
-
-</html>
+</div></div>

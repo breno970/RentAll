@@ -1,184 +1,111 @@
 @model aluguel.Models.Anuncio
 @using aluguel.Services
-@{
-    ViewData["Title"] = "Criar Anúncio";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-<div class="card-it ra-ad-editor">
-    <h1>Criar Anúncio</h1>
-    <p class="ra-field-hint">Transforme um objeto em desuso numa oportunidade de aluguel. Informe os detalhes e escolha onde ele está disponível.</p>
-    <form asp-action="Create" method="post" class="ra-ad-form">
-        <div asp-validation-summary="All" class="text-danger"></div>
-        <h2><i class="fas fa-box-open" aria-hidden="true"></i> Sobre o item</h2>
-        <div class="ra-form-grid">
-            <div class="form-group">
-                <label asp-for="itemid">Escolha o item já cadastrado *</label>
-                <select asp-for="itemid" asp-items="ViewBag.itemid" class="form-control" required>
-                    <option value="">Selecione um item</option>
-                </select>
-                <small class="ra-field-hint">Ainda não cadastrou? <a asp-controller="Items" asp-action="Create">Cadastre um item com fotos.</a></small>
+@{ ViewData["Title"] = "Criar anúncio"; }
+<div class="page-width"><div class="form-shell">
+    <div class="page-intro">
+        <div><p class="eyebrow">Passo 2 de 2 · Publicar</p><h1>Prepara o teu anúncio</h1><p>Define onde está o artigo, o preço e como poderão contactar-te.</p></div>
+        <a class="btn btn-outline" asp-controller="Items" asp-action="Index"><i class="fas fa-arrow-left"></i> Meus itens</a>
+    </div>
+    <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>A localização pública será aproximada. A rua, o número e o código postal não aparecem nos detalhes do anúncio.</span></div>
+    <form class="form-panel" asp-controller="Anuncios" asp-action="Create" method="post" data-submit-lock>
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <h2><i class="fas fa-box-open" aria-hidden="true"></i> Artigo e condições</h2>
+        <div class="form-grid">
+            <div class="form-field full">
+                <label asp-for="itemid">Artigo cadastrado *</label>
+                <select asp-for="itemid" asp-items="ViewBag.itemid" class="form-select" required><option value="">Seleciona o artigo</option></select>
+                <small>Não aparece? <a asp-controller="Items" asp-action="Create">Adiciona-o primeiro com fotografias.</a></small>
+                <span asp-validation-for="itemid" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="modelo">Modelo ou referência *</label>
-                <input asp-for="modelo" class="form-control" maxlength="150" placeholder="Marca e modelo do item" required />
+            <div class="form-field">
+                <label for="Categoria">Categoria *</label>
+                <select class="form-select" name="Categoria" id="Categoria" asp-items="ViewBag.Categoria" required><option value="">Seleciona a categoria</option></select>
+            </div>
+            <div class="form-field">
+                <label for="Tipo">Tipo *</label>
+                <select class="form-select" name="Tipo" id="Tipo" data-selected-type="@Model.tipoid" required disabled><option value="">Escolhe primeiro a categoria</option></select>
+            </div>
+            <div class="form-field full">
+                <label asp-for="modelo">Marca / modelo / referência *</label>
+                <input asp-for="modelo" class="form-control" required placeholder="Ex.: Bosch GSB 13 RE" maxlength="150" />
                 <span asp-validation-for="modelo" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label for="Categoria">Categoria *</label>
-                <select asp-items="ViewBag.Categoria" name="Categoria" id="Categoria" class="form-control" required>
-                    <option value="">Escolha a categoria</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="Tipo">Tipo *</label>
-                <select id="Tipo" name="Tipo" class="form-control" required disabled>
-                    <option value="">Selecione primeiro a categoria</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="vlitem" data-rental-currency>Valor do aluguel por dia (@(Model.Pais == "PT" ? "€" : "R$")) *</label>
-                <input asp-for="vlitem" class="form-control" type="number" min="0.01" step="0.01" inputmode="decimal" required />
+            <div class="form-field">
+                <label asp-for="vlitem" data-rental-currency>Valor por dia (@(Model.Pais == "PT" ? "€" : "R$")) *</label>
+                <input asp-for="vlitem" class="form-control" type="number" step="0.01" min="0.01" max="10000000" required />
                 <span asp-validation-for="vlitem" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="diasAluguel">Quantidade de dias disponíveis *</label>
+            <div class="form-field">
+                <label asp-for="diasAluguel">Dias disponíveis *</label>
                 <input asp-for="diasAluguel" class="form-control" type="number" min="1" max="365" required />
                 <span asp-validation-for="diasAluguel" class="text-danger"></span>
             </div>
         </div>
-
-        <h2><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Região onde o item está disponível</h2>
-        <p class="ra-field-hint">A pesquisa mostra a sua cidade e bairro; o endereço exato não precisa de ser exposto ao público.</p>
-        <div class="ra-form-grid">
-            <div class="form-group">
+        <h2><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Onde está o artigo?</h2>
+        <div class="form-grid">
+            <div class="form-field">
                 <label asp-for="Pais">País *</label>
-                <select asp-for="Pais" class="form-control" data-region-country required>
-                    <option value="BR">Brasil</option>
-                    <option value="PT">Portugal</option>
+                <select asp-for="Pais" class="form-select" data-region-country required>
+                    <option value="BR">Brasil</option><option value="PT">Portugal</option>
                 </select>
-                <span asp-validation-for="Pais" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-field">
                 <label asp-for="Estado" data-region-label>@LocationCatalog.RegionLabel(Model.Pais) *</label>
-                <select asp-for="Estado" id="txtEstado" class="form-control" data-region-uf required>
-                    <option value="">Selecione o estado</option>
-                    @foreach (var uf in LocationCatalog.RegionsFor(Model.Pais))
-                    {
-                        <option value="@uf.Code">@uf.Name (@uf.Code)</option>
-                    }
+                <select asp-for="Estado" class="form-select" data-region-uf required>
+                    <option value="">Escolhe a região</option>
+                    @foreach (var region in LocationCatalog.RegionsFor(Model.Pais))
+                    { <option value="@region.Code">@region.Name</option> }
                 </select>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Cidade">Cidade *</label>
-                <input asp-for="Cidade" id="txtCidade" class="form-control" data-region-city list="ra-ad-cities" placeholder="Selecione ou escreva a cidade" required autocomplete="address-level2" />
-                <datalist id="ra-ad-cities"></datalist>
+            <div class="form-field">
+                <label asp-for="Cidade">Cidade / município *</label>
+                <input asp-for="Cidade" class="form-control" data-region-city list="ad-cities" id="txtCidade" placeholder="Seleciona ou escreve a cidade" required />
+                <datalist id="ad-cities"></datalist>
                 <span asp-validation-for="Cidade" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Bairro">Bairro *</label>
-                <input asp-for="Bairro" id="txtBairro" class="form-control" maxlength="120" required />
+            <div class="form-field">
+                <label asp-for="Bairro">Bairro / freguesia *</label>
+                <input asp-for="Bairro" class="form-control" id="txtBairro" required />
                 <span asp-validation-for="Bairro" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-field">
                 <label asp-for="CEP" data-postal-label>@LocationCatalog.PostalLabel(Model.Pais) *</label>
-                <input asp-for="CEP" id="txtCep" class="form-control" inputmode="numeric" maxlength="9" placeholder="@(Model.Pais == "PT" ? "0000-000" : "00000-000")" required autocomplete="postal-code" />
-                <small class="ra-field-hint">O CEP pode preencher automaticamente a cidade, o bairro e a UF.</small>
+                <input asp-for="CEP" class="form-control" id="txtCep" placeholder="@(Model.Pais == "PT" ? "0000-000" : "00000-000")" maxlength="9" required inputmode="numeric" />
                 <span asp-validation-for="CEP" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-field">
                 <label asp-for="Rua">Rua *</label>
-                <input asp-for="Rua" id="txtRua" class="form-control" required autocomplete="address-line1" />
+                <input asp-for="Rua" class="form-control" id="txtRua" required autocomplete="street-address" />
                 <span asp-validation-for="Rua" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-field">
                 <label asp-for="Numero">Número (opcional)</label>
-                <input asp-for="Numero" id="txtNumero" class="form-control" inputmode="numeric" />
-                <span asp-validation-for="Numero" class="text-danger"></span>
+                <input asp-for="Numero" class="form-control" id="txtNumero" />
             </div>
-            <div class="form-group ra-full">
+            <div class="form-field">
                 <label asp-for="Complemento">Complemento (opcional)</label>
                 <input asp-for="Complemento" class="form-control" />
             </div>
         </div>
-        <div class="ra-map-actions">
-            <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" data-region-map-link aria-disabled="true"><i class="fas fa-map-marked-alt" aria-hidden="true"></i> Ver região no Google Maps</a>
-            <div class="ra-map-preview" data-ra-map hidden aria-label="Mapa aproximado da região selecionada"></div>
+        <div class="inline-map">
+            <a class="btn btn-outline" data-region-map-link href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt"></i> Ver localização aproximada no Maps</a>
+            <div class="ra-map-preview" data-ra-map hidden aria-label="Mapa aproximado da região"></div>
         </div>
-
-        <h2><i class="fas fa-phone-alt" aria-hidden="true"></i> Contato</h2>
-        <div class="ra-form-grid">
-            <div class="form-group">
-                <label asp-for="NomeFantasia">Como as pessoas devem chamar você? *</label>
-                <input asp-for="NomeFantasia" class="form-control" required />
+        <h2><i class="far fa-comments" aria-hidden="true"></i> Contacto</h2>
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="NomeFantasia">Nome público *</label>
+                <input asp-for="NomeFantasia" class="form-control" required placeholder="Como gostarias de ser tratado?" />
                 <span asp-validation-for="NomeFantasia" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="contato">Telefone ou outro contato *</label>
-                <input asp-for="contato" class="form-control" required />
+            <div class="form-field">
+                <label asp-for="contato">Contacto *</label>
+                <input asp-for="contato" class="form-control" required placeholder="Telefone, WhatsApp ou outro meio" />
                 <span asp-validation-for="contato" class="text-danger"></span>
             </div>
         </div>
-        <div class="btn-container">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-check" aria-hidden="true"></i> Publicar anúncio</button>
-            <a asp-action="Index" class="btn btn-outline-dark">Voltar para lista</a>
-        </div>
+        <div class="form-actions"><button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Publicar anúncio</button><a asp-action="Index" class="btn btn-outline">Cancelar</a></div>
     </form>
-</div>
-<div class="footer-container">
-
-    <div class="footer-content-2">
-        <div>
-            <i class="fa fa-map-marker"></i>
-            <p>
-                <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
-                    Visconde de Mauá, Resende - RJ
-                </a>
-            </p>
-        </div>
-        <div>
-            <i class="fa fa-envelope"></i>
-            <p>
-                <a href="mailto:rent.all.bn@gmail.com">
-                    rent.all.bn@gmail.com
-                </a>
-            </p>
-        </div>
-        <div>
-            <i class="fa fa-phone"></i>
-            <p><a href="tel:2499965669">(24)999656679</a></p>
-        </div>
-        <div>
-            <i class="fa fa-whatsapp"></i>
-            <p>
-                <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
-                    +55 24-999656679
-                </a>
-            </p>
-        </div>
-    </div>
-
-
-    <div class="footer-content-3">
-        <p class="footer-empresa">
-            <span>Sobre a Empresa</span>
-            Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
-        </p>
-        <div class="footer-icons">
-
-            <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
-            <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
-            <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
-            <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
-
-        </div>
-        <hr>
-        <p>©2023 Rent All Ltda.</p>
-    </div>
-    <div class="copyright">
-        <hr>
-        <p>©Copyright. Todos os direitos reservados.</p>
-    </div>
-
-</div>
+</div></div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }
