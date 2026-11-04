@@ -17,7 +17,7 @@
 <body>
     <main id="container">
 
-        <form id="card-it" method="post" enctype="multipart/form-data">
+        <div class="ra-form-wrapper">
 
             <!-- FORM HEADER -->
             <div class="card-it">
@@ -31,7 +31,7 @@
                     <input type="text" id="nmitem" name="nmitem" class="form-control" value="@Model.item.nmitem" readonly />
                 </div>
 
-                <form asp-action="Delete">
+                <form asp-action="Delete" method="post">
                     <input type="hidden" asp-for="id" />
                     <input type="submit" value="Excluir" class="btn btn-danger" />
                     <a asp-action="Index">Voltar para lista</a>
@@ -40,7 +40,7 @@
 
 
 
-        </form>
+        </div>
     </main>
 </body>
 
