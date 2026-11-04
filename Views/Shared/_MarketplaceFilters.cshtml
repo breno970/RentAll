@@ -1,0 +1,87 @@
+@model aluguel.ViewModel.MarketplaceFilters
+@using aluguel.Services
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var action = ViewData["FilterAction"] as string ?? "Index";
+    var categories = ViewData["Categories"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+<form asp-controller="Home" asp-action="@action" method="get" class="ra-marketplace-filters" role="search" aria-label="Pesquisar e filtrar anúncios">
+    <div class="ra-filter-top">
+        <div class="ra-filter-field ra-filter-search">
+            <label for="ra-search">O que você procura?</label>
+            <input id="ra-search" class="form-control" name="SearchString" type="search" placeholder="Furadeira, bicicleta, videogame…" value="@Model.SearchString" />
+        </div>
+        <div class="ra-filter-field">
+            <label for="ra-uf">Estado</label>
+            <select id="ra-uf" name="Estado" class="form-control" data-region-uf>
+                <option value="">Todo o Brasil</option>
+                @foreach (var uf in LocationCatalog.States)
+                {
+                    if (string.Equals(Model.Estado, uf.Code, StringComparison.OrdinalIgnoreCase))
+                    {
+                        <option value="@uf.Code" selected>@uf.Name (@uf.Code)</option>
+                    }
+                    else
+                    {
+                        <option value="@uf.Code">@uf.Name (@uf.Code)</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="ra-filter-field">
+            <label for="ra-city">Cidade</label>
+            <input id="ra-city" class="form-control" name="RegionFilter" value="@Model.RegionFilter" placeholder="Qualquer cidade" list="ra-filter-cities" data-region-city />
+            <datalist id="ra-filter-cities" data-region-city-list></datalist>
+        </div>
+        <button type="submit" class="btn btn-primary ra-filter-submit">Buscar</button>
+    </div>
+    <details class="ra-advanced-filters">
+        <summary><i class="fas fa-sliders-h" aria-hidden="true"></i> Mais filtros: categoria, bairro, preço e ordenação</summary>
+        <div class="ra-filter-extra">
+            @if (action == "Index")
+            {
+                <div class="ra-filter-field">
+                    <label for="ra-category">Categoria</label>
+                    <select class="form-control" name="CategoriaId" id="ra-category">
+                        <option value="">Todas as categorias</option>
+                        @foreach (var category in categories)
+                        {
+                            if (Model.CategoriaId?.ToString() == category.Value)
+                            {
+                                <option value="@category.Value" selected>@category.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@category.Value">@category.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+            }
+            <div class="ra-filter-field">
+                <label for="ra-neighborhood">Bairro</label>
+                <input class="form-control" id="ra-neighborhood" name="Bairro" placeholder="Qualquer bairro" value="@Model.Bairro" />
+            </div>
+            <div class="ra-filter-field">
+                <label for="ra-price-min">Valor mínimo por dia (R$)</label>
+                <input class="form-control" id="ra-price-min" type="number" name="MinPrice" step="0.01" min="0" value="@(Model.MinPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="0,00" />
+            </div>
+            <div class="ra-filter-field">
+                <label for="ra-price-max">Valor máximo por dia (R$)</label>
+                <input class="form-control" id="ra-price-max" type="number" name="MaxPrice" step="0.01" min="0" value="@(Model.MaxPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="Sem limite" />
+            </div>
+            <div class="ra-filter-field">
+                <label for="ra-sort">Ordenar resultados</label>
+                <select class="form-control" id="ra-sort" name="Sort">
+                    <option value="recentes" selected="@(Model.Sort == "recentes")">Mais recentes</option>
+                    <option value="preco-menor" selected="@(Model.Sort == "preco-menor")">Menor preço</option>
+                    <option value="preco-maior" selected="@(Model.Sort == "preco-maior")">Maior preço</option>
+                </select>
+            </div>
+        </div>
+        <div class="ra-filter-actions">
+            <a asp-controller="Home" asp-action="@action" class="btn btn-outline-dark">Limpar filtros</a>
+            <button class="btn btn-primary" type="submit">Aplicar filtros</button>
+        </div>
+    </details>
+</form>
