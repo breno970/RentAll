@@ -1,43 +1,42 @@
 @model IEnumerable<aluguel.Models.Item>
-@{
-    ViewData["Title"] = "Meus Itens";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<h1 class="ra-list-heading">Meus Itens<span>Gerencie seus produtos</span></h1>
-<div class="create-container">
-    <a asp-action="Create" class="create">Criar novo</a>
-</div>
-@if (!Model.Any())
-{
-    <div class="ra-empty-state">
-        <h2>Nenhum item cadastrado</h2>
-        <p>Cadastre o seu primeiro produto para começar.</p>
-        <a asp-action="Create" class="create">Cadastrar item</a>
+@{ ViewData["Title"] = "Meus itens"; }
+<div class="page-width">
+    <div class="page-intro">
+        <div><p class="eyebrow">A minha área</p><h1>Meus itens</h1><p>Organiza os objetos que podes partilhar com outras pessoas.</p></div>
+        <a class="btn btn-primary" asp-action="Create"><i class="fas fa-plus" aria-hidden="true"></i> Adicionar item</a>
     </div>
-}
-else
-{
-    <table aria-label="Meus itens cadastrados">
-        <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <div class="item-content">
-                        <img src="~/imagens/@item.imagem1" class="item-image" alt="@item.nmitem" loading="lazy" decoding="async" />
-                        <div class="item-details">
-                            <div class="item-name">@item.nmitem</div>
-                            <div class="item-actions">
-                                <a href="@Url.Action("Edit", "Items", new { id = item.id })" class="edit">Editar</a>
-                                <a href="@Url.Action("Details", "Items", new { id = item.id })" class="details">Detalhes</a>
-                                <a href="@Url.Action("Delete", "Items", new { id = item.id })" class="delete">Excluir</a>
-                            </div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-symbol"><i class="fas fa-box-open"></i></div>
+            <h2>O teu primeiro item está à espera</h2>
+            <p>Fotografa algo que raramente usas. Podes transformá-lo numa nova oportunidade.</p>
+            <a class="btn btn-primary" asp-action="Create">Cadastrar primeiro item</a>
+        </div>
+    }
+    else
+    {
+        <div class="dashboard-grid">
+            @foreach (var item in Model)
+            {
+                <article class="manage-card">
+                    @if (!string.IsNullOrWhiteSpace(item.imagem1))
+                    { <img class="manage-img" src="@Url.Content("~/imagens/" + item.imagem1)" alt="@item.nmitem" loading="lazy" /> }
+                    else { <div class="manage-img"><i class="fas fa-camera"></i></div> }
+                    <div class="manage-body">
+                        <span class="pill @(item.snativo == "N" ? "pill-warning" : "")">@(item.snativo == "N" ? "Guardado / oculto" : "Disponível para anunciar")</span>
+                        <h2>@item.nmitem</h2>
+                        <p>@item.dsitem</p>
+                        <div class="manage-actions">
+                            <a asp-controller="Items" asp-action="Details" asp-route-id="@item.id"><i class="far fa-eye"></i> Ver</a>
+                            <a asp-controller="Items" asp-action="Edit" asp-route-id="@item.id"><i class="fas fa-pen"></i> Editar</a>
+                            @if (item.snativo != "N")
+                            { <a asp-controller="Anuncios" asp-action="Create" asp-route-itemId="@item.id"><i class="fas fa-bullhorn"></i> Anunciar</a> }
+                            <a class="danger-link" asp-controller="Items" asp-action="Delete" asp-route-id="@item.id"><i class="far fa-trash-alt"></i> Excluir</a>
                         </div>
                     </div>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
+                </article>
+            }
+        </div>
+    }
+</div>
