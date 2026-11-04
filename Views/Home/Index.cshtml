@@ -1,120 +1,69 @@
-﻿@model X.PagedList.IPagedList<aluguel.Models.Anuncio>
-@using X.PagedList.Mvc.Core;
-
+@model X.PagedList.IPagedList<aluguel.Models.Anuncio>
+@using X.PagedList.Mvc.Core
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Início";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<form asp-controller="Home" asp-action="Index" method="get" class="form-se ra-search" role="search">
+    <label class="visually-hidden" for="SearchString">Pesquisar itens</label>
+    <input id="SearchString" class="form-control" type="search" name="SearchString" placeholder="Pesquisar por..." value="@ViewData["CurrentFilter"]" aria-label="Pesquisar itens" />
+    <label class="visually-hidden" for="RegionFilter">Cidade</label>
+    <input id="RegionFilter" class="form-control" type="text" name="RegionFilter" placeholder="Todas as regiões" value="@ViewData["RegionFilter"]" aria-label="Filtrar por cidade" />
+    <button type="submit" class="btn btn-outline-dark">Buscar</button>
+</form>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="~/css/voltartopo.css" asp-append-version="true" />
-    <title>Rent All</title>
-</head>
-<body>
-
-    <form method="get" action="/Home/Index">
-        <table>
-            <tr>
-                <td>
-                    <input class="form-control" type="text" placeholder="Pesquisar por..." name="SearchString" value="@ViewData["CurrentFilter"]" aria-label="Search" aria-describedby="btnNavbarSearch" />
-                </td>
-                <td>
-                    <select name="RegionFilter" class="form-control">
-                        <option value="">Todas as Regiões</option>
-                        <optgroup label="Sul Fluminense">
-                            <option value="Angra dos Reis">Angra dos Reis</option>
-                            <!-- Outras opções de cidades do Sul Fluminense -->
-                        </optgroup>
-                        <!-- Adicione outras regiões, se aplicável -->
-                    </select>
-                </td>
-                <td>
-                    <input type="submit" value="Buscar" class="btn btn-outline-dark" />
-                </td>
-            </tr>
-        </table>
-    </form>
-
-
-    <div class="form-se">
-
-
-        <form method="get" action="/Home/Index">
-            <td>
-                <input class="form-control" type="text" placeholder="Pesquisar por..." name="SearchString" value="@ViewData["CurrentFilter"]" aria-label="Search" aria-describedby="btnNavbarSearch" />
-            </td>
-            <td>
-                <input type="submit" value="Buscar" class="btn btn-outline-dark" />
-            </td>
-        </form>
-
-
-    </div>
-
-    <label>  build_1.0.203</label>
-  
-   <br />
-
-   <div class="mil">
-    <div class="form">
+<div class="mil">
+    <div class="form" aria-label="Categorias de itens">
         <a class="btn btn-primary" asp-action="VideoGame">VideoGame</a>
         <a class="btn btn-primary" asp-action="AudioVisual">ÁudioVisual</a>
-        <a class="btn btn-primary" asp-action="MusicaHobbie">Música&Hobbies</a>
-        <a class="btn btn-primary" asp-action="EsporteGinastica">Esporte&Ginástica</a>
+        <a class="btn btn-primary" asp-action="MusicaHobbie">Música&amp;Hobbies</a>
+        <a class="btn btn-primary" asp-action="EsporteGinastica">Esporte&amp;Ginástica</a>
         <a class="btn btn-primary" asp-action="Ferramentas">Ferramentas</a>
         <a class="btn btn-primary" asp-action="EletroDomesticos">EletroDomésticos</a>
     </div>
-    </div>
+</div>
 
-
+@if (Model.Any())
+{
     <div class="l-cards">
         @foreach (var item in Model)
         {
             <div class="c-card">
                 <div class="c-card__image">
-                    
-                    <img class="img" src="~/imagens/@item.item.imagem1" alt="@item.item.nmitem"
-                         width="100%"
-                         alt="@item.item.nmitem">
-                        
+                    <img class="img" src="~/imagens/@item.item.imagem1"
+                         alt="@item.item.nmitem" loading="lazy" decoding="async" />
                 </div>
-
                 <div class="c-card__content">
                     <h1>@item.item.nmitem</h1>
                     <p>@item.modelo</p>
-                    <h3>Dias de Aluguel:@item.diasAluguel</h3>
-                    <span>R$:@item.vlitem </span>
-
+                    <h3>Dias de Aluguel: @item.diasAluguel</h3>
+                    <span>R$: @item.vlitem</span>
                     <a asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id">Saiba+</a>
-                    <span class="@item.item.nmitem" style="width:30%"></span>
-                    <span class="@item.modelo" style="width:85%"></span>
-                    <span class="Dias de Aluguel:@item.diasAluguel" style="width:60%"></span>
-
                 </div>
             </div>
-
         }
-
-
     </div>
+}
+else
+{
+    <div class="mil" style="text-align:center;padding:30px 18px">
+        <h2>Nenhum anúncio encontrado</h2>
+        <p>Tente outra pesquisa ou explore uma das categorias.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark">Ver todos os anúncios</a>
+    </div>
+}
 
+@if (Model.PageCount > 1)
+{
     <div class="mil">
-    <div class="pagination-container">
-        Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount
-
-        @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewData["CurrentFilter"] }))
+        <div class="pagination-container">
+            <span>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</span>
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewData["CurrentFilter"], RegionFilter = ViewData["RegionFilter"] }))
+        </div>
     </div>
-    </div>
+}
 
-    <div class="footer-container">
+<div class="footer-container">
 
         <div class="footer-content-2">
             <div>
@@ -170,7 +119,3 @@
         </div>
 
     </div>
-</body>
-
-
-</html>
