@@ -1,51 +1,35 @@
-﻿@model IEnumerable<aluguel.Models.Anuncio>
-
+@model IEnumerable<aluguel.Models.Anuncio>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Meus Anúncios";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="pt-br">
 
-<head>
-    <!-- Cabeçalho do HTML -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./css/caditem.css">
-    <title>Rent All - Meus Anúncios</title>
-</head>
-
-<body>
-    <h1>Meus Anúncios<span>Gerencie seus Anúncios</span></h1>
-    <div class="create-container">
-        <a asp-action="Create" class="create">Criar novo</a>
+<h1 class="ra-list-heading">Meus Anúncios<span>Gerencie seus anúncios</span></h1>
+<div class="create-container">
+    <a asp-action="Create" class="create">Criar novo</a>
+</div>
+@if (!Model.Any())
+{
+    <div class="ra-empty-state">
+        <h2>Nenhum anúncio publicado</h2>
+        <p>Crie um anúncio a partir de um item já cadastrado.</p>
+        <a asp-action="Create" class="create">Criar anúncio</a>
     </div>
-
-
-
-<table>
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model) 
-            </th>
-
-        </tr>
-    </thead>
-    <tbody>
+}
+else
+{
+    <table aria-label="Meus anúncios publicados">
+        <tbody>
         @foreach (var item in Model)
         {
             <tr>
                 <td>
                     <div class="item-content">
-                        <img src="~/imagens/@item.item.imagem1" class="item-image" asp-append-version="true">
+                        <img src="~/imagens/@item.item.imagem1" class="item-image" alt="@item.item.nmitem" loading="lazy" decoding="async" />
                         <div class="item-details">
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.item.nmitem)</div>
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.Cidade)</div>
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.contato)</div>
-
+                            <div class="item-name">@item.item.nmitem</div>
+                            <div class="item-name">@item.Cidade</div>
+                            <div class="item-name">@item.contato</div>
                             <div class="item-actions">
                                 <a href="@Url.Action("Edit", "Anuncios", new { id = item.id })" class="edit">Editar</a>
                                 <a href="@Url.Action("Details", "Anuncios", new { id = item.id })" class="details">Detalhes</a>
@@ -56,9 +40,6 @@
                 </td>
             </tr>
         }
-    </tbody>
-</table>
-</body>
-
-</html>
-
+        </tbody>
+    </table>
+}
