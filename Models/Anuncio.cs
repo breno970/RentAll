@@ -24,12 +24,10 @@ namespace aluguel.Models
         public string modelo { get; set; }
 
 
-        [Required(ErrorMessage = "O CEP é obrigatório.")]
-        [RegularExpression(@"^\d{5}-?\d{3}$", ErrorMessage = "Informe um CEP válido com oito dígitos.") ]
+        [Required(ErrorMessage = "Informe o CEP ou código postal.")]
         public string CEP { get; set; }
         public string Rua { get; set; }
 
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Somente números são permitidos.")]
         public string? Numero { get; set; }
 
         [Required]
@@ -37,7 +35,6 @@ namespace aluguel.Models
         [Required]
         public string Cidade { get; set; }
         [Required]
-        [StringLength(2, MinimumLength = 2, ErrorMessage = "Selecione uma UF válida.")]
         public string Estado { get; set; }
         public string? Complemento { get; set; }
 
@@ -46,6 +43,11 @@ namespace aluguel.Models
 
         [Required]
         public string NomeFantasia { get; set; }
+
+        // Brasil (BR) ou Portugal (PT). Registos históricos são Brasil.
+        [Required]
+        [RegularExpression("^(BR|PT)$")]
+        public string Pais { get; set; } = "BR";
 
         //AspNetUsers
         public string iduser { get; set; }
