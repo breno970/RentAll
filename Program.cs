@@ -66,4 +66,17 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+app.MapGet("/healthz", async (ApplicationDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        return await db.Database.CanConnectAsync(ct)
+            ? Results.Ok(new { status = "ready" })
+            : Results.StatusCode(503);
+    }
+    catch
+    {
+        return Results.StatusCode(503);
+    }
+});
 app.Run();
