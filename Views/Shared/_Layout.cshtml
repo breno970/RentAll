@@ -38,6 +38,7 @@
                     <a class="nav-link @(currentPath.StartsWith("/Home") || currentPath == "/" ? "is-current" : "")"
                         asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-compass" aria-hidden="true"></i> Explorar</a>
                     <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy"><i class="fas fa-leaf" aria-hidden="true"></i> Como funciona</a>
+                    <a class="nav-link ra-mobile-publish" asp-area="" asp-controller="Publicar" asp-action="Index"><i class="fas fa-plus" aria-hidden="true"></i> Publicar artigo</a>
                     @if (signedIn)
                     {
                         <a class="nav-link" asp-area="" asp-controller="Mensagens" asp-action="Index"><i class="far fa-comments" aria-hidden="true"></i> Mensagens</a>
