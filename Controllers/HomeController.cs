@@ -68,6 +68,14 @@ public class HomeController : Controller
             }).ToListAsync();
 
         var results = await query.ToPagedListAsync(filters.Page ?? 1, 12);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var visibleIds = results.Select(a => a.id).ToArray();
+            ViewData["FavoriteIds"] = (await _db.Favoritos.AsNoTracking()
+                .Where(f => f.UserId == userId && visibleIds.Contains(f.AnuncioId))
+                .Select(f => f.AnuncioId).ToListAsync()).ToHashSet();
+        }
         return View(view, results);
     }
 
