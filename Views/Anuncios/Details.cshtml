@@ -54,6 +54,18 @@
                 <h2 style="font-size:1rem">Falar com o anunciante</h2>
                 <p class="muted" style="font-size:.88rem">Publicado por <strong>@(string.IsNullOrWhiteSpace(Model.NomeFantasia) ? "Anunciante RentAll" : Model.NomeFantasia)</strong></p>
                 <a asp-controller="Perfis" asp-action="Details" asp-route-id="@Model.iduser" class="btn btn-outline"><i class="far fa-user"></i> Ver perfil e outros anúncios</a>
+                @if (User.Identity?.IsAuthenticated == true && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser)
+                {
+                    <a asp-controller="Mensagens" asp-action="Conversa" asp-route-anuncioId="@Model.id" class="btn btn-primary" style="margin-top:12px"><i class="far fa-comments"></i> Enviar mensagem na RentAll</a>
+                }
+                else if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Mensagens" asp-action="Index" class="btn btn-outline" style="margin-top:12px">Ver mensagens recebidas</a>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details","Anuncios",new { id = Model.id })" class="btn btn-primary" style="margin-top:12px">Entrar para enviar mensagem</a>
+                }
                 <p class="muted" style="margin-top:12px">O contacto pessoal e a morada não são divulgados publicamente.</p>
             </div>
             @if (User.Identity?.IsAuthenticated == true)
@@ -73,6 +85,8 @@
             }
             <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>Por privacidade, a rua e a porta não são divulgadas. Nunca partilhes palavras-passe, códigos de acesso ou documentos pessoais.</span></div>
             <a class="btn btn-outline" href="@mapsUrl" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt"></i> Ver zona no Google Maps</a>
+            <button class="btn btn-outline" type="button" data-load-approx-map style="margin-top:12px">Mostrar mapa aproximado</button>
+            <p data-inline-map-status role="status"></p>
             <div class="ra-map-preview" data-ra-map data-place="@place" hidden style="margin-top:12px"></div>
         </aside>
     </div>
