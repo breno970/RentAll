@@ -7,7 +7,7 @@
 }
 <div class="ra-marketplace-heading">
     <div>
-        <a asp-controller="Home" asp-action="Index" class="ra-back-link">← Todas as categorias</a>
+        <a asp-controller="Home" asp-action="Index" asp-route-Pais="@filters.Pais" class="ra-back-link">← Todas as categorias</a>
         <h1>EletroDomésticos</h1>
         <p>Explore itens desta categoria na região que escolher.</p>
     </div>
@@ -23,7 +23,7 @@
     <div class="mil"><div class="pagination-container">
         <span>Página @Model.PageNumber de @Model.PageCount</span>
         @Html.PagedListPager(Model, page => Url.Action("Eletrodomesticos", new {
-            page, filters.SearchString, filters.Estado, filters.RegionFilter,
+            page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter,
             filters.Bairro, filters.MinPrice, filters.MaxPrice, filters.Sort
         }))
     </div></div>
