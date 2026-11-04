@@ -1,5 +1,7 @@
 using aluguel.Areas.Identity.Data;
 using aluguel.Models;
+using aluguel.Services;
+using aluguel.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -21,44 +23,61 @@ public class HomeController : Controller
             .Where(a => a.item != null && a.item.snativo != "N" && (userId == null || a.iduser != userId));
     }
 
-    public async Task<IActionResult> Index(string? searchString, string? RegionFilter, int? page)
+    private async Task<IActionResult> Results(MarketplaceFilters filters, string view, int? categoryOverride = null)
     {
+        filters.Normalize();
+        if (categoryOverride.HasValue) filters.CategoriaId = categoryOverride;
         var query = AvailableAds();
-        if (!string.IsNullOrWhiteSpace(searchString))
+
+        if (!string.IsNullOrWhiteSpace(filters.SearchString))
         {
-            var term = searchString.Trim();
-            query = query.Where(a => EF.Functions.ILike(a.item!.nmitem, "%" + term + "%") ||
-                                     EF.Functions.ILike(a.modelo, "%" + term + "%"));
+            var word = filters.SearchString;
+            query = query.Where(a => EF.Functions.ILike(a.item!.nmitem, "%" + word + "%") ||
+                                     EF.Functions.ILike(a.item!.dsitem, "%" + word + "%") ||
+                                     EF.Functions.ILike(a.modelo, "%" + word + "%"));
         }
-        if (!string.IsNullOrWhiteSpace(RegionFilter))
+        if (filters.CategoriaId.HasValue)
+            query = query.Where(a => a.categoriaid == filters.CategoriaId.Value);
+        if (!string.IsNullOrWhiteSpace(filters.Estado))
+            query = query.Where(a => EF.Functions.ILike(a.Estado, filters.Estado));
+        if (!string.IsNullOrWhiteSpace(filters.RegionFilter))
+            query = query.Where(a => EF.Functions.ILike(a.Cidade, "%" + filters.RegionFilter + "%"));
+        if (!string.IsNullOrWhiteSpace(filters.Bairro))
+            query = query.Where(a => EF.Functions.ILike(a.Bairro, "%" + filters.Bairro + "%"));
+        if (filters.MinPrice.HasValue)
+            query = query.Where(a => a.vlitem >= filters.MinPrice.Value);
+        if (filters.MaxPrice.HasValue)
+            query = query.Where(a => a.vlitem <= filters.MaxPrice.Value);
+
+        query = filters.Sort switch
         {
-            var region = RegionFilter.Trim();
-            query = query.Where(a => EF.Functions.ILike(a.Cidade, "%" + region + "%"));
-        }
-        ViewData["CurrentFilter"] = searchString;
-        ViewData["RegionFilter"] = RegionFilter;
-        return View(await query.OrderByDescending(a => a.id).ToPagedListAsync(Math.Max(1, page ?? 1), 9));
+            "preco-menor" => query.OrderBy(a => a.vlitem).ThenByDescending(a => a.id),
+            "preco-maior" => query.OrderByDescending(a => a.vlitem).ThenByDescending(a => a.id),
+            _ => query.OrderByDescending(a => a.id)
+        };
+
+        ViewData["Filters"] = filters;
+        ViewData["CurrentFilter"] = filters.SearchString;
+        ViewData["RegionFilter"] = filters.RegionFilter;
+        ViewData["FilterAction"] = view;
+        ViewData["Categories"] = await _db.Categorias.AsNoTracking()
+            .OrderBy(c => c.nmcategoria)
+            .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = c.id.ToString(), Text = c.nmcategoria
+            }).ToListAsync();
+
+        var results = await query.ToPagedListAsync(filters.Page ?? 1, 12);
+        return View(view, results);
     }
 
-    private async Task<IActionResult> Category(string view, int id, string? searchString, int? page)
-    {
-        var query = AvailableAds().Where(a => a.categoriaid == id);
-        if (!string.IsNullOrWhiteSpace(searchString))
-        {
-            var term = searchString.Trim();
-            query = query.Where(a => EF.Functions.ILike(a.item!.nmitem, "%" + term + "%") ||
-                                     EF.Functions.ILike(a.modelo, "%" + term + "%"));
-        }
-        ViewData["CurrentFilter"] = searchString;
-        return View(view, await query.OrderByDescending(a => a.id).ToPagedListAsync(Math.Max(1, page ?? 1), 12));
-    }
-
-    public Task<IActionResult> VideoGame(string? searchString, int? page) => Category("VideoGame", 1, searchString, page);
-    public Task<IActionResult> AudioVisual(string? searchString, int? page) => Category("AudioVisual", 2, searchString, page);
-    public Task<IActionResult> MusicaHobbie(string? searchString, int? page) => Category("MusicaHobbie", 3, searchString, page);
-    public Task<IActionResult> EsporteGinastica(string? searchString, int? page) => Category("EsporteGinastica", 4, searchString, page);
-    public Task<IActionResult> Ferramentas(string? searchString, int? page) => Category("Ferramentas", 5, searchString, page);
-    public Task<IActionResult> Eletrodomesticos(string? searchString, int? page) => Category("Eletrodomesticos", 6, searchString, page);
+    public Task<IActionResult> Index([FromQuery] MarketplaceFilters filters) => Results(filters, "Index");
+    public Task<IActionResult> VideoGame([FromQuery] MarketplaceFilters filters) => Results(filters, "VideoGame", 1);
+    public Task<IActionResult> AudioVisual([FromQuery] MarketplaceFilters filters) => Results(filters, "AudioVisual", 2);
+    public Task<IActionResult> MusicaHobbie([FromQuery] MarketplaceFilters filters) => Results(filters, "MusicaHobbie", 3);
+    public Task<IActionResult> EsporteGinastica([FromQuery] MarketplaceFilters filters) => Results(filters, "EsporteGinastica", 4);
+    public Task<IActionResult> Ferramentas([FromQuery] MarketplaceFilters filters) => Results(filters, "Ferramentas", 5);
+    public Task<IActionResult> Eletrodomesticos([FromQuery] MarketplaceFilters filters) => Results(filters, "Eletrodomesticos", 6);
 
     public async Task<IActionResult> Details(int? id)
     {
