@@ -1,4 +1,7 @@
 @model IEnumerable<aluguel.Models.Anuncio>
+@{
+    var favoriteIds = ViewData["FavoriteIds"] as HashSet<int> ?? new HashSet<int>();
+}
 @if (!Model.Any())
 {
     <section class="ra-empty-results" aria-live="polite">
@@ -13,6 +16,18 @@ else
     @foreach (var item in Model)
     {
         <article class="c-card">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form asp-controller="Favoritos" asp-action="Toggle" method="post" class="ra-favorite-form">
+                    <input type="hidden" name="anuncioId" value="@item.id" />
+                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    <button type="submit" class="ra-favorite-button @(favoriteIds.Contains(item.id) ? "is-favorite" : "")"
+                        aria-label="@(favoriteIds.Contains(item.id) ? "Remover dos favoritos" : "Guardar nos favoritos")"
+                        title="@(favoriteIds.Contains(item.id) ? "Remover dos favoritos" : "Guardar nos favoritos")">
+                        <i class="@(favoriteIds.Contains(item.id) ? "fas" : "far") fa-heart" aria-hidden="true"></i>
+                    </button>
+                </form>
+            }
             <a class="c-card__image" asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id" aria-label="Ver @(item.item?.nmitem ?? item.modelo)">
                 @if (!string.IsNullOrWhiteSpace(item.item?.imagem1))
                 {
