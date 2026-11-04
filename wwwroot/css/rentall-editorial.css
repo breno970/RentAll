@@ -193,3 +193,36 @@ body.rentall-app .social-links a{border-radius:7px;width:35px;height:35px}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+/* Navigation action is shown only when the desktop header CTA is unavailable. */
+body.rentall-app .site-nav .ra-mobile-publish{display:none}
+@media(max-width:1040px){
+ body.rentall-app .site-nav .ra-mobile-publish{display:inline-flex;background:rgba(245,198,75,.12);color:#ffdf80;font-weight:750}
+ body.rentall-app .site-nav .ra-mobile-publish:hover{background:rgba(245,198,75,.2);color:#fff}
+}
+/* Search controls and long content never overflow the mobile viewport. */
+.search-main>*{min-width:0}
+.form-panel,.ra-publish-section,.auth-panel,.ra-seller-summary,.ra-conversation{min-width:0}
+.form-panel img,.panel img,.ra-photo-editor img{max-width:100%}
+.listing-card .listing-price{white-space:normal;overflow-wrap:anywhere}
+@media(min-width:621px) and (max-width:850px){
+ .search-main{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .search-main .search-query{grid-column:1/-1}
+ .search-submit{grid-column:1/-1}
+ .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+ .search-main{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .search-main .search-query,.search-main .search-city,.search-submit{grid-column:1/-1}
+ .form-grid{grid-template-columns:1fr}
+ .form-field.full{grid-column:auto}
+ .listing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .listing-image{aspect-ratio:1.1}
+ .listing-body{padding:11px 10px}
+ .listing-body h3{font-size:.88rem}
+ .listing-tag{white-space:normal}
+ .listing-bottom{flex-wrap:wrap}
+ .category-link{border-radius:9px}
+ .auth-panel{padding:21px 18px}
+ .site-nav{padding:12px 15px}
+}
