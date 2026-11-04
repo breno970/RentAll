@@ -2,7 +2,8 @@
 (() => {
   const mode = document.getElementById("mode_icon");
   const form = document.getElementById("login_form");
-  if (mode && form) {
+  if (mode && form && mode.dataset.raThemeBound !== "true") {
+    mode.dataset.raThemeBound = "true";
     const toggleTheme = () => {
       const dark = !form.classList.contains("dark");
       form.classList.toggle("dark", dark);
@@ -21,7 +22,8 @@
     });
   }
   const subir = document.getElementById("subir");
-  if (subir) {
+  if (subir && subir.dataset.raScrollBound !== "true") {
+    subir.dataset.raScrollBound = "true";
     subir.addEventListener("click", event => {
       event.preventDefault();
       window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
