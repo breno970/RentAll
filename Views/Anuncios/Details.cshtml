@@ -210,6 +210,22 @@
                 <p><strong>Localidade: </strong>@Model.Cidade, @Model.Estado</p>
                 <p><strong>Bairro / Freguesia: </strong>@Model.Bairro</p>
                 <p><strong>Contato: </strong>@Model.contato</p>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    var saved = ViewData["IsFavorite"] is bool value && value;
+                    <form asp-controller="Favoritos" asp-action="Toggle" method="post" class="ra-detail-favorite">
+                        <input type="hidden" name="anuncioId" value="@Model.id" />
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        <button type="submit" class="btn btn-outline-dark">
+                            <i class="@(saved ? "fas" : "far") fa-heart" aria-hidden="true"></i>
+                            @(saved ? "Remover dos favoritos" : "Guardar anúncio")
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <p><a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path">Entre na conta para guardar este anúncio.</a></p>
+                }
                 <p class="ra-field-hint">Para segurança de quem anuncia, a morada completa não é divulgada nesta página.</p>
                 <p><a class="btn btn-outline-dark" href="@mapLink" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Ver localização aproximada no Google Maps</a></p>
                 <div class="ra-map-preview" data-ra-map data-place="@approximatePlace" hidden aria-label="Mapa aproximado de @Model.Cidade"></div>
