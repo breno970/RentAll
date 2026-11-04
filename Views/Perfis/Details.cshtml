@@ -1,0 +1,30 @@
+@model aluguel.ViewModel.PublicSellerProfile
+@{ ViewData["Title"] = "Perfil de " + Model.PublicName; }
+<link rel="stylesheet" href="~/css/publish-experience.css" asp-append-version="true" />
+<div class="page-width ra-seller-page">
+    <div class="ra-seller-head">
+        <div class="ra-seller-avatar" aria-hidden="true"><i class="far fa-user"></i></div>
+        <div>
+            <p class="eyebrow">Comunidade RentAll</p>
+            <h1>@Model.PublicName</h1>
+            <p class="muted">
+                @if (Model.RegisteredAt.HasValue)
+                {
+                    <span>Membro desde @Model.RegisteredAt.Value.ToString("MMMM 'de' yyyy", System.Globalization.CultureInfo.GetCultureInfo("pt-PT"))</span>
+                }
+                else
+                {
+                    <span>Primeira publicação em @Model.FirstPublication.ToString("MMMM 'de' yyyy", System.Globalization.CultureInfo.GetCultureInfo("pt-PT")). A data original de inscrição não está disponível.</span>
+                }
+            </p>
+        </div>
+    </div>
+    <section class="ra-seller-summary" aria-label="Resumo do perfil">
+        <div><strong>@Model.Listings.Count</strong><span>Anúncios públicos</span></div>
+        <div><strong>@Model.Listings.Select(x => x.categoriaid).Distinct().Count()</strong><span>Categorias</span></div>
+        <div><strong>@Model.Listings.Select(x => x.Pais).Distinct().Count()</strong><span>País(es) com anúncios</span></div>
+    </section>
+    <div class="ra-seller-list-title"><div><p class="eyebrow">Artigos disponíveis</p><h2>Anúncios deste perfil</h2></div><a class="btn btn-outline" asp-controller="Home" asp-action="Index">Explorar todos</a></div>
+    <partial name="_MarketplaceCards" model="Model.Listings" />
+    <p class="ra-privacy-note"><i class="fas fa-lock"></i> Este perfil mostra apenas um nome público, a antiguidade disponível e os anúncios visíveis. Nunca apresenta correio eletrónico, telefone, morada ou localização exata.</p>
+</div>
