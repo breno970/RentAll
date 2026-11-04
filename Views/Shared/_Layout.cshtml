@@ -11,7 +11,10 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#23232e" />
+    <title>@(ViewData["Title"] ?? "Início") - RentAll</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/responsive-improvements.css" asp-append-version="true" />
    
     <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
 
@@ -22,24 +25,24 @@
 </head>
 <body>
 
-    <nav>
+    <nav aria-label="Navegação principal">
 
 
         <div class="nave">
 
-            <a class="logo" href="/"> <img src="~/imagens/ra.png" class="logo-img" /></a>
+            <a class="logo" asp-area="" asp-controller="Home" asp-action="Index" aria-label="RentAll - página inicial"> <img src="~/imagens/ra.png" class="logo-img" alt="RentAll" /></a>
 
-            <div class="mobile-menu">
+            <button class="mobile-menu" type="button" aria-expanded="false" aria-controls="rentall-navigation" aria-label="Abrir menu">
                 <div class="line1"></div>
                 <div class="line2"></div>
                 <div class="line3"></div>
-            </div>
+            </button>
 
-            <ul class="nav-list">
+            <ul class="nav-list" id="rentall-navigation">
                 <li class="nav">
                     <a class="nav-link text-white-50" asp-area="" asp-controller="Home" asp-action="Privacy">Sobre nós</a>
                 </li>
-                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity?.IsAuthenticated == true)
                 { }
                 else
                 {
@@ -63,8 +66,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <form class="nav-link text-white-50" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                            <button type="submit" class="btn btn-link"><i class="fas fa-sign-out-alt"></i></button>
+                        <form class="nav-link text-white-50" method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button type="submit" class="btn btn-link" aria-label="Sair da conta" title="Sair"><i class="fas fa-sign-out-alt" aria-hidden="true"></i></button>
                         </form>
                     </li>
 
@@ -84,9 +87,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="~/js/cep.js"></script>
-    <script type="text/javascript" src="~/js/cadastro.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/cep.js" asp-append-version="true"></script>
+    <script src="~/js/cadastro.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
 
