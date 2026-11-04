@@ -38,6 +38,7 @@
                     <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy"><i class="fas fa-leaf" aria-hidden="true"></i> Como funciona</a>
                     @if (signedIn)
                     {
+                        <a class="nav-link" asp-area="" asp-controller="Mensagens" asp-action="Index"><i class="far fa-comments" aria-hidden="true"></i> Mensagens</a>
                         <a class="nav-link" asp-area="" asp-controller="Favoritos" asp-action="Index"><i class="far fa-heart" aria-hidden="true"></i> Favoritos</a>
                         <a class="nav-link" asp-area="" asp-controller="Items" asp-action="Index"><i class="fas fa-box" aria-hidden="true"></i> Meus itens</a>
                         <a class="nav-link" asp-area="" asp-controller="Anuncios" asp-action="Index"><i class="fas fa-list-alt" aria-hidden="true"></i> Anúncios</a>
@@ -91,6 +92,7 @@
                     <a asp-area="" asp-controller="Home" asp-action="Privacy">Como funciona</a>
                     <a asp-area="" asp-controller="Termos" asp-action="Index">Termos de utilização</a>
                     <a asp-area="" asp-controller="Favoritos" asp-action="Index">Favoritos</a>
+                    <a asp-area="" asp-controller="Mensagens" asp-action="Index">Mensagens</a>
                 </div>
                 <div class="footer-links">
                     <h2>A minha conta</h2>
