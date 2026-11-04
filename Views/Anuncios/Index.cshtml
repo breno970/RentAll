@@ -1,64 +1,41 @@
-﻿@model IEnumerable<aluguel.Models.Anuncio>
-
+@model IEnumerable<aluguel.Models.Anuncio>
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Meus anúncios";
 }
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <!-- Cabeçalho do HTML -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./css/caditem.css">
-    <title>Rent All - Meus Anúncios</title>
-</head>
-
-<body>
-    <h1>Meus Anúncios<span>Gerencie seus Anúncios</span></h1>
-    <div class="create-container">
-        <a asp-action="Create" class="create">Criar novo</a>
+<div class="page-heading">
+    <div><div class="eyebrow">Minha área</div><h1>Meus anúncios</h1><p>Acompanhe e edite os anúncios publicados.</p></div>
+    <a asp-action="Create" class="btn btn-primary">+ Criar anúncio</a>
+</div>
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <span class="empty-icon" aria-hidden="true">✦</span>
+        <h2>Você ainda não tem anúncios</h2>
+        <p>Primeiro cadastre um item; depois crie o anúncio e defina o preço e as informações de contato.</p>
+        <a asp-area="" asp-controller="Items" asp-action="Index" class="btn btn-primary">Ver meus itens</a>
+        <a asp-action="Create" class="btn btn-outline">Criar anúncio</a>
     </div>
-
-
-
-<table>
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model) 
-            </th>
-
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+}
+else
+{
+    <div class="dashboard-grid">
+        @foreach (var anuncio in Model)
         {
-            <tr>
-                <td>
-                    <div class="item-content">
-                        <img src="~/imagens/@item.item.imagem1" class="item-image" asp-append-version="true">
-                        <div class="item-details">
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.item.nmitem)</div>
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.Cidade)</div>
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.contato)</div>
-
-                            <div class="item-actions">
-                                <a href="@Url.Action("Edit", "Anuncios", new { id = item.id })" class="edit">Editar</a>
-                                <a href="@Url.Action("Details", "Anuncios", new { id = item.id })" class="details">Detalhes</a>
-                                <a href="@Url.Action("Delete", "Anuncios", new { id = item.id })" class="delete">Excluir</a>
-                            </div>
-                        </div>
+            <article class="manage-card">
+                @if (!string.IsNullOrWhiteSpace(anuncio.item?.imagem1))
+                { <img class="manage-img" src="@Url.Content("~/imagens/" + anuncio.item.imagem1)" alt="@(anuncio.item?.nmitem ?? "Anúncio")" loading="lazy" /> }
+                else { <div class="manage-img image-placeholder" aria-hidden="true">◇</div> }
+                <div class="manage-info">
+                    <span class="badge-pill">Publicado</span>
+                    <h2>@(anuncio.item?.nmitem ?? anuncio.modelo)</h2>
+                    <p>R$ @anuncio.vlitem.ToString("N2", new System.Globalization.CultureInfo("pt-BR")) / dia · @anuncio.Cidade</p>
+                    <div class="item-actions">
+                        <a asp-action="Details" asp-route-id="@anuncio.id" class="details">Detalhes</a>
+                        <a asp-action="Edit" asp-route-id="@anuncio.id" class="edit">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@anuncio.id" class="delete">Excluir</a>
                     </div>
-                </td>
-            </tr>
+                </div>
+            </article>
         }
-    </tbody>
-</table>
-</body>
-
-</html>
-
+    </div>
+}
