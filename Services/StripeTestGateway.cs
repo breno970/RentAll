@@ -19,23 +19,6 @@ public sealed class StripeTestGateway
         return new StripeClient(_settings.SecretKey);
     }
 
-    // Connected account creation must use the Accounts v2 API with explicit
-    // recipient configuration, Express dashboard, and platform fee/loss ownership.
-    // The v1 account creation endpoint was intentionally removed.
-    public Task<Account> CreateAccountAsync(string ownerId, CancellationToken ct)
-        => throw new NotSupportedException("Onboarding requer Stripe Accounts v2; ainda não integrado.");
-
-    public async Task<Account> GetAccountAsync(string id, CancellationToken ct) =>
-        await new AccountService(Client()).GetAsync(id, cancellationToken: ct);
-
-    public async Task<AccountLink> OnboardingAsync(string id, string origin, CancellationToken ct) =>
-        await new AccountLinkService(Client()).CreateAsync(new AccountLinkCreateOptions
-        {
-            Account = id, Type = "account_onboarding",
-            RefreshUrl = origin + "/Pagamentos/Conta",
-            ReturnUrl = origin + "/Pagamentos/Conta"
-        }, cancellationToken: ct);
-
     public async Task<Session> CreateCheckoutAsync(int requestId, long amountCents, long feeCents,
         string sellerAccount, string itemName, string origin, CancellationToken ct)
     {
