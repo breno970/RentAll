@@ -1,52 +1,5 @@
-﻿@page
+@page
 @model ResendEmailConfirmationModel
-
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tela de Edição</title>
-    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
-
-</head>
-<body>
-
-
-
-    <main id="container">
-
-        <form id="card-it" method="post">
-
-            <!-- FORM HEADER -->
-            <div class="card-it">
-                <h1>Reenviar email de confirmação</h1>
-             
-         
-            <div class="input-box">
-                <form method="post">
-
-                    <div class="input-field">
-
-                            <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="Endereço de e-mail" />
-
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
-                    </div>
-                    <button type="submit" class="w-50 btn btn-lg btn-primary">Reenviar</button>
-                    <div asp-validation-summary="All" class="form-control" role="alert"></div>
-                </form>
-            </div>
-            </div>
-
-
-            @section Scripts {
-                <partial name="_ValidationScriptsPartial" />
-            }
-        </form>
-    </main>
-</body>
-</html>
-
-<!-- JAVASCRIPT -->
-<script type="text/javascript" src="~/js/cadastro.js"></script>
+@{ ViewData["Title"] = "Reenviar confirmação"; }
+<div class="page-width"><section class="auth-shell"><div class="auth-panel"><div class="empty-symbol"><i class="fas fa-paper-plane" aria-hidden="true"></i></div><h1>Reenviar confirmação</h1><p class="auth-lead">Indica o e-mail associado à conta para pedir uma nova mensagem de confirmação.</p><form method="post" data-submit-lock><div asp-validation-summary="All" class="text-danger" role="alert"></div><div class="field"><label asp-for="Input.Email">E-mail</label><input asp-for="Input.Email" class="form-control" autocomplete="email" type="email" required /><span asp-validation-for="Input.Email" class="text-danger"></span></div><button class="btn btn-brand auth-wide" type="submit">Reenviar e-mail</button></form><div class="auth-row"><a asp-page="./Login">Voltar ao login</a></div></div></section></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
