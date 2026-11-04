@@ -19,9 +19,9 @@
 
     <main id="container">
 
-        <form id="card-it" method="post" enctype="multipart/form-data">
+        <div class="ra-form-wrapper">
 
-            <form asp-action="Edit">
+            <form asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="id" />
 
@@ -78,7 +78,7 @@
                 
                 </div>
             </form>
-        </form>
+        </div>
     </main>
 </body>
 
