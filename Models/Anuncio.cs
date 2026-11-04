@@ -21,28 +21,28 @@ namespace aluguel.Models
         public int diasAluguel { get; set; }
 
         [Required(ErrorMessage = "O modelo é obrigatório.")]
-        public string modelo { get; set; }
+        public string modelo { get; set; } = "";
 
 
         [Required(ErrorMessage = "Informe o CEP ou código postal.")]
-        public string CEP { get; set; }
-        public string Rua { get; set; }
+        public string CEP { get; set; } = "";
+        public string Rua { get; set; } = "";
 
         public string? Numero { get; set; }
 
         [Required]
-        public string Bairro { get; set; }
+        public string Bairro { get; set; } = "";
         [Required]
-        public string Cidade { get; set; }
+        public string Cidade { get; set; } = "";
         [Required]
-        public string Estado { get; set; }
+        public string Estado { get; set; } = "";
         public string? Complemento { get; set; }
 
         [Required]
-        public string contato { get; set; }
+        public string contato { get; set; } = "";
 
         [Required]
-        public string NomeFantasia { get; set; }
+        public string NomeFantasia { get; set; } = "";
 
         // Brasil (BR) ou Portugal (PT). Registos históricos são Brasil.
         [Required]
@@ -50,7 +50,7 @@ namespace aluguel.Models
         public string Pais { get; set; } = "BR";
 
         //AspNetUsers
-        public string iduser { get; set; }
+        public string iduser { get; set; } = "";
 
         //Item
         [ForeignKey("itemid")]
