@@ -1,13 +1,14 @@
 @page
 @model RegisterModel
 @{ ViewData["Title"] = "Criar conta"; }
+<link rel="stylesheet" href="~/css/marketplace-enhancements.css" asp-append-version="true" />
 <div class="page-width">
-    <section class="auth-shell" style="max-width:530px">
-        <div class="auth-panel">
+    <section class="auth-shell ra-register-shell" style="max-width:570px">
+        <div class="auth-panel ra-register-panel">
             <p class="eyebrow">Faz parte da comunidade</p>
             <h1>Cria a tua conta</h1>
             <p class="auth-lead">Encontra artigos perto de ti ou transforma objetos parados em oportunidades de aluguer.</p>
-            <form method="post" asp-route-returnUrl="@Model.ReturnUrl" data-submit-lock>
+            <form method="post" asp-route-returnUrl="@Model.ReturnUrl" data-submit-lock data-registration-form>
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-grid" style="gap:13px;margin-bottom:15px">
                     <div class="form-field"><label asp-for="Input.FirstName">Nome *</label><input asp-for="Input.FirstName" class="form-control" autocomplete="given-name" required /><span asp-validation-for="Input.FirstName" class="text-danger"></span></div>
@@ -28,12 +29,16 @@
                     <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" required />
                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                 </div>
-                <label class="check-line" style="align-items:flex-start;margin-bottom:16px">
-                    <input asp-for="AcceptTerms" type="checkbox" required />
-                    <span>Li e aceito os <a asp-area="" asp-controller="Termos" asp-action="Index" target="_blank" rel="noopener noreferrer">termos de utilização</a>.</span>
-                </label>
-                <span asp-validation-for="AcceptTerms" class="text-danger"></span>
-                <button class="btn btn-brand auth-wide" type="submit">Criar conta</button>
+                <div class="ra-consent-wrap">
+                    <label class="ra-consent-check" for="AcceptTerms">
+                        <input id="AcceptTerms" name="AcceptTerms" type="checkbox" value="true" required
+                               checked="@Model.AcceptTerms" aria-describedby="terms-description" />
+                        <span class="ra-consent-box" aria-hidden="true"><i class="fas fa-check"></i></span>
+                        <span id="terms-description">Li e aceito os <a asp-area="" asp-controller="Termos" asp-action="Index" target="_blank" rel="noopener noreferrer">termos de utilização</a> e consultei a <a asp-area="" asp-controller="Privacidade" asp-action="Index" target="_blank" rel="noopener noreferrer">informação de privacidade</a>.</span>
+                    </label>
+                    <span asp-validation-for="AcceptTerms" class="text-danger" role="alert"></span>
+                </div>
+                <button class="btn btn-brand auth-wide" type="submit"><i class="fas fa-user-plus" aria-hidden="true"></i> Criar conta</button>
             </form>
             <div class="auth-divider"></div>
             <p style="text-align:center;margin:0">Já tens uma conta? <a asp-page="./Login">Entrar</a></p>
