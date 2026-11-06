@@ -5,7 +5,7 @@
     var action = ViewData["FilterAction"] as string ?? "Index";
     var categories = ViewData["Categories"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
 }
-<form class="search-card" asp-controller="Home" asp-action="@action" method="get" role="search" aria-label="Pesquisar artigos">
+<form class="search-card" data-marketplace-filters asp-controller="Home" asp-action="@action" method="get" role="search" aria-label="Pesquisar artigos">
     <div class="search-main">
         <div class="field search-query">
             <label for="filter-search">O que procura?</label>
@@ -14,8 +14,8 @@
         <div class="field">
             <label for="filter-country">País</label>
             <select class="form-select" id="filter-country" name="Pais" data-region-country>
-                <option value="BR" selected="@(Model.Pais == "BR")">Brasil</option>
-                <option value="PT" selected="@(Model.Pais == "PT")">Portugal</option>
+                <option value="PT" selected="@(Model.Pais == "PT")">Portugal (€)</option>
+                <option value="BR" selected="@(Model.Pais == "BR")">Brasil (R$)</option>
             </select>
         </div>
         <div class="field">
@@ -30,12 +30,13 @@
         </div>
         <div class="field search-city">
             <label for="filter-city">Cidade / município</label>
-            <input class="form-control" id="filter-city" name="RegionFilter" value="@Model.RegionFilter" data-region-city list="filter-cities" placeholder="Todas as cidades" autocomplete="off" />
+            <input class="form-control" id="filter-city" name="RegionFilter" value="@Model.RegionFilter" data-region-city list="filter-cities" placeholder="Todas as cidades" autocomplete="off" aria-describedby="filter-city-help" />
+            <small id="filter-city-help" class="ra-filter-city-help" data-city-status aria-live="polite">Podes escrever qualquer cidade. As sugestões são de anúncios publicados.</small>
             <datalist id="filter-cities"></datalist>
         </div>
         <button class="btn btn-brand search-submit" type="submit"><i class="fas fa-search" aria-hidden="true"></i> Pesquisar</button>
     </div>
-    <details class="advanced-filters">
+    <details class="advanced-filters" @(Model.CategoriaId.HasValue || Model.MinPrice.HasValue || Model.MaxPrice.HasValue || !string.IsNullOrEmpty(Model.Bairro) || Model.Sort != "recentes" ? "open" : "")>
         <summary><i class="fas fa-sliders-h" aria-hidden="true"></i> Mais filtros: categoria, preço, bairro e ordenação</summary>
         <div class="search-extra">
             @if (action == "Index")
