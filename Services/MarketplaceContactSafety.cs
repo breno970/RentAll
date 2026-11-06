@@ -22,7 +22,7 @@ public static partial class MarketplaceContactSafety
     }
 
     private const RegexOptions SafeOptions =
-        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.NonBacktracking;
+        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
 
     [GeneratedRegex(@"(?<![\p{L}\p{N}])(?:\+|00)?(?:\d[\s.()\-_/|,]*?){9,15}(?!\d)",
         SafeOptions, 250)]
