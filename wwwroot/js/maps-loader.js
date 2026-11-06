@@ -30,6 +30,12 @@
     if (!button) return;
     const target = button.parentElement?.querySelector("[data-ra-map]");
     const status = button.parentElement?.querySelector("[data-inline-map-status]");
+    if (button.dataset.externalConfirmed !== "true") {
+      button.dataset.externalConfirmed = "true";
+      if (status) status.textContent = "Ao abrir o mapa, a Google poderá receber o teu endereço IP e a zona consultada. Confirma se pretendes continuar.";
+      button.textContent = "Confirmar e abrir mapa Google";
+      return;
+    }
     button.disabled = true;
     try {
       await window.rentallLoadGoogleMaps();
