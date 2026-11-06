@@ -22,7 +22,7 @@
         <div class="ra-demo-sections">
             <section class="ra-demo-box" data-demo-screen="0" aria-labelledby="ra-demo-review">
                 <span class="ra-demo-tag">ETAPA 1 DE 4</span>
-                <h2 id="ra-demo-review">Confirmar o pedido</h2>
+                <h2 id="ra-demo-review" tabindex="-1">Confirmar o pedido</h2>
                 <p>Depois de o anunciante aceitar, o comprador confirma os valores, as condições e o método de pagamento.</p>
                 <dl class="ra-demo-order">
                     <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
@@ -39,7 +39,7 @@
 
             <section class="ra-demo-box" data-demo-screen="1" aria-labelledby="ra-demo-method" hidden>
                 <span class="ra-demo-tag">ETAPA 2 DE 4</span>
-                <h2 id="ra-demo-method">Escolher método de pagamento</h2>
+                <h2 id="ra-demo-method" tabindex="-1">Escolher método de pagamento</h2>
                 <p>Escolhe apenas para visualizar o percurso. Estes botões não pedem nem enviam dados reais.</p>
                 <div class="ra-demo-methods" role="group" aria-label="Método fictício">
                     <button type="button" data-demo-method="card" aria-pressed="true" class="is-selected">Cartão de crédito ou débito</button>
@@ -60,13 +60,14 @@
                 <p class="ra-demo-method-info" data-demo-method-info>Num checkout real, os campos do cartão seriam fornecidos pelo prestador de pagamentos, não pela RentAll.</p>
                 <div class="ra-demo-controls">
                     <button type="button" class="btn btn-outline" data-demo-back="0">Voltar</button>
-                    <button type="button" class="btn btn-primary" data-demo-authorize>Simular autorização</button>
+                    <button type="button" class="btn btn-primary" data-demo-authorize>Simular aprovação</button>
+                    <button type="button" class="btn btn-outline" data-demo-decline>Simular recusa</button>
                 </div>
             </section>
 
             <section class="ra-demo-box" data-demo-screen="2" aria-labelledby="ra-demo-result" hidden>
                 <span class="ra-demo-tag">ETAPA 3 DE 4</span>
-                <h2 id="ra-demo-result">Resultado de exemplo</h2>
+                <h2 id="ra-demo-result" tabindex="-1">Resultado de exemplo</h2>
                 <div class="ra-demo-result" data-demo-result role="status">
                     <strong data-demo-result-title>Confirmação fictícia</strong>
                     <p data-demo-result-text>O exemplo não realiza nenhuma comunicação com um banco ou a Stripe.</p>
@@ -79,7 +80,7 @@
 
             <section class="ra-demo-box" data-demo-screen="3" aria-labelledby="ra-demo-completion" hidden>
                 <span class="ra-demo-tag">ETAPA 4 DE 4</span>
-                <h2 id="ra-demo-completion">Comprovativo e conclusão do aluguer</h2>
+                <h2 id="ra-demo-completion" tabindex="-1">Comprovativo e conclusão do aluguer</h2>
                 <div class="ra-demo-receipt">
                     <strong>Comprovativo de exemplo — SEM VALIDADE FISCAL</strong>
                     <p>Referência: DEMONSTRAÇÃO (não é um ID de transação)</p>
