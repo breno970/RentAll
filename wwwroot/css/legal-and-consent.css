@@ -37,3 +37,9 @@ body.rentall-app .ra-cookie-actions .btn{width:100%;font-size:.83rem!important;m
 .ra-cookie-actions [hidden]{display:none!important}
 body.rentall-app .site-footer .ra-footer-cookie-link{border:0;padding:0;text-align:left;background:none;color:#c6ded0;font-size:.85rem;line-height:1.55;font-weight:400;cursor:pointer}
 body.rentall-app .site-footer .ra-footer-cookie-link:hover{color:#fff}
+
+/* Restrained labels; no decorative marketing badges on transactional screens. */
+body.rentall-app .eyebrow{letter-spacing:.035em;text-transform:none;font-size:.74rem;font-weight:700}
+.ra-legal-page .panel{box-shadow:none}
+.ra-demo-panel h1{font-size:clamp(1.65rem,3vw,2.25rem);margin-bottom:12px}
+.ra-demo-panel .muted{color:#57685c}
