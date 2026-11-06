@@ -18,7 +18,7 @@ for path in pages:
     )
 
 journey = Path("Views/Experiencia/Index.cshtml").read_text(encoding="utf-8").casefold()
-for required in ["mensagens", "pedidos", "cauç", "em preparação", "não há cobranças", "incidentes"]:
+for required in ["mensagens", "pedidos", "cauç", "em preparação", "não há cobrança", "incidentes"]:
     assert required in journey, f"Rental journey missing important feature/status: {required}"
 
 payment = Path("Views/Pagamentos/Demonstracao.cshtml").read_text(encoding="utf-8").casefold()
