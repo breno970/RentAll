@@ -67,7 +67,7 @@ public sealed class PedidosController : Controller
     {
         var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .FirstOrDefaultAsync(a => a.id == anuncioId, ct);
-        if (ad == null || ad.item == null || ad.item.snativo == "N")
+        if (ad == null || ad.Pais != "PT" || ad.item == null || ad.item.snativo == "N")
             return NotFound();
         var me = Me;
         if (me == ad.iduser) return BadRequest("Não podes pedir o aluguer do teu próprio artigo.");
