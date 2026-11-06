@@ -78,6 +78,27 @@ public class HomeController : Controller
         return View(view, results);
     }
 
+    [HttpGet]
+    [ResponseCache(Duration = 180, Location = ResponseCacheLocation.Client)]
+    public async Task<IActionResult> Cidades(string pais, string? estado, CancellationToken ct)
+    {
+        pais = (pais ?? "").Trim().ToUpperInvariant();
+        if (!LocationCatalog.IsValidCountry(pais)) return BadRequest("País inválido.");
+        estado = string.IsNullOrWhiteSpace(estado) ? null : LocationCatalog.CanonicalRegion(pais, estado);
+        if (!string.IsNullOrWhiteSpace(Request.Query["estado"]) && estado == null)
+            return BadRequest("Região inválida.");
+
+        // Only municipalities already appearing on public, active listings.
+        // No third-party geo API, exact addresses or user account details.
+        var locations = _db.Anuncios.AsNoTracking()
+            .Where(a => a.Pais == pais && a.item != null && a.item.snativo != "N" &&
+                        a.Cidade != null && a.Cidade != "");
+        if (estado != null) locations = locations.Where(a => a.Estado == estado);
+        var cities = await locations.Select(a => a.Cidade.Trim())
+            .Distinct().OrderBy(c => c).Take(90).ToListAsync(ct);
+        return Json(cities);
+    }
+
     public Task<IActionResult> Index([FromQuery] MarketplaceFilters filters) => Results(filters, "Index");
     public Task<IActionResult> VideoGame([FromQuery] MarketplaceFilters filters) => Results(filters, "VideoGame", 1);
     public Task<IActionResult> AudioVisual([FromQuery] MarketplaceFilters filters) => Results(filters, "AudioVisual", 2);
