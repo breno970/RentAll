@@ -37,3 +37,18 @@ foreach (var (value, expected) in cases)
     passed++;
 }
 Console.WriteLine($"Marketplace contact checks passed: {passed}.");
+
+var portugalDefault = new aluguel.ViewModel.MarketplaceFilters();
+portugalDefault.Normalize();
+if (portugalDefault.Pais != "PT") throw new Exception("Portugal must be the default market.");
+var brazil = new aluguel.ViewModel.MarketplaceFilters { Pais = "BR", Estado = "RJ", MinPrice = 30, MaxPrice = 10 };
+brazil.Normalize();
+if (brazil.Pais != "BR" || brazil.Estado != "RJ" || brazil.MinPrice != 10 || brazil.MaxPrice != 30)
+    throw new Exception("Brazil market and price range must be preserved correctly.");
+var wrongRegion = new aluguel.ViewModel.MarketplaceFilters { Pais = "PT", Estado = "RJ" };
+wrongRegion.Normalize();
+if (wrongRegion.Estado != null) throw new Exception("Reject regions that belong to the other country.");
+var portugal = new aluguel.ViewModel.MarketplaceFilters { Pais = "PT", Estado = "Lisboa" };
+portugal.Normalize();
+if (portugal.Estado != "Lisboa") throw new Exception("Keep a valid Portuguese district.");
+Console.WriteLine("Country, district, state and price filters passed.");
