@@ -39,6 +39,7 @@ public sealed class PagamentosController : Controller
     // Read-only visual tour. Never invokes the payment gateway or saves financial data.
     [AllowAnonymous]
     [HttpGet("Demonstracao")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<IActionResult> Demonstracao(int? pedidoId, CancellationToken ct)
     {
         if (!pedidoId.HasValue)
