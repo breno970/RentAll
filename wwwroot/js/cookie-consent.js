@@ -40,14 +40,21 @@
     document.dispatchEvent(new CustomEvent("rentall:consent-change", { detail: { external: choice.external } }));
   }
   function save(externalAllowed) {
+    const wasExternal = Boolean(current?.external);
     const choice = { version: VERSION, external: Boolean(externalAllowed), updatedAt: new Date().toISOString() };
     try { localStorage.setItem(KEY, JSON.stringify(choice)); } catch { /* keep this tab's decision */ }
     apply(choice);
+    // Revocation must stop any already-loaded external kit resources.
+    if (wasExternal && !choice.external) window.location.reload();
   }
   function showSettings() {
     if (!panel) return;
     panel.hidden = false;
     if (prefs) prefs.hidden = false;
+    const saveButton = panel.querySelector("[data-cookie-save]");
+    const manageButton = panel.querySelector("[data-cookie-manage]");
+    if (saveButton) saveButton.hidden = false;
+    if (manageButton) manageButton.hidden = true;
     if (external) external.checked = Boolean(current?.external);
     panel.querySelector("[data-cookie-save]")?.focus();
   }
