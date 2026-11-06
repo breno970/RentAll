@@ -11,9 +11,9 @@
     </div>
     <section class="ra-chat-journey" aria-label="Próximo passo do aluguer">
         <div class="ra-journey-intro">
-            <span class="ra-journey-tag"><i class="fas fa-lock" aria-hidden="true"></i> Negociação na RentAll</span>
-            <h2>Do interesse ao pedido, sem sair da conversa.</h2>
-            <p>Combina a disponibilidade aqui. Os pedidos guardam o valor e os dias acordados para ambos consultarem.</p>
+            <span class="ra-journey-tag"><i class="fas fa-lock" aria-hidden="true"></i> Conversa na RentAll</span>
+            <h2>Combina os detalhes deste aluguer.</h2>
+            <p>Fala sobre disponibilidade, entrega e estado do artigo. Regista o pedido para manteres as condições organizadas.</p>
         </div>
         @if (Model.PedidoId.HasValue)
         {
@@ -58,7 +58,7 @@
                 </article>
             }
         </div>
-        <form asp-action="Enviar" method="post" class="ra-chat-form">
+        <form asp-action="Enviar" method="post" class="ra-chat-form" data-guarded-message-form>
             <input type="hidden" name="anuncioId" value="@Model.AnuncioId" />
             <input type="hidden" name="peerId" value="@Model.OutroUtilizadorId" />
             <label for="messageText">A tua mensagem</label>
@@ -67,8 +67,14 @@
                 <button type="button" data-chat-suggestion="Podemos combinar um local público para a entrega?" >Combinar entrega</button>
                 <button type="button" data-chat-suggestion="Podes confirmar o estado do artigo e os acessórios incluídos?" >Confirmar condições</button>
             </div>
-            <textarea id="messageText" name="texto" required maxlength="2000" rows="3" class="form-control" placeholder="Escreve aqui a tua pergunta sobre o artigo..."></textarea>
-            <small class="ra-chat-help">Os contactos externos não são necessários para combinar um aluguer. Se houver um acordo, utiliza «Enviar pedido de aluguer» para registar as condições.</small>
+            @if (ViewBag.MessageError is string policyError)
+            {
+                <div class="ra-message-issue" role="alert">@policyError</div>
+            }
+            <textarea id="messageText" name="texto" required maxlength="2000" rows="3" class="form-control"
+                aria-describedby="ra-message-policy" placeholder="Escreve aqui a tua pergunta sobre o artigo...">@ViewBag.UnsentMessage</textarea>
+            <div class="ra-message-issue" role="alert" data-message-warning hidden></div>
+            <small class="ra-chat-help" id="ra-message-policy">Não envies números de telemóvel, e-mail, links, redes sociais ou pedidos de pagamento externo. Se uma mensagem for recusada, podes corrigi-la. <a asp-controller="Termos" asp-action="Index">Ver regras de utilização</a>.</small>
             <button type="submit" class="btn btn-primary"><i class="far fa-paper-plane"></i> Enviar mensagem</button>
         </form>
     </div>
