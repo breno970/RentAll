@@ -41,10 +41,10 @@ namespace aluguel.Models
 
         public string NomeFantasia { get; set; } = "";
 
-        // Brasil (BR) ou Portugal (PT). Registos históricos são Brasil.
+        // Novos anúncios: Portugal. Os registos históricos BR são conservados na base de dados.
         [Required]
         [RegularExpression("^(BR|PT)$")]
-        public string Pais { get; set; } = "BR";
+        public string Pais { get; set; } = "PT";
 
         //AspNetUsers
         public string iduser { get; set; } = "";
