@@ -62,7 +62,10 @@
   document.addEventListener("DOMContentLoaded", () => {
     const choice = stored();
     if (choice) apply(choice);
-    else if (panel) panel.hidden = false;
+    else {
+      document.documentElement.dataset.externalResources = "off";
+      if (panel) panel.hidden = false;
+    }
     document.querySelectorAll("[data-cookie-reopen]").forEach(button => button.addEventListener("click", showSettings));
     document.querySelector("[data-cookie-accept]")?.addEventListener("click", () => save(true));
     document.querySelector("[data-cookie-reject]")?.addEventListener("click", () => save(false));
