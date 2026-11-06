@@ -51,7 +51,7 @@ public sealed class PagamentosController : Controller
             .Where(p => p.Id == pedidoId.Value &&
                 (p.InteressadoId == me || p.AnuncianteId == me))
             .FirstOrDefaultAsync(ct);
-        if (request == null) return NotFound();
+        if (request == null || request.Pais != "PT") return NotFound();
 
         var itemName = await db.Anuncios.AsNoTracking().Include(a => a.item)
             .Where(a => a.id == request.AnuncioId)
