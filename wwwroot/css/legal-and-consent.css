@@ -67,3 +67,13 @@ html[data-external-resources="off"] i.fa-eye-slash::before{content:"◌"}
 html[data-external-resources="off"] i.fa-map-marker-alt::before{content:"⌖"}
 html[data-external-resources="off"] i.fa-shield-alt::before{content:"◇"}
 html[data-external-resources="off"] i.fa-paper-plane::before{content:"→"}
+
+html[data-external-resources="off"] i.fa-github::before{content:"GH";font-size:.7em;font-weight:700}
+html[data-external-resources="off"] i.fa-instagram::before{content:"IG";font-size:.7em;font-weight:700}
+html[data-external-resources="off"] i.fa-twitter::before{content:"X";font-weight:700}
+html[data-external-resources="off"] i.fa-linkedin-in::before{content:"in";font-size:.85em;font-weight:700}
+html[data-external-resources="off"] i.fa-envelope::before{content:"@"}
+html[data-external-resources="off"] i.fa-user::before{content:"○"}
+html[data-external-resources="off"] i.fa-flag::before{content:"⚑"}
+html[data-external-resources="off"] i.fa-lock::before{content:"▣"}
+html[data-external-resources="off"] i.fa-sign-out-alt::before{content:"↪"}
