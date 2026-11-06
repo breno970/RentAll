@@ -83,7 +83,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Cidades(string pais, string? estado, CancellationToken ct)
     {
         pais = (pais ?? "").Trim().ToUpperInvariant();
-        if (!LocationCatalog.IsValidCountry(pais)) return BadRequest("País inválido.");
+        if (pais != "PT") return BadRequest("A pesquisa está disponível apenas em Portugal.");
         estado = string.IsNullOrWhiteSpace(estado) ? null : LocationCatalog.CanonicalRegion(pais, estado);
         if (!string.IsNullOrWhiteSpace(Request.Query["estado"]) && estado == null)
             return BadRequest("Região inválida.");
