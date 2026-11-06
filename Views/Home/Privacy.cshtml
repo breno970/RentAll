@@ -10,18 +10,19 @@
     <div class="panel" style="margin-bottom:22px;background:linear-gradient(125deg,#e6f4ec,#fffdf3)">
         <h2>Menos objetos parados. Mais oportunidades.</h2>
         <p class="detail-description">A RentAll aproxima pessoas que têm objetos em desuso de quem precisa deles por um período limitado. É uma forma prática de aproveitar ferramentas, eletrónica, equipamentos de lazer e artigos do quotidiano sem ter de comprar tudo.</p>
-        <div class="form-actions"><a class="btn btn-primary" asp-controller="Home" asp-action="Index"><i class="fas fa-search"></i> Explorar artigos</a><a class="btn btn-outline" asp-controller="Items" asp-action="Create"><i class="fas fa-plus"></i> Tenho algo para partilhar</a></div>
+        <div class="form-actions"><a class="btn btn-primary" asp-controller="Home" asp-action="Index"><i class="fas fa-search"></i> Explorar artigos</a><a class="btn btn-outline" asp-controller="Publicar" asp-action="Index"><i class="fas fa-plus"></i> Tenho algo para partilhar</a></div>
     </div>
     <div class="section-heading"><div><p class="eyebrow">Três passos</p><h2>Simples de começar</h2></div></div>
     <div class="benefit-strip">
-        <div class="panel"><span class="pill">01</span><h3 style="margin-top:15px">Encontra</h3><p class="muted">Pesquisa por nome, categoria, preço e região — no Brasil ou em Portugal.</p></div>
+        <div class="panel"><span class="pill">01</span><h3 style="margin-top:15px">Encontra</h3><p class="muted">Pesquisa por nome, categoria, preço e distrito em Portugal.</p></div>
         <div class="panel"><span class="pill">02</span><h3 style="margin-top:15px">Fala</h3><p class="muted">Consulta os detalhes e combina diretamente com quem publicou o anúncio.</p></div>
         <div class="panel"><span class="pill">03</span><h3 style="margin-top:15px">Reutiliza</h3><p class="muted">Aproveita o artigo durante o tempo acordado e contribui para uma utilização mais consciente.</p></div>
     </div>
     <div class="panel" style="max-width:830px">
         <h2>Uma comunidade assente no respeito</h2>
         <p class="muted">Publica apenas artigos que possuis ou estás autorizado a disponibilizar, descreve o seu estado com clareza e confirma todas as condições antes de acordares um aluguer. Não anuncies produtos ilegais, perigosos ou proibidos pelos termos da plataforma.</p>
-        <p class="muted">A RentAll disponibiliza anúncios e contactos entre utilizadores. A conclusão do aluguer, os pagamentos, a entrega e a devolução dependem do acordo entre as pessoas envolvidas.</p>
+        <p class="muted">A RentAll disponibiliza anúncios e contactos entre utilizadores. Os pagamentos reais, a proteção financeira e os registos de entrega/devolução não estão ativos.</p>
+        <p><a asp-controller="Experiencia" asp-action="Index">Experimentar o percurso de segurança e devolução da RentAll</a></p>
         <a asp-controller="Termos" asp-action="Index">Ler os termos de utilização <i class="fas fa-arrow-right"></i></a>
     </div>
 </div>

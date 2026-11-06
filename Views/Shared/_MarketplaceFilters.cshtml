@@ -11,12 +11,10 @@
             <label for="filter-search">O que procura?</label>
             <input class="form-control" id="filter-search" type="search" name="SearchString" placeholder="Ferramenta, bicicleta, câmara..." value="@Model.SearchString" autocomplete="off" />
         </div>
-        <div class="field">
-            <label for="filter-country">País</label>
-            <select class="form-select" id="filter-country" name="Pais" data-region-country>
-                <option value="PT" selected="@(Model.Pais == "PT")">Portugal (€)</option>
-                <option value="BR" selected="@(Model.Pais == "BR")">Brasil (R$)</option>
-            </select>
+        <input type="hidden" name="Pais" value="PT" data-region-country />
+        <div class="field ra-pt-only">
+            <span class="ra-pt-only-label">Mercado</span>
+            <strong>Portugal <small>EUR (€)</small></strong>
         </div>
         <div class="field">
             <label for="filter-region" data-region-label>@LocationCatalog.RegionLabel(Model.Pais)</label>
@@ -74,7 +72,7 @@
             </div>
         </div>
         <div class="search-foot">
-            <a class="btn btn-outline" asp-controller="Home" asp-action="@action" asp-route-Pais="@Model.Pais"><i class="fas fa-undo-alt" aria-hidden="true"></i> Limpar</a>
+            <a class="btn btn-outline" asp-controller="Home" asp-action="@action" asp-route-Pais="PT"><i class="fas fa-undo-alt" aria-hidden="true"></i> Limpar</a>
             <button class="btn btn-primary" type="submit"><i class="fas fa-check" aria-hidden="true"></i> Aplicar filtros</button>
         </div>
     </details>

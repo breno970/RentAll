@@ -27,7 +27,7 @@
                 <dl class="ra-demo-order">
                     <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
                     <div><dt>Tipo de operação</dt><dd>Aluguer entre utilizadores</dd></div>
-                    <div><dt>Mercado</dt><dd>@(Model.Pais == "BR" ? "Brasil · BRL" : "Portugal · EUR")</dd></div>
+                    <div><dt>Mercado</dt><dd>Portugal · EUR</dd></div>
                     <div><dt>Pedido</dt><dd>@(Model.PedidoAssociado ? "Pedido associado — simulação sem alteração do pedido" : "Exemplo sem pedido associado")</dd></div>
                 </dl>
                 <label class="ra-demo-agreement"><input type="checkbox" data-demo-ack />
@@ -43,14 +43,7 @@
                 <p>Escolhe apenas para visualizar o percurso. Estes botões não pedem nem enviam dados reais.</p>
                 <div class="ra-demo-methods" role="group" aria-label="Método fictício">
                     <button type="button" data-demo-method="card" aria-pressed="true" class="is-selected">Cartão de crédito ou débito</button>
-                    @if (Model.Pais == "BR")
-                    {
-                        <button type="button" data-demo-method="pix" aria-pressed="false">Pix (exemplo)</button>
-                    }
-                    else
-                    {
-                        <button type="button" data-demo-method="mbway" aria-pressed="false">MB WAY (exemplo)</button>
-                    }
+                    <button type="button" data-demo-method="mbway" aria-pressed="false">MB WAY (exemplo)</button>
                 </div>
                 <div class="ra-demo-fake-card" data-demo-card aria-label="Cartão ilustrativo sem dados editáveis">
                     <small>CARTÃO DE EXEMPLO · SEM DADOS REAIS</small>

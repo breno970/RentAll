@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/css/in-platform-journey.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/css/rental-dashboard.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true"/>
 <div class="page-width ra-request-page">
     <div class="page-intro">
         <div><p class="eyebrow">RentAll · Alugueres</p><h1>Pedidos de aluguer</h1>
@@ -23,6 +24,11 @@
     </div>
     <div class="ra-fee-disclosure"><i class="fas fa-info-circle" aria-hidden="true"></i>
         Os pedidos registam apenas interesse no aluguer. Não existem cobranças, reservas pagas nem proteção financeira ativadas nesta fase. A comissão indicativa não é cobrada.
+    </div>
+    <div class="ra-proto-detail-note">
+        <strong>Protótipo do percurso de entrega e devolução</strong>
+        <p>Experimenta como funcionariam a confirmação do artigo, a eventual caução e a gestão de danos, sem mexer nos teus pedidos reais.</p>
+        <a asp-controller="Experiencia" asp-action="Index" class="ra-proto-textlink">Abrir o simulador de aluguer</a>
     </div>
     <section class="ra-pipeline-overview" aria-label="Resumo dos alugueres">
         <div class="ra-pipeline-heading">

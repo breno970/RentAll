@@ -46,7 +46,7 @@
             <div class="form-field">
                 <label asp-for="Pais">País *</label>
                 <select asp-for="Pais" class="form-select" data-region-country required>
-                    <option value="BR">Brasil</option><option value="PT">Portugal</option>
+                    <option value="PT">Portugal</option>
                 </select>
             </div>
             <div class="form-field">
@@ -71,7 +71,7 @@
             </div>
             <div class="form-field">
                 <label asp-for="CEP" data-postal-label>@LocationCatalog.PostalLabel(Model.Pais) (opcional)</label>
-                <input asp-for="CEP" class="form-control" id="txtCep" placeholder="@(Model.Pais == "PT" ? "0000-000" : "00000-000")" maxlength="9" inputmode="numeric" />
+                <input asp-for="CEP" class="form-control" id="txtCep" placeholder="0000-000" maxlength="9" inputmode="numeric" />
                 <span asp-validation-for="CEP" class="text-danger"></span>
             </div>
             <div class="form-field">

@@ -14,7 +14,7 @@
         </div>
         <h2>Localização</h2>
         <div class="form-grid">
-            <div class="form-field"><label asp-for="Pais">País *</label><select asp-for="Pais" class="form-select" data-region-country required><option value="BR">Brasil</option><option value="PT">Portugal</option></select></div>
+            <div class="form-field"><label asp-for="Pais">País *</label><select asp-for="Pais" class="form-select" data-region-country required><option value="PT">Portugal</option></select></div>
             <div class="form-field"><label asp-for="Estado" data-region-label>@LocationCatalog.RegionLabel(Model.Pais) *</label><select asp-for="Estado" class="form-select" data-region-uf required><option value="">Escolhe a região</option>@foreach (var region in LocationCatalog.RegionsFor(Model.Pais)) { <option value="@region.Code">@region.Name</option> }</select><span asp-validation-for="Estado" class="text-danger"></span></div>
             <div class="form-field"><label asp-for="Cidade">Cidade / município *</label><input asp-for="Cidade" id="txtCidade" data-region-city list="ad-cities" class="form-control" required /><datalist id="ad-cities"></datalist></div>
             <div class="form-field"><label asp-for="Bairro">Bairro / freguesia (opcional)</label><input asp-for="Bairro" id="txtBairro" class="form-control" /></div>

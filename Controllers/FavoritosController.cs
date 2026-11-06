@@ -21,7 +21,7 @@ public class FavoritosController : Controller
     public async Task<IActionResult> Index()
     {
         var items = await _db.Favoritos.AsNoTracking()
-            .Where(f => f.UserId == UserId && f.Anuncio != null && f.Anuncio.item != null && f.Anuncio.item.snativo != "N")
+            .Where(f => f.UserId == UserId && f.Anuncio != null && f.Anuncio.Pais == "PT" && f.Anuncio.item != null && f.Anuncio.item.snativo != "N")
             .OrderByDescending(f => f.CriadoEm)
             .Include(f => f.Anuncio).ThenInclude(a => a!.item)
             .Include(f => f.Anuncio).ThenInclude(a => a!.categoria)
@@ -41,7 +41,7 @@ public class FavoritosController : Controller
         {
             var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
                 .FirstOrDefaultAsync(a => a.id == anuncioId);
-            if (ad == null || ad.item == null || ad.item.snativo == "N")
+            if (ad == null || ad.Pais != "PT" || ad.item == null || ad.item.snativo == "N")
                 return NotFound();
             _db.Favoritos.Add(new Favorito { UserId = UserId, AnuncioId = anuncioId });
         }

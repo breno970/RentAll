@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/rental-dashboard.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
 <div class="page-width ra-detail-with-mobile-bar">
     <div class="page-intro">
         <div><p class="eyebrow"><a asp-controller="Home" asp-action="Index" asp-route-Pais="@Model.Pais">Explorar</a> / Detalhes do anúncio</p><h1>@(Model.item?.nmitem ?? Model.modelo)</h1><p><i class="fas fa-map-marker-alt"></i> @place</p></div>
@@ -78,6 +79,11 @@
                     <a asp-controller="Pedidos" asp-action="Index" class="btn btn-outline" style="margin-top:10px">Consultar pedidos</a>
                 </div>
             }
+            <div class="ra-proto-detail-note">
+                <strong>Como evitar problemas durante um aluguer?</strong>
+                <p>Conhece o modelo de proteção previsto para a RentAll: verificação, registo do estado, caução separada e análise de ocorrências. Trata-se ainda de um protótipo.</p>
+                <a asp-controller="Experiencia" asp-action="Index" class="ra-proto-textlink">Experimentar o percurso completo</a>
+            </div>
             <div class="ra-rental-safety">
                 <h3><i class="fas fa-shield-alt" aria-hidden="true"></i> Aluguer com mais confiança</h3>
                 <ul>

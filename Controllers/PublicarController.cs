@@ -41,7 +41,7 @@ public sealed class PublicarController : Controller
     public async Task<IActionResult> Index(string? Pais)
     {
         await LoadCategories();
-        return View(new PublishViewModel { Pais = Pais == "BR" ? "BR" : "PT" });
+        return View(new PublishViewModel { Pais = "PT" });
     }
 
     private static bool ParseMoney(string? raw, out float amount)
@@ -71,6 +71,7 @@ public sealed class PublicarController : Controller
     {
         vm.Photos ??= new();
         vm.Pais = (vm.Pais ?? "").Trim().ToUpperInvariant();
+        if (vm.Pais != "PT") ModelState.AddModelError(nameof(vm.Pais), "Neste momento só são aceites anúncios em Portugal.");
         vm.Estado = vm.Estado?.Trim();
         vm.Cidade = vm.Cidade?.Trim();
 
@@ -93,7 +94,7 @@ public sealed class PublicarController : Controller
         if (vm.DiasAluguel is < 1 or > 365)
             ModelState.AddModelError(nameof(vm.DiasAluguel), "Indica um período entre 1 e 365 dias, ou deixa em branco.");
         if (!ParseMoney(vm.Preco, out var price))
-            ModelState.AddModelError(nameof(vm.Preco), "Indica um preço válido em euros ou reais, ou deixa em branco.");
+            ModelState.AddModelError(nameof(vm.Preco), "Indica um preço válido em euros, ou deixa em branco.");
         if (vm.Photos.Count is < 1 or > 5)
             ModelState.AddModelError(nameof(vm.Photos), "Seleciona entre 1 e 5 fotografias.");
         var order = (vm.PhotoOrder ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);

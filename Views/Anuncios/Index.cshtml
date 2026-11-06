@@ -25,12 +25,12 @@
                     { <img class="manage-img" src="@Url.Content("~/imagens/" + ad.item.imagem1)" alt="@(ad.item?.nmitem ?? ad.modelo)" loading="lazy" /> }
                     else { <div class="manage-img"><i class="far fa-image"></i></div> }
                     <div class="manage-body">
-                        <span class="pill"><i class="fas fa-circle" style="font-size:.46rem" aria-hidden="true"></i> Publicado · @aluguel.Services.LocationCatalog.CountryName(ad.Pais)</span>
+                        <span class="pill"><i class="fas fa-circle" style="font-size:.46rem" aria-hidden="true"></i> @(ad.Pais == "PT" ? "Anúncio · Portugal" : "Histórico · indisponível no mercado atual")</span>
                         <h2>@(ad.item?.nmitem ?? ad.modelo)</h2>
                         <p>@aluguel.Services.RentalLocalization.FormatPrice(ad.vlitem, ad.Pais) por dia · @ad.Cidade, @ad.Estado</p>
                         <div class="manage-actions">
                             <a asp-action="Details" asp-route-id="@ad.id"><i class="far fa-eye"></i> Ver</a>
-                            <a asp-action="Edit" asp-route-id="@ad.id"><i class="fas fa-pen"></i> Editar</a>
+                            @if (ad.Pais == "PT") { <a asp-action="Edit" asp-route-id="@ad.id"><i class="fas fa-pen"></i> Editar</a> }
                             <a class="danger-link" asp-action="Delete" asp-route-id="@ad.id"><i class="far fa-trash-alt"></i> Excluir</a>
                         </div>
                     </div>
