@@ -44,17 +44,12 @@ public class AnunciosController : Controller
     public async Task<IActionResult> Details(int? id)
     {
         if (id is null) return NotFound();
-        // Browsing/search results are public, but full listing details require an account.
-        if (User.Identity?.IsAuthenticated != true)
-            return RedirectToPage("/Account/Register", new
-            {
-                area = "Identity",
-                returnUrl = Url.Action(nameof(Details), "Anuncios", new { id })
-            });
+        // Guests can inspect public listing details before deciding to register.
         var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .Include(a => a.categoria).Include(a => a.tipo)
             .FirstOrDefaultAsync(a => a.id == id);
         if (ad == null || ad.item == null) return NotFound();
+        if (ad.Pais != "PT" && ad.iduser != User.FindFirstValue(ClaimTypes.NameIdentifier)) return NotFound();
         if (ad.item.snativo == "N" && ad.iduser != User.FindFirstValue(ClaimTypes.NameIdentifier))
             return NotFound();
         var viewerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -67,7 +62,7 @@ public class AnunciosController : Controller
     public async Task<IActionResult> Create(int? itemId)
     {
         await PrepareCreateOptions(itemId);
-        return View(new Anuncio { itemid = itemId ?? 0 });
+        return View(new Anuncio { itemid = itemId ?? 0, Pais = "PT" });
     }
 
     [AllowAnonymous]
@@ -95,7 +90,7 @@ public class AnunciosController : Controller
         ad.contato = (ad.contato ?? "").Trim();
         ad.NomeFantasia = (ad.NomeFantasia ?? "").Trim();
 
-        if (!LocationCatalog.IsValidCountry(ad.Pais))
+        if (ad.Pais != "PT")
             ModelState.AddModelError(nameof(ad.Pais), "Selecione Brasil ou Portugal.");
         if (!LocationCatalog.IsValidRegion(ad.Pais, ad.Estado))
             ModelState.AddModelError(nameof(ad.Estado), "Selecione um estado ou distrito válido para o país.");
@@ -172,6 +167,7 @@ public class AnunciosController : Controller
     {
         if (id is null) return NotFound();
         var ad = await _db.Anuncios.FirstOrDefaultAsync(a => a.id == id && a.iduser == UserId);
+        if (ad?.Pais == "BR") { TempData["Error"] = "A edição de anúncios históricos do Brasil está temporariamente indisponível."; return RedirectToAction(nameof(Index)); }
         return ad is null ? NotFound() : View(ad);
     }
 
@@ -181,6 +177,7 @@ public class AnunciosController : Controller
         if (id != anuncio.id) return NotFound();
         var existing = await _db.Anuncios.FirstOrDefaultAsync(a => a.id == id && a.iduser == UserId);
         if (existing is null) return NotFound();
+        if (existing.Pais != "PT") { TempData["Error"] = "Os anúncios históricos fora de Portugal não podem ser alterados nesta fase."; return RedirectToAction(nameof(Index)); }
 
         anuncio.iduser = existing.iduser;
         anuncio.Pais = (anuncio.Pais ?? "").Trim().ToUpperInvariant();
