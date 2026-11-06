@@ -39,11 +39,15 @@ public sealed class PedidosController : Controller
         ViewBag.TotalRequests = requests.Count;
         ViewBag.ReceivedCount = requests.Count(p => p.AnuncianteId == me);
         ViewBag.SentCount = requests.Count(p => p.InteressadoId == me);
-        ViewBag.PendingToAnswer = requests.Count(p => p.AnuncianteId == me && p.Estado == "Pendente");
+        ViewBag.PendingToAnswer = requests.Count(p =>
+            (p.AnuncianteId == me && p.Estado == "Pendente") ||
+            (p.Estado == "Contraproposta" && p.PropostaPorId != me));
         var visible = vista switch {
             "recebidos" => requests.Where(p => p.AnuncianteId == me).ToList(),
             "enviados" => requests.Where(p => p.InteressadoId == me).ToList(),
-            "pendentes" => requests.Where(p => p.AnuncianteId == me && p.Estado == "Pendente").ToList(),
+            "pendentes" => requests.Where(p =>
+                (p.AnuncianteId == me && p.Estado == "Pendente") ||
+                (p.Estado == "Contraproposta" && p.PropostaPorId != me)).ToList(),
             _ => requests
         };
         ViewBag.AdNames = adNames;
