@@ -7,6 +7,7 @@
   <ItemGroup>
     <!-- Legacy SQL Server migrations are retained for reference, but are not compatible with PostgreSQL. -->
     <Compile Remove="Migrations/**/*.cs" />
+    <Compile Remove="tests/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.0" />
