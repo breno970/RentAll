@@ -52,6 +52,8 @@
     const list = city?.list;
     const postcode = form.querySelector("#txtCep");
     const mapLink = form.querySelector("[data-region-map-link]");
+    const marketplaceFilter = form.hasAttribute("data-marketplace-filters");
+    const cityStatus = form.querySelector("[data-city-status]");
     if (!country || !region) return;
     let requestCounter = 0;
 
@@ -72,16 +74,30 @@
       if (!list) return;
       const request = ++requestCounter;
       list.replaceChildren();
-      if (!region.value) return;
+      if (!marketplaceFilter && !region.value) return;
       list.setAttribute("aria-busy", "true");
+      if (cityStatus) cityStatus.textContent = "A procurar cidades com anúncios...";
       try {
-        const names = await citySuggestions(country.value, region.value);
+        let names;
+        if (marketplaceFilter) {
+          // Suggestions use only RentAll's public listings. No external location
+          // services are called just because someone opens a search filter.
+          const url = "/Home/Cidades?pais=" + encodeURIComponent(country.value) +
+            (region.value ? "&estado=" + encodeURIComponent(region.value) : "");
+          const response = await fetch(url, { credentials: "same-origin", headers: { Accept: "application/json" } });
+          if (!response.ok) throw new Error("Falha ao carregar cidades");
+          names = await response.json();
+          if (!Array.isArray(names)) names = [];
+        } else names = await citySuggestions(country.value, region.value);
         if (request !== requestCounter) return;
         const fragment = document.createDocumentFragment();
         for (const name of names) fragment.appendChild(new Option(name, name));
         list.replaceChildren(fragment);
+        if (cityStatus) cityStatus.textContent = names.length
+          ? names.length + " cidade(s) com anúncios disponíveis para sugestão. Também podes escrever outra."
+          : "Sem cidades sugeridas nesta zona. Podes escrever o nome manualmente.";
       } catch {
-        // Entrada manual de cidade/município continua sempre permitida.
+        if (cityStatus) cityStatus.textContent = "Não foi possível carregar as sugestões. Podes escrever a cidade manualmente.";
       } finally {
         if (request === requestCounter) list.removeAttribute("aria-busy");
       }

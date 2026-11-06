@@ -29,5 +29,7 @@ jobs:
         run: dotnet restore aluguel.csproj
       - name: Compile application
         run: dotnet build aluguel.csproj --no-restore -c Release
+      - name: Test server-side contact safeguards
+        run: dotnet run --project tests/ContactSafetyChecks/ContactSafetyChecks.csproj -c Release
       - name: Verify Docker image
         run: docker build --tag rentall:ci .

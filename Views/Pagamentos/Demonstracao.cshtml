@@ -1,50 +1,124 @@
 @model aluguel.ViewModel.CartaoDemoViewModel
-@{ ViewData["Title"] = "Exemplo de pagamento com cartão"; }
-<div class="page-width">
-  <div class="ra-demo-layout">
-    <div class="ra-demo-banner" role="note">
-      <strong>Demonstração — nenhuma cobrança será efetuada.</strong> Esta página não recolhe dados de cartão e não confirma reservas nem pagamentos.
-    </div>
-    <section class="ra-demo-panel" aria-labelledby="demo-pay-title">
-      <h1 id="demo-pay-title">Pagamento com cartão</h1>
-      <p class="muted">Exemplo do futuro processo de pagamento da RentAll.</p>
-      <div class="ra-demo-checkout" data-demo-checkout>
-        <h2>Cartão de pagamento</h2>
-        <div class="ra-demo-card" aria-label="Representação visual de um cartão fictício">
-          <p>Cartão de exemplo</p>
-          <strong>•••• &nbsp; •••• &nbsp; •••• &nbsp; 4242</strong>
-          <p>EXEMPLO · NÃO UTILIZAR DADOS REAIS</p>
-        </div>
-        <div class="ra-demo-field">
-          <small>Número do cartão</small>
-          <strong>•••• •••• •••• 4242</strong>
-        </div>
-        <div class="ra-demo-field">
-          <small>Validade e código de segurança</small>
-          <strong>••/•• &nbsp; · &nbsp; •••</strong>
-        </div>
-        <p class="muted" style="font-size:.82rem">Estes campos são ilustrativos e não podem ser editados. O checkout real será alojado pelo prestador de pagamentos quando a integração estiver ativa.</p>
-        <button type="button" data-demo-pay class="btn btn-primary">Ver confirmação de exemplo</button>
-      </div>
-      <div class="ra-demo-success" role="status" data-demo-success hidden>
-        <h2>Exemplo de confirmação</h2>
-        <p>Este é o aspeto de uma confirmação futura. <strong>Nenhum pagamento foi efetuado, nenhuma reserva foi confirmada e nenhum dado bancário foi enviado.</strong></p>
-        <button type="button" class="btn btn-outline" data-demo-reset>Voltar à demonstração</button>
-      </div>
-    </section>
-    <aside class="ra-demo-panel" aria-labelledby="demo-summary-title">
-      <h2 id="demo-summary-title">Resumo do aluguer</h2>
-      <p><strong>@Model.Artigo</strong></p>
-      <p class="muted">@(Model.PedidoAssociado ? "Valores do pedido selecionado. Apresentação sem pagamento." : "Exemplo ilustrativo de um aluguer.")</p>
-      <div class="ra-demo-total"><span>Valor do aluguer</span><strong>@aluguel.Services.RentalLocalization.FormatPrice((float)Model.Total, Model.Pais)</strong></div>
-      <div class="ra-demo-total"><span>Comissão futura da RentAll (10%)</span><span>@aluguel.Services.RentalLocalization.FormatPrice((float)Model.Comissao, Model.Pais)</span></div>
-      <div class="ra-demo-total"><span>Montante ilustrativo para o anunciante</span><span>@aluguel.Services.RentalLocalization.FormatPrice((float)(Model.Total - Model.Comissao), Model.Pais)</span></div>
-      <p class="muted" style="font-size:.78rem;margin-top:16px">Valores indicativos, antes das taxas do prestador, impostos e eventuais ajustes. A comissão não é cobrada nesta fase.</p>
-      <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Consultar os meus pedidos</a>
-      <p style="margin-top:17px;font-size:.85rem"><a asp-controller="Termos" asp-action="Index">Termos</a> · <a asp-controller="Privacidade" asp-action="Index">Privacidade</a></p>
-    </aside>
-  </div>
-</div>
-@section Scripts {
-    <script src="~/js/payment-demo.js" asp-append-version="true" defer></script>
+@{
+    ViewData["Title"] = "Como funciona o pagamento";
+    var money = (Func<decimal, string>)(n => aluguel.Services.RentalLocalization.FormatPrice((float)n, Model.Pais));
 }
+<link rel="stylesheet" href="~/css/payment-journey-demo.css" asp-append-version="true" />
+<div class="page-width ra-checkout-example" data-payment-example>
+    <div class="ra-demo-head">
+        <div><p class="eyebrow">RentAll · Processo de aluguer</p><h1>Como funciona o pagamento</h1>
+            <p>Uma demonstração de como será o checkout, a confirmação e a conclusão de um aluguer.</p>
+        </div>
+        <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Voltar aos pedidos</a>
+    </div>
+    <div class="ra-demo-warning" role="note"><strong>Ambiente de demonstração.</strong> Não há pagamentos, reservas, autorizações ou transferências reais. Não introduzas dados bancários.</div>
+    <ol class="ra-demo-steps" aria-label="Etapas do pagamento">
+        <li data-demo-step="0" aria-current="step">1. Pedido</li>
+        <li data-demo-step="1">2. Método</li>
+        <li data-demo-step="2">3. Resultado</li>
+        <li data-demo-step="3">4. Conclusão</li>
+    </ol>
+    <div class="ra-demo-main">
+        <div class="ra-demo-sections">
+            <section class="ra-demo-box" data-demo-screen="0" aria-labelledby="ra-demo-review">
+                <span class="ra-demo-tag">ETAPA 1 DE 4</span>
+                <h2 id="ra-demo-review" tabindex="-1">Confirmar o pedido</h2>
+                <p>Depois de o anunciante aceitar, o comprador confirma os valores, as condições e o método de pagamento.</p>
+                <dl class="ra-demo-order">
+                    <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
+                    <div><dt>Tipo de operação</dt><dd>Aluguer entre utilizadores</dd></div>
+                    <div><dt>Mercado</dt><dd>@(Model.Pais == "BR" ? "Brasil · BRL" : "Portugal · EUR")</dd></div>
+                    <div><dt>Pedido</dt><dd>@(Model.PedidoAssociado ? "Pedido associado — simulação sem alteração do pedido" : "Exemplo sem pedido associado")</dd></div>
+                </dl>
+                <label class="ra-demo-agreement"><input type="checkbox" data-demo-ack />
+                    <span>Percebi que esta é uma demonstração, que não será cobrado dinheiro e que nenhum pedido será confirmado nesta página.</span>
+                </label>
+                <div class="ra-demo-alert" data-demo-ack-error hidden role="alert">Assinala a confirmação de que estás numa demonstração.</div>
+                <button type="button" class="btn btn-primary" data-demo-next>Continuar para métodos de pagamento</button>
+            </section>
+
+            <section class="ra-demo-box" data-demo-screen="1" aria-labelledby="ra-demo-method" hidden>
+                <span class="ra-demo-tag">ETAPA 2 DE 4</span>
+                <h2 id="ra-demo-method" tabindex="-1">Escolher método de pagamento</h2>
+                <p>Escolhe apenas para visualizar o percurso. Estes botões não pedem nem enviam dados reais.</p>
+                <div class="ra-demo-methods" role="group" aria-label="Método fictício">
+                    <button type="button" data-demo-method="card" aria-pressed="true" class="is-selected">Cartão de crédito ou débito</button>
+                    @if (Model.Pais == "BR")
+                    {
+                        <button type="button" data-demo-method="pix" aria-pressed="false">Pix (exemplo)</button>
+                    }
+                    else
+                    {
+                        <button type="button" data-demo-method="mbway" aria-pressed="false">MB WAY (exemplo)</button>
+                    }
+                </div>
+                <div class="ra-demo-fake-card" data-demo-card aria-label="Cartão ilustrativo sem dados editáveis">
+                    <small>CARTÃO DE EXEMPLO · SEM DADOS REAIS</small>
+                    <strong>•••• &nbsp; •••• &nbsp; •••• &nbsp; 4242</strong>
+                    <span>Validade ••/•• &nbsp; Código •••</span>
+                </div>
+                <p class="ra-demo-method-info" data-demo-method-info>Num checkout real, os campos do cartão seriam fornecidos pelo prestador de pagamentos, não pela RentAll.</p>
+                <div class="ra-demo-controls">
+                    <button type="button" class="btn btn-outline" data-demo-back="0">Voltar</button>
+                    <button type="button" class="btn btn-primary" data-demo-authorize>Simular aprovação</button>
+                    <button type="button" class="btn btn-outline" data-demo-decline>Simular recusa</button>
+                </div>
+            </section>
+
+            <section class="ra-demo-box" data-demo-screen="2" aria-labelledby="ra-demo-result" hidden>
+                <span class="ra-demo-tag">ETAPA 3 DE 4</span>
+                <h2 id="ra-demo-result" tabindex="-1">Resultado de exemplo</h2>
+                <div class="ra-demo-result" data-demo-result role="status">
+                    <strong data-demo-result-title>Confirmação fictícia</strong>
+                    <p data-demo-result-text>O exemplo não realiza nenhuma comunicação com um banco ou a Stripe.</p>
+                </div>
+                <div class="ra-demo-controls">
+                    <button type="button" class="btn btn-outline" data-demo-retry>Repetir simulação</button>
+                    <button type="button" class="btn btn-primary" data-demo-finish>Ver comprovativo e conclusão</button>
+                </div>
+            </section>
+
+            <section class="ra-demo-box" data-demo-screen="3" aria-labelledby="ra-demo-completion" hidden>
+                <span class="ra-demo-tag">ETAPA 4 DE 4</span>
+                <h2 id="ra-demo-completion" tabindex="-1">Comprovativo e conclusão do aluguer</h2>
+                <div class="ra-demo-receipt">
+                    <strong>Comprovativo de exemplo — SEM VALIDADE FISCAL</strong>
+                    <p>Referência: DEMONSTRAÇÃO (não é um ID de transação)</p>
+                    <dl class="ra-demo-order">
+                        <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
+                        <div><dt>Valor apresentado</dt><dd>@money(Model.Total)</dd></div>
+                        <div><dt>Comissão ilustrativa</dt><dd>@money(Model.Comissao)</dd></div>
+                        <div><dt>Valor para o anunciante (antes de custos)</dt><dd>@money(Model.Total - Model.Comissao)</dd></div>
+                        <div><dt>Estado real</dt><dd>Não foi efetuado pagamento</dd></div>
+                    </dl>
+                </div>
+                <h3>Etapas após um pagamento real, no futuro</h3>
+                <div class="ra-demo-timeline">
+                    <div><span>1</span><p><strong>Reserva confirmada</strong><small>Após confirmação real do prestador de pagamentos.</small></p></div>
+                    <div><span>2</span><p><strong>Entrega do artigo</strong><small>Participantes confirmam a entrega pela RentAll.</small></p></div>
+                    <div><span>3</span><p><strong>Devolução</strong><small>Regista-se o estado e a devolução.</small></p></div>
+                    <div><span>4</span><p><strong>Conclusão e avaliação</strong><small>O aluguer entra no histórico e poderão existir avaliações verificadas.</small></p></div>
+                </div>
+                <p>O acompanhamento, os reembolsos, a proteção financeira e a cobrança real <strong>ainda não estão ativados</strong>. Esta página não altera dados na plataforma.</p>
+                <div class="ra-demo-controls">
+                    <button type="button" class="btn btn-outline" data-demo-restart>Reiniciar demonstração</button>
+                    <a class="btn btn-primary" asp-controller="Pedidos" asp-action="Index">Voltar aos pedidos</a>
+                </div>
+            </section>
+        </div>
+
+        <aside class="ra-demo-box ra-demo-sidebar" aria-label="Resumo financeiro de exemplo">
+            <h2>Resumo do aluguer</h2>
+            <strong class="ra-demo-item">@Model.Artigo</strong>
+            <p>Exemplo informativo, sem processamento de impostos ou pagamentos.</p>
+            <dl class="ra-demo-order">
+                <div><dt>Aluguer</dt><dd>@money(Model.Total)</dd></div>
+                <div><dt>Comissão futura RentAll (10%)</dt><dd>@money(Model.Comissao)</dd></div>
+                <div><dt>Parte ilustrativa do anunciante</dt><dd>@money(Model.Total - Model.Comissao)</dd></div>
+            </dl>
+            <p class="ra-demo-sidebar-note">A divisão é indicativa, antes de taxas de processamento, impostos, disputas ou reembolsos. Não foi cobrada comissão.</p>
+            <p><a asp-controller="Termos" asp-action="Index">Termos</a> · <a asp-controller="Privacidade" asp-action="Index">Privacidade</a></p>
+        </aside>
+    </div>
+</div>
+@section Scripts {<script src="~/js/payment-demo.js" asp-append-version="true" defer></script>}

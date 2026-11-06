@@ -46,7 +46,8 @@ public sealed class MensagensController : Controller
                 UltimaMensagem = g.Max(m => m.CriadaEm),
                 UltimoTexto = g.OrderByDescending(m => m.CriadaEm).First().Texto,
                 PedidoPendente = requests.Any(p => p.AnuncioId == g.Key.AnuncioId &&
-                    p.Estado == "Pendente" && p.AnuncianteId == me &&
+                    ((p.Estado == "Pendente" && p.AnuncianteId == me) ||
+                     (p.Estado == "Contraproposta" && p.PropostaPorId != me)) &&
                     p.InteressadoId == g.Key.PeerId),
                 SouAnunciante = ad?.iduser == me
             };
@@ -64,7 +65,8 @@ public sealed class MensagensController : Controller
                 NomeArtigo = ad?.item?.nmitem ?? "Anúncio",
                 UltimaMensagem = request.CriadoEm,
                 UltimoTexto = "Pedido de aluguer registado",
-                PedidoPendente = request.AnuncianteId == me && request.Estado == "Pendente",
+                PedidoPendente = (request.AnuncianteId == me && request.Estado == "Pendente") ||
+                    (request.Estado == "Contraproposta" && request.PropostaPorId != me),
                 SouAnunciante = request.AnuncianteId == me
             });
         }
@@ -92,6 +94,13 @@ public sealed class MensagensController : Controller
         if (!owner && ad.item?.snativo == "N" && !hasMessage && !hasRequest)
             return NotFound();
 
+        return View(await BuildConversationAsync(ad, owner, me, other, ct));
+    }
+
+    private async Task<ConversaViewModel> BuildConversationAsync(Anuncio ad, bool owner,
+        string me, string other, CancellationToken ct)
+    {
+        var anuncioId = ad.id;
         var messages = await _db.Mensagens.AsNoTracking()
             .Where(m => m.AnuncioId == anuncioId &&
                 ((m.RemetenteId == me && m.DestinatarioId == other) ||
@@ -103,7 +112,7 @@ public sealed class MensagensController : Controller
             .OrderByDescending(p => p.CriadoEm)
             .Select(p => new { p.Id, p.Estado, p.TotalEstimado, p.Dias, p.Pais })
             .FirstOrDefaultAsync(ct);
-        return View(new ConversaViewModel {
+        return new ConversaViewModel {
             AnuncioId = ad.id, NomeArtigo = ad.item?.nmitem ?? ad.modelo,
             MeuId = me, OutroUtilizadorId = other,
             SouAnunciante = owner, Mensagens = messages,
@@ -112,7 +121,7 @@ public sealed class MensagensController : Controller
             Pais = ad.Pais, PedidoId = latestRequest?.Id,
             EstadoPedido = latestRequest?.Estado, DiasPedido = latestRequest?.Dias,
             TotalPedido = latestRequest?.TotalEstimado
-        });
+        };
     }
 
     [HttpPost]
@@ -137,17 +146,16 @@ public sealed class MensagensController : Controller
         if (ad.item?.snativo == "N" && !previous && !hasRequest) return NotFound();
 
         var body = texto?.Trim() ?? "";
-        if (body.Length is < 1 or > 2000)
+        var reason = MarketplaceContactSafety.Classify(body);
+        if (body.Length is < 1 or > 2000 || reason != MarketplaceContactSafety.Reason.None)
         {
-            TempData["Error"] = "Escreve uma mensagem com até 2000 caracteres.";
-            return RedirectToAction(nameof(Conversa), new { anuncioId, peerId = other });
-        }
-        // Do not accept links, email addresses or telephone numbers, which can leak private
-        // information and bypass any future buyer/seller protections.
-        if (MarketplaceContactSafety.ContainsContactOrRedirect(body))
-        {
-            TempData["Error"] = "Por segurança, não incluas contactos, números de telefone ou links. Combina tudo pela RentAll.";
-            return RedirectToAction(nameof(Conversa), new { anuncioId, peerId = other });
+            ViewBag.MessageError = reason != MarketplaceContactSafety.Reason.None
+                ? MarketplaceContactSafety.UserMessage(reason)
+                : "Escreve uma mensagem com até 2000 caracteres.";
+            // A refused message is NOT stored or sent. Render it back safely so a
+            // legitimate user can edit the text without losing the conversation.
+            ViewBag.UnsentMessage = body.Length > 2000 ? body[..2000] : body;
+            return View("Conversa", await BuildConversationAsync(ad, owner, me, other, ct));
         }
         _db.Mensagens.Add(new Mensagem
         {

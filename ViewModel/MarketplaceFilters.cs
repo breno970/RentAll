@@ -3,7 +3,7 @@ namespace aluguel.ViewModel;
 /// <summary>Filtros da vitrine RentAll. Todos são opcionais e preservados na paginação.</summary>
 public sealed class MarketplaceFilters
 {
-    public string Pais { get; set; } = "BR";
+    public string Pais { get; set; } = "PT";
     public string? SearchString { get; set; }
     public string? Estado { get; set; }
     /// <summary>Filtro da cidade; mantém o nome da query antiga para não quebrar URLs.</summary>
@@ -17,7 +17,7 @@ public sealed class MarketplaceFilters
 
     public void Normalize()
     {
-        Pais = Pais?.ToUpperInvariant() == "PT" ? "PT" : "BR";
+        Pais = Pais?.Trim().ToUpperInvariant() == "BR" ? "BR" : "PT";
         SearchString = NormalizeText(SearchString);
         Estado = NormalizeText(Estado);
         if (Pais == "BR") Estado = Estado?.ToUpperInvariant();
