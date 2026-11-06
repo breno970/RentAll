@@ -43,3 +43,27 @@ body.rentall-app .eyebrow{letter-spacing:.035em;text-transform:none;font-size:.7
 .ra-legal-page .panel{box-shadow:none}
 .ra-demo-panel h1{font-size:clamp(1.65rem,3vw,2.25rem);margin-bottom:12px}
 .ra-demo-panel .muted{color:#57685c}
+
+/* Accessible native-glyph fallbacks: the essential UI works with optional icon kit rejected. */
+html[data-external-resources="off"] i[class*="fa-"]{font-family:system-ui,Arial,sans-serif!important;font-weight:500;font-style:normal!important}
+html[data-external-resources="off"] i[class*="fa-"]::before{content:"";font-family:system-ui,Arial,sans-serif}
+html[data-external-resources="off"] i.fa-heart::before{content:"♡"}
+html[data-external-resources="off"] .active i.fa-heart::before{content:"♥"}
+html[data-external-resources="off"] i.fa-search::before{content:"⌕"}
+html[data-external-resources="off"] i.fa-chevron-right::before{content:"›"}
+html[data-external-resources="off"] i.fa-chevron-left::before{content:"‹"}
+html[data-external-resources="off"] i.fa-arrow-right::before{content:"→"}
+html[data-external-resources="off"] i.fa-arrow-left::before{content:"←"}
+html[data-external-resources="off"] i.fa-plus::before{content:"+"}
+html[data-external-resources="off"] i.fa-times::before{content:"×"}
+html[data-external-resources="off"] i.fa-check::before{content:"✓"}
+html[data-external-resources="off"] i.fa-check-circle::before{content:"✓"}
+html[data-external-resources="off"] i.fa-info-circle::before{content:"ⓘ"}
+html[data-external-resources="off"] i.fa-exclamation-circle::before{content:"!"}
+html[data-external-resources="off"] i.fa-comments::before{content:"▤"}
+html[data-external-resources="off"] i.fa-calendar-check::before{content:"✓"}
+html[data-external-resources="off"] i.fa-eye::before{content:"◉"}
+html[data-external-resources="off"] i.fa-eye-slash::before{content:"◌"}
+html[data-external-resources="off"] i.fa-map-marker-alt::before{content:"⌖"}
+html[data-external-resources="off"] i.fa-shield-alt::before{content:"◇"}
+html[data-external-resources="off"] i.fa-paper-plane::before{content:"→"}
