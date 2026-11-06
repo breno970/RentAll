@@ -1,23 +1,34 @@
 @{ ViewData["Title"] = "Privacidade e proteção de dados"; }
-<div class="page-width" style="max-width:880px;padding-top:42px;padding-bottom:75px">
-    <p class="eyebrow">RentAll · Transparência</p>
-    <h1>Privacidade e proteção de dados</h1>
-    <p class="muted">Informação preliminar sobre como a plataforma trata os teus dados. Este documento não substitui a política de privacidade e os termos jurídicos finais, que precisam de ser aprovados pelo responsável pelo tratamento antes de operações comerciais.</p>
-    <section class="panel">
-        <h2>O que recolhemos</h2>
-        <p>Para criar uma conta, são necessários os dados de registo fornecidos pelo utilizador e as informações técnicas estritamente necessárias para autenticação e segurança. Para publicar um artigo, recolhemos nome, descrição, fotografias, categoria, cidade e região. O preço, o período e o nome público são opcionais.</p>
-        <h2>Localização aproximada e serviços externos</h2>
-        <p>A deteção de zona é opcional e só ocorre após clicares no botão de localização e concederes autorização ao navegador. Usamos o serviço gratuito BigDataCloud para converter as coordenadas atuais em país, região e cidade. Nesse pedido, o fornecedor recebe as coordenadas do dispositivo e o endereço IP, podendo utilizá-los para melhorar a precisão da sua geolocalização, segundo a sua política de privacidade. A RentAll não guarda as coordenadas no anúncio e só publica a cidade e a região. Podes sempre escolher a localização manualmente, sem usar a deteção automática. A opção separada de abrir o mapa Google pode enviar dados técnicos ao Google se a selecionares.</p>
-        <h2>Fotografias</h2>
-        <p>A aplicação tenta eliminar os metadados das fotografias no navegador antes do envio, incluindo possíveis coordenadas GPS. Evita fotografias com documentos, números de matrícula, pessoas sem autorização ou elementos que revelem a morada. Fotografias públicas são disponibilizadas pelo serviço Supabase Storage.</p>
-        <h2>Perfis e anúncios públicos</h2>
-        <p>O perfil público mostra o nome escolhido, os anúncios ativos e a antiguidade da conta quando existe um registo fiável. Nunca apresentamos publicamente correio eletrónico, telefone ou morada guardados na conta. Anúncios históricos podem conter dados antigos: estamos a reduzir essa recolha nos novos formulários.</p>
-        <h2>Mensagens</h2>
-        <p>As mensagens ficam guardadas na plataforma e são acessíveis apenas aos participantes através da aplicação, sujeitas a limites para prevenir abuso. Não partilhes contactos ou documentos pessoais. Não existem neste momento pagamentos ou proteção financeira integrada na RentAll.</p>
-        <h2>Finalidade, direitos e contacto</h2>
-        <p>Os dados são tratados para permitir contas, anúncios, comunicação e segurança. Dependendo da tua residência e das operações realizadas, aplicam-se o RGPD na União Europeia e a LGPD no Brasil. Podes solicitar acesso, correção, eliminação, portabilidade ou esclarecimentos sobre os teus dados através de <a href="mailto:rent.all.bn@gmail.com">rent.all.bn@gmail.com</a>. Algumas informações podem ter de ser conservadas por obrigação legal.</p>
-        <h2>O que ainda falta formalizar</h2>
-        <p>Antes do lançamento comercial, é necessário identificar formalmente o responsável pelo tratamento, definir bases legais e prazos de conservação, documentar os fornecedores e transferências internacionais, criar procedimentos de incidentes e garantir meios eficazes para os pedidos dos titulares. Esta página não constitui uma declaração de conformidade integral.</p>
-        <p class="muted">Referências: <a href="https://eur-lex.europa.eu/eli/reg/2016/679/pt" target="_blank" rel="noopener noreferrer">RGPD</a> e <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares" target="_blank" rel="noopener noreferrer">ANPD — direitos dos titulares</a>.</p>
-    </section>
+<div class="page-width">
+ <article class="ra-legal-page">
+  <header><h1>Privacidade e proteção de dados</h1><p>Informação sobre o tratamento de dados pessoais na RentAll.</p></header>
+  <div class="panel">
+   <h2>1. Responsável pelo tratamento e contacto</h2>
+   <p>A RentAll é uma plataforma de intermediação de anúncios de aluguer de artigos entre utilizadores. Para questões relacionadas com dados pessoais ou exercício de direitos, contacta <a href="mailto:rent.all.bn@gmail.com">rent.all.bn@gmail.com</a>.</p>
+   <p class="ra-legal-note"><strong>Identificação legal por completar:</strong> o nome legal, a morada profissional e o NIF do responsável pelo tratamento ainda têm de ser confirmados e publicados. A presente política é uma descrição das funcionalidades verificadas, não uma declaração de conformidade integral com o RGPD.</p>
+   <h2>2. Dados tratados</h2>
+   <ul>
+    <li><strong>Conta:</strong> endereço de correio eletrónico, credenciais protegidas por mecanismos de autenticação e dados de perfil fornecidos pelo utilizador.</li>
+    <li><strong>Anúncios:</strong> nome e descrição do artigo, imagens, preço, duração, categoria e localização aproximada (cidade/região).</li>
+    <li><strong>Comunicações:</strong> mensagens entre participantes, pedidos de aluguer, estados e denúncias de anúncios.</li>
+    <li><strong>Segurança:</strong> registos técnicos de acesso, endereço IP e eventos necessários à prevenção de abuso e à manutenção da aplicação.</li>
+    <li><strong>Pagamentos:</strong> existem estruturas técnicas para testes Stripe, mas os pagamentos e as comissões reais estão desativados. Os dados completos de cartões não são recolhidos pela RentAll.</li>
+   </ul>
+   <h2>3. Finalidades e fundamentos</h2>
+   <p>As informações necessárias à conta, publicação e comunicação são utilizadas para prestar as funcionalidades solicitadas (execução de contrato ou diligências pré-contratuais, conforme aplicável). Medidas proporcionais de segurança e prevenção de fraude poderão basear-se em interesses legítimos sujeitos a ponderação. Obrigações fiscais ou legais, quando existam, baseiam-se no cumprimento da lei. Recursos opcionais que dependam de consentimento não devem ser ativados antes da autorização correspondente.</p>
+   <h2>4. Visibilidade e destinatários</h2>
+   <p>Os anúncios e os nomes públicos escolhidos podem ser consultados por visitantes; mensagens e pedidos estão reservados aos respetivos participantes autenticados. As denúncias são privadas e destinadas a moderação. O serviço utiliza fornecedores tecnológicos, incluindo Render para alojamento, Supabase para dados e imagens e, se configurado, serviços de mensagens transacionais. Os dados são partilhados apenas quando necessários à prestação do serviço e às respetivas condições contratuais.</p>
+   <h2>5. Serviços externos e localização</h2>
+   <p>A localização automática é opcional: quando solicitada e autorizada pelo navegador, o serviço BigDataCloud recebe coordenadas e dados técnicos como o endereço IP para devolver uma região aproximada. Não guardamos as coordenadas nos novos anúncios. O Google Maps só é solicitado quando o utilizador pede o mapa ou segue um link. Fontes Google e ícones Font Awesome dependem da escolha relativa a recursos visuais externos. Consulta a <a asp-controller="Cookies" asp-action="Index">política de cookies</a> para gerir essas preferências.</p>
+   <h2>6. Transferências internacionais</h2>
+   <p>Determinados prestadores externos podem tratar dados fora do Espaço Económico Europeu. Antes da exploração comercial devem ser confirmadas a localização efetiva do armazenamento, as garantias legais aplicáveis, os acordos com fornecedores e, quando necessárias, as cláusulas contratuais-tipo ou outros mecanismos válidos do RGPD. Não é possível assumir que todas as transferências estão verificadas apenas com base nesta página.</p>
+   <h2>7. Conservação</h2>
+   <p>Os dados podem ser conservados enquanto necessários à utilização da conta, à manutenção das conversas e pedidos, à prevenção de fraude ou ao cumprimento de obrigações legais. Os prazos de conservação e a eliminação automática de cada categoria ainda carecem de validação e implementação documentada. Os pedidos de apagamento estão sujeitos às exceções legais aplicáveis.</p>
+   <h2>8. Direitos dos titulares</h2>
+   <p>Podes solicitar acesso, retificação, apagamento, limitação, portabilidade ou oposição, e retirar consentimentos opcionais, quando aplicável. Escreve para <a href="mailto:rent.all.bn@gmail.com">rent.all.bn@gmail.com</a> indicando o pedido; poderão ser solicitados elementos proporcionais para confirmar a identidade. O RGPD prevê, em regra, resposta no prazo de um mês, com prorrogações legalmente justificadas.</p>
+   <p>Podes apresentar reclamação à <a href="https://www.cnpd.pt/" target="_blank" rel="noopener noreferrer">Comissão Nacional de Proteção de Dados (CNPD)</a>, sem prejuízo de outras vias de tutela.</p>
+   <h2>9. Segurança e alterações</h2>
+   <p>A plataforma utiliza autenticação, controlo de acessos e medidas técnicas de proteção. Não é possível garantir ausência absoluta de incidentes. Esta informação poderá ser revista conforme sejam alteradas as funcionalidades, os fornecedores ou o enquadramento jurídico. Consulta também os <a asp-controller="Termos" asp-action="Index">termos de utilização</a>.</p>
+  </div>
+ </article>
 </div>

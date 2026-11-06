@@ -17,14 +17,13 @@
     <meta name="description" content="RentAll: aluga artigos que já existem. Encontra equipamentos, ferramentas e objetos em desuso no Brasil e em Portugal." />
     <title>@(ViewData["Title"] ?? "Descobrir artigos") | RentAll</title>
     <link rel="icon" href="@Url.Content("~/imagens/ico.png")" type="image/png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    @* External font resources are loaded only after optional consent. *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/rentall-2026.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/marketplace-enhancements.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/rentall-editorial.css" asp-append-version="true" />
-    <script defer src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="~/css/legal-and-consent.css" asp-append-version="true" />
+    @* External icon kit is loaded after optional consent. *@
 </head>
 <body class="rentall-app">
     <a class="skip-link" href="#main-content">Ir para o conteúdo principal</a>
@@ -96,9 +95,12 @@
                     <a asp-area="" asp-controller="Home" asp-action="Privacy">Como funciona</a>
                     <a asp-area="" asp-controller="Termos" asp-action="Index">Termos de utilização</a>
                     <a asp-area="" asp-controller="Privacidade" asp-action="Index">Privacidade e dados pessoais</a>
+                    <a asp-area="" asp-controller="Cookies" asp-action="Index">Política de cookies</a>
+                    <button type="button" class="ra-footer-cookie-link" data-cookie-reopen>Preferências de cookies</button>
                     <a asp-area="" asp-controller="Favoritos" asp-action="Index">Favoritos</a>
                     <a asp-area="" asp-controller="Mensagens" asp-action="Index">Mensagens</a>
                     <a asp-area="" asp-controller="Pedidos" asp-action="Index">Pedidos de aluguer</a>
+                    <a asp-controller="Pagamentos" asp-action="Demonstracao">Exemplo de pagamento</a>
                 </div>
                 <div class="footer-links">
                     <h2>A minha conta</h2>
@@ -110,14 +112,38 @@
                 <div class="footer-contact">
                     <h2>Contactos</h2>
                     <a href="mailto:rent.all.bn@gmail.com"><i class="far fa-envelope" aria-hidden="true"></i> rent.all.bn@gmail.com</a>
-                    <a href="tel:+5524999656679"><i class="fas fa-phone-alt" aria-hidden="true"></i> +55 24 99965-6679</a>
-                    <a href="https://api.whatsapp.com/send?phone=5524999656679" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp" aria-hidden="true"></i> Falar pelo WhatsApp</a>
-                    <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Visconde de Mauá, RJ · Brasil</a>
+                    <a asp-controller="Privacidade" asp-action="Index">Exercer direitos sobre dados pessoais</a>
+                    <a asp-controller="Legal" asp-action="Index">Informação legal e reclamações</a>
                 </div>
             </div>
             <div class="footer-bottom page-width"><span>© @DateTime.UtcNow.Year RentAll. Todos os direitos reservados.</span><span>Aluga. Partilha. Reutiliza.</span></div>
         </footer>
     </div>
+    <section id="ra-cookie-consent" class="ra-cookie-consent" role="region" aria-label="Preferências de cookies" hidden>
+        <button type="button" data-cookie-close class="ra-cookie-dismiss" aria-label="Fechar aviso de cookies">×</button>
+        <h2>Privacidade e cookies</h2>
+        <p>A RentAll utiliza armazenamento e cookies necessários à autenticação, segurança e funcionamento do serviço. Fontes e ícones fornecidos por terceiros só são carregados se autorizares. Não usamos cookies de publicidade ou análise nesta versão.</p>
+        <div id="ra-cookie-preferences" class="ra-cookie-preferences" hidden>
+            <label class="ra-cookie-essential"><input type="checkbox" checked disabled />
+                <span>Estritamente necessários<small>Autenticação, prevenção de abuso, segurança e registo da escolha. Sempre ativos.</small></span>
+            </label>
+            <label><input id="ra-cookie-external" type="checkbox" />
+                <span>Recursos visuais externos<small>Permitir o carregamento opcional de fontes Google e ícones Font Awesome; podem existir comunicações técnicas com esses fornecedores.</small></span>
+            </label>
+        </div>
+        <div class="ra-cookie-actions">
+            <button type="button" class="btn btn-outline" data-cookie-reject>Rejeitar opcionais</button>
+            <button type="button" class="btn btn-outline" data-cookie-accept>Aceitar opcionais</button>
+            <button type="button" class="btn btn-outline" data-cookie-manage>Personalizar</button>
+            <button type="button" class="btn btn-primary" data-cookie-save hidden>Guardar preferências</button>
+        </div>
+        <div class="ra-cookie-references">
+            <a asp-controller="Cookies" asp-action="Index">Política de cookies</a>
+            <a asp-controller="Privacidade" asp-action="Index">Proteção de dados</a>
+        </div>
+        <span id="ra-cookie-status" role="status" class="visually-hidden"></span>
+    </section>
+    <script src="~/js/cookie-consent.js" asp-append-version="true" defer></script>
     <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     <script src="~/js/regions.js" asp-append-version="true" defer></script>

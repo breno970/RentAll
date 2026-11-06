@@ -1,6 +1,7 @@
 using aluguel.Areas.Identity.Data;
 using aluguel.Models;
 using aluguel.Services;
+using aluguel.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -33,6 +34,39 @@ public sealed class PagamentosController : Controller
             !string.IsNullOrEmpty(uri.Fragment) || !string.IsNullOrEmpty(uri.UserInfo))
             return null;
         return uri.GetLeftPart(UriPartial.Authority);
+    }
+
+    // Read-only visual tour. Never invokes the payment gateway or saves financial data.
+    [AllowAnonymous]
+    [HttpGet("Demonstracao")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> Demonstracao(int? pedidoId, CancellationToken ct)
+    {
+        if (!pedidoId.HasValue)
+            return View(new CartaoDemoViewModel());
+        if (User.Identity?.IsAuthenticated != true) return Challenge();
+
+        var me = Me;
+        var request = await db.PedidosAluguer.AsNoTracking()
+            .Where(p => p.Id == pedidoId.Value &&
+                (p.InteressadoId == me || p.AnuncianteId == me))
+            .FirstOrDefaultAsync(ct);
+        if (request == null) return NotFound();
+
+        var itemName = await db.Anuncios.AsNoTracking().Include(a => a.item)
+            .Where(a => a.id == request.AnuncioId)
+            .Select(a => a.item != null ? a.item.nmitem : a.modelo)
+            .FirstOrDefaultAsync(ct);
+
+        return View(new CartaoDemoViewModel
+        {
+            PedidoId = request.Id,
+            PedidoAssociado = true,
+            Artigo = itemName ?? "Aluguer de artigo",
+            Total = request.TotalEstimado,
+            Comissao = request.ComissaoIndicativa,
+            Pais = request.Pais
+        });
     }
 
     [HttpGet("Conta")]

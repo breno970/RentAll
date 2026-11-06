@@ -40,7 +40,6 @@ else
                 <div class="listing-body">
                     <span class="listing-kicker">@(ad.categoria?.nmcategoria ?? "Objeto para alugar")</span>
                     <h3><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@ad.id">@(ad.item?.nmitem ?? ad.modelo)</a></h3>
-                    @if (User.Identity?.IsAuthenticated != true) { <span class="ra-card-locked"><i class="fas fa-lock" aria-hidden="true"></i> Cria conta para ver todos os detalhes</span> }
                     <a class="listing-seller" asp-controller="Perfis" asp-action="Details" asp-route-id="@ad.iduser"><i class="far fa-user"></i> @(string.IsNullOrWhiteSpace(ad.NomeFantasia) ? "Anunciante" : ad.NomeFantasia)</a>
                     <p class="listing-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> @ad.Cidade, @ad.Estado · @aluguel.Services.LocationCatalog.CountryName(ad.Pais)</p>
                     <div class="listing-bottom">

@@ -42,7 +42,6 @@
             </div>
         </div>
         <aside class="panel">
-            <span class="pill"><i class="fas fa-leaf"></i> Aluguer de objeto em desuso</span>
             <h1 class="detail-name" style="margin:18px 0 6px">@(Model.item?.nmitem ?? Model.modelo)</h1>
             @if (!string.IsNullOrWhiteSpace(Model.modelo)) { <p class="muted">@Model.modelo</p> }
             <div class="detail-price">@aluguel.Services.RentalLocalization.FormatPrice(Model.vlitem, Model.Pais) @if (Model.vlitem > 0) { <small>/ dia</small> }</div>
