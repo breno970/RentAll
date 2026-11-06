@@ -91,7 +91,7 @@ public class AnunciosController : Controller
         ad.NomeFantasia = (ad.NomeFantasia ?? "").Trim();
 
         if (ad.Pais != "PT")
-            ModelState.AddModelError(nameof(ad.Pais), "Selecione Brasil ou Portugal.");
+            ModelState.AddModelError(nameof(ad.Pais), "Nesta fase, a RentAll aceita apenas anúncios de Portugal.");
         if (!LocationCatalog.IsValidRegion(ad.Pais, ad.Estado))
             ModelState.AddModelError(nameof(ad.Estado), "Selecione um estado ou distrito válido para o país.");
         bool validPostal = ad.Pais switch
