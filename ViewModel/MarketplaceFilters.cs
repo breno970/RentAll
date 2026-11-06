@@ -17,10 +17,10 @@ public sealed class MarketplaceFilters
 
     public void Normalize()
     {
-        Pais = Pais?.Trim().ToUpperInvariant() == "BR" ? "BR" : "PT";
+        // Portugal-only public marketplace. Old BR entries remain stored, never shown.
+        Pais = "PT";
         SearchString = NormalizeText(SearchString);
         Estado = NormalizeText(Estado);
-        if (Pais == "BR") Estado = Estado?.ToUpperInvariant();
         RegionFilter = NormalizeText(RegionFilter);
         Bairro = NormalizeText(Bairro);
         if (CategoriaId <= 0) CategoriaId = null;
