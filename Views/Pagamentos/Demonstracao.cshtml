@@ -7,11 +7,11 @@
 <div class="page-width ra-checkout-example" data-payment-example>
     <div class="ra-demo-head">
         <div><p class="eyebrow">RentAll · Processo de aluguer</p><h1>Como funciona o pagamento</h1>
-            <p>Uma demonstração de como será o checkout, a confirmação e a conclusão de um aluguer.</p>
+            <p>Confirma o pedido, escolhe um método de pagamento e vê as etapas seguintes.</p>
         </div>
         <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Voltar aos pedidos</a>
     </div>
-    <div class="ra-demo-warning" role="note"><strong>Ambiente de demonstração.</strong> Não há pagamentos, reservas, autorizações ou transferências reais. Não introduzas dados bancários.</div>
+    <div class="ra-demo-warning" role="note"><strong>Pré-visualização do pagamento.</strong> Esta experiência é simulada: não cobra, não reserva artigos e não recolhe dados bancários.</div>
     <ol class="ra-demo-steps" aria-label="Etapas do pagamento">
         <li data-demo-step="0" aria-current="step">1. Pedido</li>
         <li data-demo-step="1">2. Método</li>
@@ -103,7 +103,7 @@
         <aside class="ra-demo-box ra-demo-sidebar" aria-label="Resumo financeiro de exemplo">
             <h2>Resumo do aluguer</h2>
             <strong class="ra-demo-item">@Model.Artigo</strong>
-            <p>Exemplo informativo, sem processamento de impostos ou pagamentos.</p>
+            <p>Valores de referência, sem cobrança ou cálculo de impostos.</p>
             <dl class="ra-demo-order">
                 <div><dt>Aluguer</dt><dd>@money(Model.Total)</dd></div>
                 <div><dt>Comissão futura RentAll (10%)</dt><dd>@money(Model.Comissao)</dd></div>

@@ -36,7 +36,7 @@
                 <nav id="main-navigation" class="site-nav" aria-label="Navegação principal">
                     <a class="nav-link @(currentPath.StartsWith("/Home") || currentPath == "/" ? "is-current" : "")"
                         asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-compass" aria-hidden="true"></i> Explorar</a>
-                    <a class="nav-link" asp-controller="Experiencia" asp-action="Index"><i class="fas fa-shield-alt" aria-hidden="true"></i> Como funciona</a>
+                    <a class="nav-link" asp-controller="Experiencia" asp-action="ComoFunciona"><i class="fas fa-shield-alt" aria-hidden="true"></i> Como funciona</a>
                     <a class="nav-link ra-mobile-publish" asp-area="" asp-controller="Publicar" asp-action="Index"><i class="fas fa-plus" aria-hidden="true"></i> Publicar artigo</a>
                     @if (signedIn)
                     {
@@ -92,7 +92,7 @@
                 <div class="footer-links">
                     <h2>Explorar</h2>
                     <a asp-area="" asp-controller="Home" asp-action="Index">Todos os artigos</a>
-                    <a asp-controller="Experiencia" asp-action="Index">Como funciona e segurança</a>
+                    <a asp-controller="Experiencia" asp-action="ComoFunciona">Como funciona e segurança</a>
                     <a asp-controller="Planos" asp-action="Index">Preços e serviços</a>
                     <a asp-area="" asp-controller="Termos" asp-action="Index">Termos de utilização</a>
                     <a asp-area="" asp-controller="Privacidade" asp-action="Index">Privacidade e dados pessoais</a>
@@ -101,8 +101,8 @@
                     <a asp-area="" asp-controller="Favoritos" asp-action="Index">Favoritos</a>
                     <a asp-area="" asp-controller="Mensagens" asp-action="Index">Mensagens</a>
                     <a asp-area="" asp-controller="Pedidos" asp-action="Index">Pedidos de aluguer</a>
-                    <a asp-controller="Pagamentos" asp-action="Demonstracao">Exemplo de pagamento</a>
-                    <a asp-controller="Experiencia" asp-action="Index">Protótipo de segurança</a>
+                    <a asp-controller="Pagamentos" asp-action="Demonstracao">Como funciona o pagamento</a>
+                    <a asp-controller="Experiencia" asp-action="ComoFunciona">Entrega, devolução e segurança</a>
                 </div>
                 <div class="footer-links">
                     <h2>A minha conta</h2>

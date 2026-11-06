@@ -20,6 +20,8 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Validate Razor page structure
         run: python3 scripts/check_ui.py
+      - name: Validate customer-facing product copy and financial disclosures
+        run: python3 scripts/check_product_copy.py
       - name: Validate frontend JavaScript
         run: |
           for file in wwwroot/js/rentall-ui.js wwwroot/js/regions.js wwwroot/js/cep.js wwwroot/js/google-maps.js wwwroot/js/photo-carousel.js wwwroot/js/publish-experience.js wwwroot/js/maps-loader.js wwwroot/js/marketplace-enhancements.js wwwroot/js/in-platform-journey.js wwwroot/js/publish-earnings.js wwwroot/js/rental-confidence.js wwwroot/js/cookie-consent.js wwwroot/js/payment-demo.js wwwroot/js/rental-prototype.js; do
