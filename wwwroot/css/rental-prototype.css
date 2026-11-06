@@ -96,3 +96,19 @@
 @media(max-width:730px){.ra-proto-hero{grid-template-columns:1fr;padding:26px}.ra-proto-snapshot{max-width:550px}.ra-proto-intro,.ra-proto-section-heading{align-items:flex-start;flex-direction:column}.ra-proto-workflow-layout{grid-template-columns:1fr}.ra-proto-step-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.ra-proto-step-list button{grid-template-columns:1fr;min-height:77px;gap:3px;padding:9px}.ra-proto-step-list button span{grid-row:auto;width:24px;height:24px}.ra-proto-step-list button small{display:none}.ra-proto-stage{min-height:0}.ra-proto-business{grid-template-columns:1fr}.ra-proto-teaser{flex-direction:column;align-items:flex-start}}
 @media(max-width:490px){.ra-proto-principles{grid-template-columns:1fr}.ra-proto-snapshot{padding:18px}.ra-proto-form{grid-template-columns:1fr}.ra-proto-inline-summary{grid-template-columns:1fr}.ra-proto-stage{padding:18px}.ra-proto-step-list{grid-template-columns:repeat(3,minmax(0,1fr))}.ra-proto-step-list button strong{font-size:.72rem}.ra-proto-stage-content>.btn{width:100%}.ra-proto-ledger>div{flex-direction:column;gap:4px}}
 @media(prefers-reduced-motion:reduce){.ra-proto-step-list button{transition:none}}
+
+/* Customer-facing product refinements: keep operational tools prominent and
+   financial or identity simulations clearly separated from live transactions. */
+.ra-proto-disclaimer{border:1px solid #dce7dd;border-left:3px solid #81a88c;background:#f7faf7;color:#455b4a;padding:12px 17px;margin:0 0 8px}
+.ra-proto-simulation-note{color:#485d4f;background:#f8faf8;border:1px solid #dce6de;border-radius:8px;padding:13px 17px;font-size:.84rem;line-height:1.65;margin:0 0 16px}
+.ra-proto-simulation-note strong{color:#294f36}
+.ra-proto-principles{margin-bottom:8px}
+.ra-proto-principles article{display:flex;flex-direction:column}
+.ra-proto-principles article p{flex:1}
+.ra-proto-principles article small{font-weight:600;line-height:1.5;color:#4d7555}
+.ra-proto-business .ra-proto-textlink{display:inline-block;margin-top:16px}
+.ra-proto-snapshot{border:1px solid #e4ebe4}
+.ra-proto-hero .ra-proto-actions a:focus-visible,.ra-proto-stage button:focus-visible,.ra-proto-step-list button:focus-visible{outline:3px solid #dfbc58;outline-offset:3px}
+.ra-proto-teaser{box-shadow:none}
+.ra-proto-teaser .ra-proto-kicker{margin-bottom:5px}
+@media(max-width:760px){.ra-proto-business .ra-proto-business-values strong{font-size:1.14rem}.ra-proto-simulation-note{padding:12px 13px}.ra-proto-disclaimer{padding:12px 13px}}
