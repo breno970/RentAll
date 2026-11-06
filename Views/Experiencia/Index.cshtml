@@ -1,53 +1,53 @@
 @{
-    ViewData["Title"] = "Como vai funcionar um aluguer seguro";
+    ViewData["Title"] = "Como funciona a RentAll";
 }
 <link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
 <div class="page-width ra-proto" data-rental-prototype>
     <header class="ra-proto-hero">
         <div class="ra-proto-hero-copy">
             <span class="ra-proto-kicker">RentAll · Portugal</span>
-            <h1>Alugueres com regras claras, do pedido à devolução.</h1>
-            <p>Conhece o futuro percurso para reduzir fraudes, danos e conflitos entre quem aluga e quem disponibiliza artigos.</p>
+            <h1>Aluga com confiança. Tudo começa com um bom acordo.</h1>
+            <p>Descobre artigos em Portugal, fala com quem os anuncia e organiza os pedidos sem sair da RentAll.</p>
             <div class="ra-proto-actions">
-                <a class="btn btn-primary" href="#simulador">Experimentar o protótipo</a>
-                <a class="btn btn-outline" asp-controller="Home" asp-action="Index">Explorar artigos</a>
+                <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Encontrar artigos</a>
+                <a class="btn btn-outline" href="#simulador">Conhecer todas as etapas</a>
             </div>
         </div>
-        <div class="ra-proto-snapshot" aria-label="Percurso ilustrativo do aluguer">
-            <p class="ra-proto-kicker">Percurso previsto</p>
-            <div><span>01</span><strong>Identificar e acordar</strong><small>Quem participa, o quê e por quanto tempo</small></div>
-            <div><span>02</span><strong>Reservar e documentar</strong><small>Pagamento futuro e registo de entrega</small></div>
-            <div><span>03</span><strong>Devolver e concluir</strong><small>Inspeção e resolução de divergências</small></div>
+        <div class="ra-proto-snapshot" aria-label="Como utilizar a RentAll">
+            <p class="ra-proto-kicker">Já podes começar</p>
+            <div><span>01</span><strong>Descobrir artigos</strong><small>Pesquisa por categoria, distrito e preço</small></div>
+            <div><span>02</span><strong>Conversar na RentAll</strong><small>Esclarece dúvidas sem trocar contactos</small></div>
+            <div><span>03</span><strong>Gerir o pedido</strong><small>Negocia preço e duração e acompanha a resposta</small></div>
         </div>
     </header>
 
     <div class="ra-proto-disclaimer" role="note">
-        <strong>Protótipo interativo, sem proteção financeira ativa.</strong>
-        As verificações de identidade, cauções, retenções, fotografias de entrega, assinaturas, seguro, decisões sobre incidentes e pagamentos apresentados abaixo são exemplos de funcionalidades futuras. Nenhuma ação nesta página grava dados, recolhe documentos, cobra dinheiro ou confirma um aluguer.
+        <strong>Sobre os serviços apresentados nesta página.</strong>
+        A pesquisa, as mensagens e os pedidos estão disponíveis. A verificação de identidade, o pagamento, a caução, os registos de entrega e a resolução de incidentes são processos em preparação, apresentados de forma interativa. Não há cobrança, retenção de caução ou seguro ativo.
     </div>
 
     <section class="ra-proto-intro" aria-labelledby="prot-why">
         <div>
-            <p class="ra-proto-kicker">Segurança desenhada desde o início</p>
-            <h2 id="prot-why">Reduzir riscos sem prometer risco zero.</h2>
-            <p>Um anúncio ou uma caução isolada não impede furtos. O modelo combina identidade, condições registadas, prova de estado, verificações na entrega e um processo de resolução com intervenção humana.</p>
+            <p class="ra-proto-kicker">Boas práticas para alugar</p>
+            <h2 id="prot-why">O que deves confirmar antes de entregar um artigo.</h2>
+            <p>Conversa pela plataforma, acorda as condições por escrito, encontra-te num local seguro e verifica o estado do artigo. Estamos a preparar ferramentas adicionais para apoiar estes cuidados.</p>
         </div>
         <a asp-controller="Termos" asp-action="Index" class="ra-proto-textlink">Consultar regras e direitos</a>
     </section>
     <div class="ra-proto-principles">
-        <article><span>01 · Prevenção</span><h3>Quem entrega e quem recebe</h3><p>Verificação de identidade por um prestador especializado antes de operações elegíveis, sem expor documentos no chat.</p><small>Planeado, não ativo</small></article>
-        <article><span>02 · Prova</span><h3>Estado do artigo</h3><p>Condições acordadas, acessórios e fotografias datadas na entrega e na devolução, confirmadas por ambas as partes.</p><small>Planeado, não ativo</small></article>
-        <article><span>03 · Pagamento</span><h3>Valores transparentes</h3><p>Preço, comissão, eventual caução separada e regras de cancelamento visíveis antes da confirmação.</p><small>Checkout demonstrativo</small></article>
-        <article><span>04 · Resolução</span><h3>Problemas documentados</h3><p>Prazo para comunicar danos, conservação de provas e análise humana antes de qualquer decisão sobre a caução.</p><small>Planeado, não ativo</small></article>
+        <article><span>01 · Prevenção</span><h3>Quem entrega e quem recebe</h3><p>Verificação de identidade por um prestador especializado antes de operações elegíveis, sem expor documentos no chat.</p><small>Em preparação</small></article>
+        <article><span>02 · Prova</span><h3>Estado do artigo</h3><p>Condições acordadas, acessórios e fotografias datadas na entrega e na devolução, confirmadas por ambas as partes.</p><small>Em preparação</small></article>
+        <article><span>03 · Pagamento</span><h3>Valores transparentes</h3><p>Preço, comissão, eventual caução separada e regras de cancelamento visíveis antes da confirmação.</p><small>Pagamento em demonstração</small></article>
+        <article><span>04 · Resolução</span><h3>Problemas documentados</h3><p>Prazo para comunicar danos, conservação de provas e análise humana antes de qualquer decisão sobre a caução.</p><small>Em preparação</small></article>
     </div>
 
     <section id="simulador" class="ra-proto-workflow" aria-labelledby="sim-heading">
         <div class="ra-proto-section-heading">
-            <div><p class="ra-proto-kicker">Demonstração</p><h2 id="sim-heading">Experimenta um aluguer completo</h2><p>Altera os valores e avança pelas etapas. A demonstração funciona apenas neste navegador, sem guardar as escolhas.</p></div>
+            <div><p class="ra-proto-kicker">Guia interativo</p><h2 id="sim-heading">Do acordo à devolução</h2><p>Percorre as etapas, ajusta os valores e descobre como será a experiência completa de aluguer.</p></div>
             <button type="button" class="ra-proto-reset" data-proto-reset>Recomeçar</button>
         </div>
         <div class="ra-proto-workflow-layout">
-            <nav class="ra-proto-step-list" aria-label="Etapas do protótipo" data-proto-tabs>
+            <nav class="ra-proto-step-list" aria-label="Etapas do percurso demonstrativo" data-proto-tabs>
                 <button type="button" data-proto-tab="0" aria-current="step"><span>01</span><strong>Verificação</strong><small>Antes do pedido</small></button>
                 <button type="button" data-proto-tab="1"><span>02</span><strong>Condições</strong><small>Preço e duração</small></button>
                 <button type="button" data-proto-tab="2"><span>03</span><strong>Pagamento</strong><small>Resumo e caução</small></button>
@@ -110,7 +110,7 @@
                         <div><span>Comissão RentAll incluída no aluguer</span><strong data-proto-fee>5,40 €</strong></div>
                     </div>
                     <p class="ra-proto-deposit">A caução seria uma garantia separada, com limites e condições comunicados antecipadamente. <strong>Não pode ser retida automaticamente por uma denúncia.</strong> A disponibilidade de pré-autorização depende do prestador, do método e dos prazos de captura.</p>
-                    <a class="ra-proto-textlink" asp-controller="Pagamentos" asp-action="Demonstracao">Ver também o checkout fictício com cartão</a>
+                    <a class="ra-proto-textlink" asp-controller="Pagamentos" asp-action="Demonstracao">Ver a demonstração de pagamento com cartão</a>
                     <button class="btn btn-primary" type="button" data-proto-next>Simular confirmação e entrega</button>
                 </section>
 
@@ -168,22 +168,24 @@
                 </section>
             </div>
         </div>
-        <p class="ra-proto-memory">Tudo o que experimentas aqui é temporário e desaparece ao sair da página. Os pedidos reais da RentAll continuam no painel habitual, sem estes mecanismos automatizados.</p>
+        <p class="ra-proto-memory">Esta experiência é ilustrativa: não altera pedidos nem guarda os dados introduzidos. Para os teus pedidos, utiliza a <a asp-controller="Pedidos" asp-action="Index">área de alugueres</a>.</p>
     </section>
 
     <section class="ra-proto-business" aria-labelledby="business-heading">
-        <div><p class="ra-proto-kicker">Modelo de negócio</p><h2 id="business-heading">Receita quando o aluguer acontece na plataforma.</h2><p>Publicação gratuita para atrair anúncios; receita sobre pagamentos confirmados e, mais tarde, serviços opcionais para anunciantes. Quanto mais valor o percurso oferecer, menos motivos existem para negociar fora.</p></div>
+        <div>
+            <p class="ra-proto-kicker">Preços e condições</p>
+            <h2 id="business-heading">Publicar é gratuito. Os valores são sempre claros.</h2>
+            <p>Podes publicar artigos, enviar mensagens e negociar pedidos sem pagar. A comissão prevista para futuros alugueres pagos é de 10%, incluída no preço indicado, e só será aplicada quando os pagamentos estiverem disponíveis.</p>
+            <a class="ra-proto-textlink" asp-controller="Planos" asp-action="Index">Consultar preços e serviços</a>
+        </div>
         <div class="ra-proto-business-card">
-            <label>Alugueres pagos num mês (simulação)
-                <input type="range" min="0" max="200" step="5" value="40" data-proto-volume />
-            </label>
+            <span class="ra-proto-kicker">Exemplo de cálculo</span>
             <div class="ra-proto-business-values">
-                <div><small>Transações ilustrativas</small><strong data-proto-count>40</strong></div>
-                <div><small>Valor médio do aluguer</small><strong>45 €</strong></div>
-                <div><small>Comissão bruta mensal (10%)</small><strong data-proto-revenue>180,00 €</strong></div>
+                <div><small>Preço do aluguer</small><strong>100,00 €</strong></div>
+                <div><small>Comissão prevista (10%)</small><strong>10,00 €</strong></div>
+                <div><small>Valor ilustrativo para o anunciante</small><strong>90,00 €</strong></div>
             </div>
-            <small>Simulação, não previsão. Não considera impostos, taxas Stripe, reembolsos, disputas nem despesas da RentAll. Nenhuma comissão é cobrada atualmente.</small>
-            <a asp-controller="Planos" asp-action="Index" class="ra-proto-textlink">Ver a proposta de preços e serviços</a>
+            <small>Exemplo informativo. Não são cobradas comissões nesta fase. Impostos e custos do prestador de pagamentos serão apresentados quando aplicáveis.</small>
         </div>
     </section>
 </div>
