@@ -42,3 +42,14 @@
 .ra-plan-card ul{padding-left:18px}
 .ra-plan-status{font-size:.76rem;font-weight:750;color:#4d6555;letter-spacing:.02em}
 @media(max-width:850px){.ra-plan-grid{grid-template-columns:1fr}}
+
+.ra-counteroffer-details,.ra-counteroffer-active{background:#f8faf8;border:1px solid #d5e0d7;border-radius:9px;padding:15px;margin:13px 0}
+.ra-counteroffer-details summary{cursor:pointer;font-size:.87rem;font-weight:750;color:#285e43}
+.ra-counteroffer-form{display:flex;align-items:flex-end;flex-wrap:wrap;gap:10px;margin:14px 0 8px}
+.ra-counteroffer-form label{display:grid;gap:5px;font-size:.8rem;font-weight:650;min-width:112px;flex:1}
+.ra-counteroffer-form input{min-height:42px}
+.ra-counteroffer-form button{min-height:42px}
+.ra-counteroffer-help,.ra-counteroffer-active p{color:#53695b;line-height:1.55;font-size:.82rem;margin:7px 0}
+.ra-counteroffer-active strong{font-size:.88rem}
+.ra-counteroffer-active .ra-request-actions{margin-top:12px}
+@media(max-width:620px){.ra-counteroffer-form{display:grid;grid-template-columns:1fr 1fr}.ra-counteroffer-form button{grid-column:1/-1;width:100%}.ra-counteroffer-active .ra-request-actions{flex-direction:column;align-items:stretch}.ra-counteroffer-active .ra-request-actions .btn{width:100%}}
