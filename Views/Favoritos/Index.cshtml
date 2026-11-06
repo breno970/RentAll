@@ -1,0 +1,9 @@
+@model IEnumerable<aluguel.Models.Anuncio>
+@{ ViewData["Title"] = "Favoritos"; }
+<div class="page-width">
+    <div class="page-intro">
+        <div><p class="eyebrow">A minha seleção</p><h1>Artigos favoritos</h1><p>Guarda o que gostas para voltares a consultar mais tarde.</p></div>
+        <a class="btn btn-outline" asp-controller="Home" asp-action="Index"><i class="fas fa-search"></i> Explorar</a>
+    </div>
+    <partial name="_MarketplaceCards" model="Model" />
+</div>

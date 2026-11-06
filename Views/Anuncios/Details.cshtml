@@ -1,241 +1,184 @@
-﻿@model aluguel.Models.Anuncio
-
+@model aluguel.Models.Anuncio
 @{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.item?.nmitem ?? Model.modelo;
+    var photos = new[] { Model.item?.imagem1, Model.item?.imagem2, Model.item?.imagem3, Model.item?.imagem4, Model.item?.imagem5 }.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+    var place = string.Join(", ", new[] { Model.Cidade, Model.Estado, aluguel.Services.LocationCatalog.CountryName(Model.Pais) });
+    var mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + Uri.EscapeDataString(place);
+    var isSaved = ViewData["IsFavorite"] is bool value && value;
+}
+<link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-dashboard.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
+<div class="page-width ra-detail-with-mobile-bar">
+    <div class="page-intro">
+        <div><p class="eyebrow"><a asp-controller="Home" asp-action="Index" asp-route-Pais="@Model.Pais">Explorar</a> / Detalhes do anúncio</p><h1>@(Model.item?.nmitem ?? Model.modelo)</h1><p><i class="fas fa-map-marker-alt"></i> @place</p></div>
+        <a class="btn btn-outline" asp-controller="Home" asp-action="Index" asp-route-Pais="@Model.Pais"><i class="fas fa-arrow-left"></i> Voltar à pesquisa</a>
+    </div>
+    <div class="detail-layout">
+        <div>
+            <div class="panel">
+                @if (photos.Length > 0)
+                {
+                    <div class="ra-photo-view" data-photo-carousel-view>
+                        @foreach (var photo in photos)
+                        {
+                            <span data-view-photo="@Url.Content("~/imagens/" + photo)" hidden></span>
+                        }
+                        <div class="ra-photo-stage">
+                            <button type="button" data-view-prev aria-label="Fotografia anterior"><i class="fas fa-chevron-left"></i></button>
+                            <div class="ra-photo-frame">
+                                <img class="detail-main-image" data-view-main alt="Fotografia de @(Model.item?.nmitem ?? Model.modelo)" />
+                                <p data-view-counter aria-live="polite"></p>
+                            </div>
+                            <button type="button" data-view-next aria-label="Próxima fotografia"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                }
+                else { <div class="detail-main-image image-empty"><i class="far fa-image"></i></div> }
+            </div>
+            <div class="panel" style="margin-top:18px">
+                <h2>Sobre este artigo</h2>
+                <p class="detail-description">@(Model.item?.dsitem ?? "Não existe uma descrição adicional.")</p>
+            </div>
+        </div>
+        <aside class="panel">
+            <h1 class="detail-name" style="margin:18px 0 6px">@(Model.item?.nmitem ?? Model.modelo)</h1>
+            @if (!string.IsNullOrWhiteSpace(Model.modelo)) { <p class="muted">@Model.modelo</p> }
+            <div class="detail-price">@aluguel.Services.RentalLocalization.FormatPrice(Model.vlitem, Model.Pais) @if (Model.vlitem > 0) { <small>/ dia</small> }</div>
+            <div class="detail-facts">
+                <div><small>Período</small><strong>@(Model.diasAluguel > 0 ? $"Até {Model.diasAluguel} dia(s)" : "A combinar")</strong></div>
+                <div><small>Categoria</small><strong>@(Model.categoria?.nmcategoria ?? "Outros")</strong></div>
+                <div><small>Tipo</small><strong>@(Model.tipo?.nmtipo ?? "Outros")</strong></div>
+                <div><small>Localização</small><strong>@Model.Cidade, @Model.Estado</strong></div>
+            </div>
+            @if (User.Identity?.IsAuthenticated == true &&
+                 User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser &&
+                 Model.vlitem > 0 && Model.item?.snativo != "N")
+            {
+                <div class="ra-request-widget" id="rental-request" style="scroll-margin-top:100px">
+                    <h3><i class="far fa-calendar-check" aria-hidden="true"></i> Pedir aluguer</h3>
+                    <p>Envia um pedido ao anunciante para confirmar a disponibilidade. Não é uma reserva paga.</p>
+                    <form asp-controller="Pedidos" asp-action="Criar" method="post">
+                        <input type="hidden" name="anuncioId" value="@Model.id"/>
+                        <label for="rental-days">Número de dias
+                            <input id="rental-days" type="number" name="dias" class="form-control" min="1" max="@(Model.diasAluguel > 0 ? Model.diasAluguel : 365)" value="1" required data-rental-days/>
+                        </label>
+                        <button class="btn btn-primary" type="submit">Enviar pedido</button>
+                    </form>
+                    <div class="ra-money-calc" data-rental-calculator data-daily-price="@Model.vlitem.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-country="@Model.Pais" aria-live="polite">Valor estimado a partir do preço indicado no anúncio.</div>
+                    <p>Nenhum pagamento é realizado agora. A comissão ilustrativa de 10% é apenas uma proposta para uma futura modalidade de pagamento na RentAll.</p>
+                </div>
+            }
+            else if (User.Identity?.IsAuthenticated == true &&
+                     User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == Model.iduser)
+            {
+                <div class="ra-rental-motivation">
+                    <strong><i class="far fa-calendar-check"></i> Organiza os teus alugueres</strong>
+                    <p>Responde aos pedidos e mantém um histórico das negociações sem divulgar o teu telefone.</p>
+                    <a asp-controller="Pedidos" asp-action="Index" class="btn btn-outline" style="margin-top:10px">Consultar pedidos</a>
+                </div>
+            }
+            <div class="ra-proto-detail-note">
+                <strong>Entrega e devolução: o que deves saber</strong>
+                <p>Confirma o estado do artigo, os acessórios e as condições antes da entrega. Conhece também as funcionalidades de verificação e caução que estamos a preparar.</p>
+                <a asp-controller="Experiencia" asp-action="ComoFunciona" class="ra-proto-textlink">Como funciona o aluguer</a>
+            </div>
+            <div class="ra-rental-safety">
+                <h3><i class="fas fa-shield-alt" aria-hidden="true"></i> Aluguer com mais confiança</h3>
+                <ul>
+                    <li>Combina uma entrega em local público e verifica a identidade do artigo presencialmente.</li>
+                    <li>Guarda fotografias do estado do objeto antes e depois do aluguer.</li>
+                    <li>Não entregues códigos, documentos, dados bancários ou depósitos a desconhecidos.</li>
+                    <li>Conserva o histórico do pedido e da conversa na RentAll.</li>
+                </ul>
+                <p class="muted" style="font-size:.8rem;margin-top:12px">A RentAll ainda não oferece pagamento protegido, seguro ou garantias financeiras.</p>
+            </div>
+            <div class="contact-box">
+                <h2 style="font-size:1rem">Falar com o anunciante</h2>
+                <p class="muted" style="font-size:.88rem">Publicado por <strong>@(string.IsNullOrWhiteSpace(Model.NomeFantasia) ? "Anunciante RentAll" : Model.NomeFantasia)</strong></p>
+                <a asp-controller="Perfis" asp-action="Details" asp-route-id="@Model.iduser" class="btn btn-outline"><i class="far fa-user"></i> Ver perfil e outros anúncios</a>
+                @if (User.Identity?.IsAuthenticated == true && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser)
+                {
+                    <a asp-controller="Mensagens" asp-action="Conversa" asp-route-anuncioId="@Model.id" class="btn btn-primary" style="margin-top:12px"><i class="far fa-comments"></i> Enviar mensagem na RentAll</a>
+                }
+                else if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Mensagens" asp-action="Index" class="btn btn-outline" style="margin-top:12px">Ver mensagens recebidas</a>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details","Anuncios",new { id = Model.id })" class="btn btn-primary" style="margin-top:12px">Entrar para enviar mensagem</a>
+                }
+                <p class="muted" style="margin-top:12px">O contacto pessoal e a morada não são divulgados publicamente.</p>
+            </div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form asp-controller="Favoritos" asp-action="Toggle" method="post" style="margin:15px 0">
+                    <input type="hidden" name="anuncioId" value="@Model.id" />
+                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    <button type="submit" class="btn btn-outline" style="width:100%">
+                        <i class="@(isSaved ? "fas" : "far") fa-heart" aria-hidden="true"></i>
+                        @(isSaved ? "Remover dos favoritos" : "Guardar nos favoritos")
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a class="btn btn-outline" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path"><i class="far fa-heart"></i> Entrar para guardar</a>
+            }
+            @if (User.Identity?.IsAuthenticated == true &&
+                 User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser)
+            {
+                <details class="ra-report-details">
+                    <summary><i class="far fa-flag" aria-hidden="true"></i> Denunciar este anúncio</summary>
+                    <form asp-controller="Denuncias" asp-action="Criar" method="post">
+                        <input type="hidden" name="anuncioId" value="@Model.id"/>
+                        <label for="report-reason">Motivo</label>
+                        <select class="form-select" name="motivo" id="report-reason" required>
+                            <option value="">Seleciona o motivo</option>
+                            <option>Artigo suspeito</option><option>Informação falsa</option>
+                            <option>Pedido de dados pessoais</option><option>Possível fraude</option>
+                            <option>Conteúdo proibido</option><option>Outro</option>
+                        </select>
+                        <label for="report-details">Descrição adicional (opcional)</label>
+                        <textarea class="form-control" name="detalhes" id="report-details" maxlength="700" rows="3" placeholder="Descreve o que identificaste, sem inserir dados pessoais."></textarea>
+                        <button class="btn btn-outline" type="submit">Enviar denúncia</button>
+                    </form>
+                    <p class="muted" style="font-size:.8rem">A denúncia é privada e será avaliada pela equipa responsável.</p>
+                </details>
+            }
+            <div class="helper-banner"><i class="fas fa-shield-alt"></i><span>Por privacidade, a rua e a porta não são divulgadas. Nunca partilhes palavras-passe, códigos de acesso ou documentos pessoais.</span></div>
+            <a class="btn btn-outline" href="@mapsUrl" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt"></i> Ver zona no Google Maps</a>
+            <button class="btn btn-outline" type="button" data-load-approx-map style="margin-top:12px">Mostrar mapa aproximado</button>
+            <p data-inline-map-status role="status"></p>
+            <div class="ra-map-preview" data-ra-map data-place="@place" hidden style="margin-top:12px"></div>
+        </aside>
+    </div>
+</div>
+
+
+@if (Model.item?.snativo != "N" &&
+     User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser)
+{
+    <nav class="ra-detail-mobile-bar" aria-label="Ações do anúncio">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            @if (Model.vlitem > 0)
+            {
+                <a class="btn btn-primary" href="#rental-request"><i class="far fa-calendar-check" aria-hidden="true"></i> Pedir aluguer</a>
+            }
+            <a class="btn btn-outline" asp-controller="Mensagens" asp-action="Conversa" asp-route-anuncioId="@Model.id"><i class="far fa-comments" aria-hidden="true"></i> Mensagem</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login"
+               asp-route-returnUrl="@Url.Action("Details", "Anuncios", new { id = Model.id })"><i class="far fa-user" aria-hidden="true"></i> Entrar para contactar</a>
+        }
+    </nav>
 }
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/css/site.css" rel="stylesheet">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  
-    <title>Rent All - Detalhes do Anúncio</title>
-
-    <style>
-        /* Estilos gerais */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        #form_header {
-            width: 450px;
-            height: 480px;
-            background-color: rgba(0, 0, 0, 0); /* Define a cor como completamente transparente */
-           
-        
-        }
-
-
-        /* Estilo para as imagens do carrossel */
-        .carousel-item img {
-            display: block;
-            margin: 0 auto;
-            object-fit: cover;
-            order: 1;
-            max-width: 400px;
-            max-height: 400px;
-            min-height: 400px;
-            min-width: 400px;
-            width: auto;
-            height: auto;
-        }
-
-        /* Estilo para os elementos da card */
-        .card {
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Estilo para as linhas com bordas */
-        .card-body.row {
-            border-bottom: 1px solid #ccc;
-            padding: 10px 0;
-        }
-
-        /* Estilo para os títulos */
-        .card-body p strong {
-            font-weight: bold;
-        }
-
-        /* Estilo para os detalhes */
-        .card-body p {
-            margin-bottom: 5px;
-        }
-
-        /* Estilos para links */
-        a {
-            text-decoration: none;
-            color: #007bff;
-        }
-
-            a:hover {
-                color: #0056b3;
-            }
-
-        /* Estilos para botões */
-        .btn {
-            display: inline-block;
-            font-weight: 400;
-            text-align: center;
-            vertical-align: middle;
-            cursor: pointer;
-            border: 1px solid transparent;
-            padding: .375rem .75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            border-radius: .25rem;
-            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-        }
-
-        .btn-primary {
-            color: #fff;
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-
-            .btn-primary:hover {
-                color: #fff;
-                background-color: #0056b3;
-                border-color: #0056b3;
-            }
-
-    </style>
-</head>
-<body>
-
-    <div class="card" id="form_header">
-        <div class="l-cards">
-            <div class="carousel-container">
-                <div id="imageCarousel" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="/imagens/@Html.DisplayFor(model => model.item.imagem1)" class="d-block" alt="Imagem 1">
-                        </div>
-
-                        @if (Model.item.imagem2 != null)
-                        {
-                            <div class="carousel-item">
-                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem2)" class="d-block" alt="Imagem 2">
-                            </div>
-                        }
-                        @if (Model.item.imagem3 != null)
-                        {
-                            <div class="carousel-item">
-                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem3)" class="d-block" alt="Imagem 3">
-                            </div>
-                        }
-                        @if (Model.item.imagem4 != null)
-                        {
-                            <div class="carousel-item">
-                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem4)" class="d-block" alt="Imagem 4">
-                            </div>
-                        }
-                        @if (Model.item.imagem5 != null)
-                        {
-                            <div class="carousel-item">
-                                <img src="/imagens/@Html.DisplayFor(model => model.item.imagem5)" class="d-block" alt="Imagem 5">
-                            </div>
-                        }
-                    </div>
-                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Anterior</span>
-                    </a>
-                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Próximo</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <hr />
-
-
-
-
-
-    <div class="anuncio-details row">
-
-
-        <!-- Seção de Informações do Item -->
-        <div class="section col-md-6">
-            <h3>Informações do Item</h3>
-            <div class="details">
-                <p><strong>Nome: </strong>@Html.DisplayFor(model => model.item.nmitem)</p>
-                <p><strong>Categoria: </strong>@Html.DisplayFor(model => model.categoria.nmcategoria)</p>
-                <p><strong>Tipo: </strong>@Html.DisplayFor(model => model.tipo.nmtipo)</p>
-                <p><strong>Modelo: </strong>@Html.DisplayFor(model => model.modelo)</p>
-                <p><strong>Descrição do Item: </strong>@Html.DisplayFor(model => model.item.dsitem)</p>
-                <!-- Adicione outros detalhes específicos do item -->
-            </div>
-        </div>
-        <br />
-        <br />
-        <br />
-        <br />
-        <!-- Seção de Detalhes do Anúncio -->
-        <div class="section col-md-6">
-            <h3>Detalhes do Anúncio</h3>
-            <div class="details">
-                <p><strong>Valor da Diaria: </strong>@Model.vlitem.ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("pt-BR"))</p>
-                <p><strong>Quantos dias posso usar: </strong>@Html.DisplayFor(model => model.diasAluguel)</p>
-                <!-- Adicione outros detalhes relacionados ao anúncio -->
-            </div>
-        </div>
-        <br />
-        <br />
-        <br />
-        <br />
-
-        <!-- Seção de Ofertante -->
-        <div class="section col-md-6">
-            <h3>Detalhes do Ofertante</h3>
-            <div class="details">
-                <p><strong>Nome do Ofertante: </strong>@Html.DisplayFor(model => model.NomeFantasia)</p>
-                <p><strong>CEP: </strong>@Html.DisplayFor(model => model.CEP)</p>
-                <p><strong>Cidade: </strong>@Html.DisplayFor(model => model.Cidade)</p>
-                <p><strong>Bairro: </strong>@Html.DisplayFor(model => model.Bairro)</p>
-                <p><strong>Estado: </strong>@Html.DisplayFor(model => model.Estado)</p>
-                <p><strong>Número: </strong>@Html.DisplayFor(model => model.Numero)</p>
-                <p><strong>Rua: </strong>@Html.DisplayFor(model => model.Rua)</p>
-                <p><strong>Complemento: </strong>@Html.DisplayFor(model => model.Complemento)</p>
-                <p><strong>Contato: </strong>@Html.DisplayFor(model => model.contato)</p>
-                <!-- Adicione outros detalhes relacionados ao anúncio -->
-            </div>
-        </div>
-
-
-        <!-- Outras seções para informações adicionais do anúncio -->
-    </div>
-
-
-
-
-
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <script type="text/javascript" src="~/js/cadastro.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
-
-
-
-</body>
-
-
-</html>
+@section Scripts {
+    <script src="~/js/photo-carousel.js" asp-append-version="true"></script>
+    <script src="~/js/rental-confidence.js" asp-append-version="true"></script>
+}

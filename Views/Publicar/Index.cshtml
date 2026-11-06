@@ -1,0 +1,158 @@
+@model aluguel.ViewModel.PublishViewModel
+@using aluguel.Services
+@{
+    ViewData["Title"] = "Publicar um objeto";
+}
+<link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/publish-experience.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
+<div class="page-width ra-publish">
+    <header class="ra-publish-head">
+        <p class="eyebrow">Publicar na RentAll</p>
+        <h1>Publica o teu artigo.</h1>
+        <p>Fotografias, preço e localização num único formulário. Não precisas de partilhar a tua morada nem o telefone.</p>
+    </header>
+    <form asp-controller="Publicar" asp-action="Index" class="ra-publish-form" method="post"
+          enctype="multipart/form-data" data-submit-lock data-single-publish>
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <section class="ra-publish-section" aria-labelledby="publish-object">
+            <div class="ra-publish-step"><span>01</span><div><h2 id="publish-object">Dados do artigo</h2><p>Dá um nome simples ao objeto e explica em que estado está.</p></div></div>
+            <div class="form-grid">
+                <div class="form-field full">
+                    <label asp-for="Nome">Nome do objeto *</label>
+                    <input asp-for="Nome" class="form-control" required maxlength="140" placeholder="Ex.: Bicicleta de montanha, projetor, berbequim" data-smart-title />
+                </div>
+                <div class="form-field full">
+                    <label asp-for="Descricao">Descrição *</label>
+                    <textarea asp-for="Descricao" class="form-control" rows="5" required maxlength="6000"
+                              placeholder="Estado, acessórios, medidas, condições de utilização..." data-smart-description></textarea>
+                    <div class="ra-publish-hint"><span>Descreve o estado real do objeto. Não incluas moradas, números ou documentos.</span><button type="button" class="ra-text-action" data-description-assist>Sugerir estrutura</button></div>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Categoria">Categoria *</label>
+                    <select asp-for="Categoria" asp-items="ViewBag.Categoria" id="Categoria" class="form-select" required>
+                        <option value="">Seleciona uma categoria</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Tipo">Tipo *</label>
+                    <select asp-for="Tipo" id="Tipo" class="form-select" data-selected-type="@Model.Tipo" required disabled>
+                        <option value="">Escolhe primeiro a categoria</option>
+                    </select>
+                    <small>Se não encontrares o tipo, escolhe «Outros».</small>
+                </div>
+                <div class="form-field full">
+                    <label asp-for="Modelo">Marca e modelo (opcional)</label>
+                    <input asp-for="Modelo" maxlength="150" class="form-control" placeholder="Se souberes, indica a referência" />
+                </div>
+            </div>
+            <h3>Fotografias</h3>
+            <p class="muted">Até cinco imagens. Podes alterar a ordem, escolher a capa e remover fotografias antes de publicar.</p>
+            <div class="ra-photo-editor" data-photo-carousel-editor>
+                <div class="ra-photo-toolbar">
+                    <button class="btn btn-outline" type="button" data-photo-add><i class="fas fa-plus" aria-hidden="true"></i> Adicionar fotografias</button>
+                    <span data-photo-counter aria-live="polite">0 de 5</span>
+                </div>
+                <input name="Photos" type="file" accept="image/jpeg,image/png,image/webp" multiple data-photo-files hidden />
+                <input name="PhotoOrder" type="hidden" data-photo-order />
+                <div class="ra-photo-stage">
+                    <button type="button" data-photo-prev aria-label="Fotografia anterior"><i class="fas fa-chevron-left"></i></button>
+                    <div class="ra-photo-frame">
+                        <img data-photo-preview alt="Pré-visualização" hidden />
+                        <div data-photo-empty class="ra-photo-placeholder">Escolhe as fotografias do teu artigo.</div>
+                    </div>
+                    <button type="button" data-photo-next aria-label="Fotografia seguinte"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="ra-photo-actions">
+                    <button type="button" data-photo-cover>Definir como capa</button>
+                    <button type="button" data-photo-left><i class="fas fa-arrow-left"></i> Mover</button>
+                    <button type="button" data-photo-right>Mover <i class="fas fa-arrow-right"></i></button>
+                    <button type="button" data-photo-remove><i class="far fa-trash-alt"></i> Remover</button>
+                </div>
+                <p data-photo-status class="ra-photo-status" role="alert" hidden></p>
+            </div>
+        </section>
+        <section class="ra-publish-section" aria-labelledby="publish-terms">
+            <div class="ra-publish-step"><span>02</span><div><h2 id="publish-terms">Preço e disponibilidade</h2><p>O preço e o período podem ser combinados com quem estiver interessado.</p></div></div>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="Preco" data-rental-currency>Preço por dia (opcional)</label>
+                    <div class="ra-money-field"><span data-money-symbol aria-hidden="true">€</span><input asp-for="Preco" class="form-control" type="text" inputmode="decimal" data-money-input autocomplete="off" placeholder="A combinar" /></div>
+                    <small>Deixa vazio para mostrar «Preço a combinar».</small>
+                </div>
+                <div class="form-field">
+                    <label asp-for="DiasAluguel">Período máximo em dias (opcional)</label>
+                    <input asp-for="DiasAluguel" class="form-control" type="number" min="1" max="365" placeholder="A combinar" />
+                    <small>Não é necessário definir os dias agora.</small>
+                </div>
+                <div class="form-field full">
+                    <label asp-for="Visibilidade">Visibilidade do anúncio</label>
+                    <select asp-for="Visibilidade" class="form-select">
+                        <option value="S">Ativo — publicar imediatamente (predefinição)</option>
+                        <option value="N">Oculto — guardar sem publicar</option>
+                    </select>
+                    <small>O anúncio fica ativo por predefinição. Só será ocultado se escolheres essa opção.</small>
+                </div>
+            </div>
+            <div class="ra-rental-motivation">
+                <strong><i class="fas fa-chart-line" aria-hidden="true"></i> Faz o teu artigo render</strong>
+                <p>Anunciar é gratuito. Um artigo disponível mais vezes pode gerar interesse sem teres de o vender. Publica boas fotografias e responde rapidamente aos pedidos.</p>
+                <p data-earnings-preview aria-live="polite">Indica um preço para veres uma simulação de ganhos.</p>
+                <small>Comissão de 10% apresentada apenas como exemplo de um futuro serviço de pagamentos. A RentAll não cobra nem processa pagamentos atualmente.</small>
+            </div>
+        </section>
+        <section class="ra-publish-section" aria-labelledby="publish-area">
+            <div class="ra-publish-step"><span>03</span><div><h2 id="publish-area">Localização aproximada</h2><p>Só a cidade e a região são mostradas aos outros utilizadores.</p></div></div>
+            <div class="ra-location-privacy"><i class="fas fa-shield-alt" aria-hidden="true"></i>
+                <span>Não pedimos morada, número de porta, código postal nem coordenadas exatas. Podes selecionar a zona manualmente.</span></div>
+            <div class="ra-location-action">
+                <button class="btn btn-outline" type="button" data-use-approx-location><i class="fas fa-location-arrow"></i> Detetar a minha zona aproximada</button>
+                <small>Ao clicar, o navegador pede autorização e a localização é consultada no serviço gratuito BigDataCloud para obter apenas cidade e região. O fornecedor recebe as coordenadas e o IP. A RentAll não guarda coordenadas.</small>
+                <p data-location-feedback role="status" aria-live="polite"></p>
+            </div>
+            <div class="form-grid">
+                <input type="hidden" asp-for="Pais" value="PT" data-region-country />
+                <div class="form-field ra-pt-only"><span class="ra-pt-only-label">Mercado</span><strong>Portugal <small>EUR (€)</small></strong></div>
+                <div class="form-field"><label asp-for="Estado" data-region-label data-required="true">Distrito / estado *</label>
+                    <select asp-for="Estado" class="form-select" data-region-uf data-initial-value="@Model.Estado" required><option value="">Seleciona a região</option></select>
+                </div>
+                <div class="form-field"><label asp-for="Cidade">Cidade ou município *</label>
+                    <input asp-for="Cidade" class="form-control" data-region-city list="publish-cities" required maxlength="120" placeholder="Ex.: Almada" />
+                    <datalist id="publish-cities"></datalist>
+                </div>
+                <div class="form-field"><label asp-for="Bairro">Bairro ou freguesia (opcional)</label>
+                    <input asp-for="Bairro" class="form-control" maxlength="120" placeholder="Uma zona geral, nunca a morada" />
+                </div>
+            </div>
+            <div class="inline-map">
+                <a data-region-map-link class="btn btn-outline" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Ver zona no Google Maps</a>
+                <button class="btn btn-outline" data-load-approx-map type="button">Mostrar mapa aproximado</button>
+                <p data-inline-map-status role="status"></p>
+                <div class="ra-map-preview" data-ra-map hidden aria-label="Pré-visualização aproximada do mapa"></div>
+            </div>
+        </section>
+        <section class="ra-publish-section" aria-labelledby="publish-profile">
+            <div class="ra-publish-step"><span>04</span><div><h2 id="publish-profile">Perfil público</h2><p>Usa um nome público ou alcunha. Não é necessário partilhar o telemóvel.</p></div></div>
+            <div class="form-field">
+                <label asp-for="NomePublico">Nome público (opcional)</label>
+                <input asp-for="NomePublico" class="form-control" maxlength="100" placeholder="Ex.: João · Aluga ferramentas" />
+            </div>
+            <p class="ra-privacy-note"><i class="far fa-eye-slash"></i> Não divulgamos números de telemóvel ou moradas neste anúncio. Uma futura reserva ou pagamento dentro da plataforma dependerá de um sistema de mensagens e pagamentos verificado.</p>
+        </section>
+        <aside class="ra-proto-detail-note">
+            <strong>Prepara o teu artigo para ser alugado</strong>
+            <p>Descreve o estado com precisão, fotografa as marcas de uso e indica os acessórios incluídos. Guarda os dados sensíveis fora da descrição pública. Os registos bilaterais de entrega e devolução estão em preparação.</p>
+            <a asp-controller="Experiencia" asp-action="ComoFunciona" class="ra-proto-textlink" target="_blank" rel="noopener noreferrer">Recomendações para um aluguer seguro</a>
+        </aside>
+        <div class="ra-publish-submit">
+            <span><i class="fas fa-lock"></i> Os teus dados de localização exata não são guardados.</span>
+            <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Publicar o meu objeto</button>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <script src="~/js/photo-carousel.js" asp-append-version="true"></script>
+    <script src="~/js/publish-experience.js" asp-append-version="true"></script>
+    <script src="~/js/publish-earnings.js" asp-append-version="true"></script>
+}

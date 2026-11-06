@@ -1,0 +1,52 @@
+/* RentAll checkout walkthrough: no real payments or collection of card data. */
+.ra-checkout-example{max-width:1120px;padding-block:30px 76px}
+.ra-demo-head{display:flex;justify-content:space-between;gap:25px;align-items:flex-start;margin-bottom:18px}
+.ra-demo-head h1{font-size:clamp(1.7rem,3.2vw,2.5rem);margin:4px 0 8px}
+.ra-demo-head p{color:var(--ink-soft);margin:0}
+.ra-demo-warning{background:#f5f8f5;border:1px solid #9ebbaa;border-left:4px solid #27644b;padding:16px 19px;border-radius:7px;line-height:1.5;font-size:.88rem;color:#294a36}
+.ra-demo-steps{list-style:none;padding:0;display:flex;gap:8px;flex-wrap:wrap;margin:21px 0 16px}
+.ra-demo-steps li{color:#657368;border:1px solid #dce3dd;padding:9px 13px;background:#fff;border-radius:7px;font-size:.8rem;flex:1;text-align:center;min-width:130px}
+.ra-demo-steps li[aria-current="step"]{font-weight:750;color:#1a5036;background:#eaf3ec;border-color:#9ac5a5}
+.ra-demo-main{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(270px,.75fr);gap:18px;align-items:start}
+.ra-demo-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:25px}
+.ra-demo-box[hidden],.ra-demo-fake-card[hidden],.ra-demo-controls [hidden],.ra-demo-alert[hidden]{display:none!important}
+.ra-demo-box h2{margin:8px 0 10px;font-size:1.25rem}
+.ra-demo-box h3{font-size:1.01rem;margin:24px 0 14px}
+.ra-demo-box p{font-size:.86rem;line-height:1.62;color:var(--ink-soft)}
+.ra-demo-tag{font-size:.72rem;font-weight:800;color:#276448;letter-spacing:.03em}
+.ra-demo-order{margin:18px 0 10px}
+.ra-demo-order div{display:flex;justify-content:space-between;gap:17px;padding:12px 0;border-bottom:1px solid #e5eae5}
+.ra-demo-order dt{color:#58695d;font-size:.85rem}
+.ra-demo-order dd{margin:0;font-size:.88rem;font-weight:700;text-align:right;min-width:0;overflow-wrap:anywhere}
+.ra-demo-agreement{display:flex;gap:11px;align-items:flex-start;background:#f8faf8;border-radius:8px;padding:14px;margin:18px 0;color:#304b3b;line-height:1.5;font-size:.83rem}
+.ra-demo-agreement input{width:18px;height:18px;flex:none;margin-top:1px;accent-color:#226745}
+.ra-demo-alert{background:#fff5e8;padding:10px;color:#714219;font-size:.83rem;margin:10px 0;border-radius:7px}
+.ra-demo-controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}
+.ra-demo-controls .btn{min-height:43px}
+.ra-demo-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.ra-demo-methods button{background:#fff;border:1px solid #d6e0d8;border-radius:9px;min-height:70px;padding:13px;text-align:left;font:inherit;font-weight:650;font-size:.87rem;cursor:pointer;color:#374d3e}
+.ra-demo-methods button.is-selected{background:#f0f7f1;border-color:#377254;box-shadow:inset 0 0 0 1px #377254}
+.ra-demo-fake-card{background:linear-gradient(130deg,#214b35,#103321);color:#fff;border-radius:12px;padding:24px;margin:14px 0;min-height:158px;display:flex;flex-direction:column;justify-content:space-between}
+.ra-demo-fake-card small{font-weight:750;letter-spacing:.12em;font-size:.65rem;color:#cee1d5}
+.ra-demo-fake-card strong{font-size:1.22rem;letter-spacing:.07em}
+.ra-demo-fake-card span{font-size:.8rem;color:#e0e9e2}
+.ra-demo-result{border:1px solid #a4cbb0;background:#eff7f1;padding:18px;border-radius:9px;margin-top:16px}
+.ra-demo-result.is-declined{border-color:#e1b9b2;background:#fdf3f0}
+.ra-demo-result strong{color:#255a3d}
+.ra-demo-result.is-declined strong{color:#914b42}
+.ra-demo-receipt{border:1px dashed #aec4b2;background:#f8fbf8;border-radius:9px;padding:16px;margin:16px 0}
+.ra-demo-receipt>strong{font-size:.9rem}
+.ra-demo-timeline{display:grid;gap:13px;margin:12px 0 20px}
+.ra-demo-timeline>div{display:flex;gap:13px;align-items:flex-start}
+.ra-demo-timeline>div>span{display:grid;place-items:center;background:#edf4ef;color:#195239;border-radius:50%;height:29px;width:29px;flex:none;font-weight:750;font-size:.8rem}
+.ra-demo-timeline p{margin:0}
+.ra-demo-timeline strong{display:block;font-size:.86rem;color:#253c2e}
+.ra-demo-timeline small{display:block;font-size:.76rem;line-height:1.5;color:#617165}
+.ra-demo-sidebar{position:sticky;top:90px}
+.ra-demo-sidebar h2{font-size:1.15rem}
+.ra-demo-item{font-size:.93rem}
+.ra-demo-sidebar-note{border-top:1px solid var(--border);padding-top:14px;font-size:.78rem!important}
+.ra-filter-city-help{display:block;color:#62746a;font-size:.75rem;line-height:1.4;margin-top:4px}
+@media(max-width:830px){.ra-demo-main{grid-template-columns:1fr}.ra-demo-sidebar{position:static}}
+@media(max-width:540px){.ra-demo-head{flex-direction:column;gap:13px}.ra-demo-steps{gap:5px}.ra-demo-steps li{min-width:0;flex:1 1 calc(50% - 5px);font-size:.7rem;padding:8px}.ra-demo-box{padding:17px}.ra-demo-methods{grid-template-columns:1fr}.ra-demo-controls{flex-direction:column}.ra-demo-controls .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.ra-demo-methods button{transition:none}}

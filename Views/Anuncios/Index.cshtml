@@ -1,64 +1,41 @@
-﻿@model IEnumerable<aluguel.Models.Anuncio>
-
-@{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <!-- Cabeçalho do HTML -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./css/caditem.css">
-    <title>Rent All - Meus Anúncios</title>
-</head>
-
-<body>
-    <h1>Meus Anúncios<span>Gerencie seus Anúncios</span></h1>
-    <div class="create-container">
-        <a asp-action="Create" class="create">Criar novo</a>
+@model IEnumerable<aluguel.Models.Anuncio>
+@{ ViewData["Title"] = "Meus anúncios"; }
+<div class="page-width">
+    <div class="page-intro">
+        <div><p class="eyebrow">A minha área</p><h1>Meus anúncios</h1><p>Acompanha o que colocaste disponível para alugar.</p></div>
+        <a class="btn btn-primary" asp-action="Create"><i class="fas fa-plus"></i> Criar anúncio</a>
     </div>
-
-
-
-<table>
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model) 
-            </th>
-
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <div class="item-content">
-                        <img src="~/imagens/@item.item.imagem1" class="item-image" asp-append-version="true">
-                        <div class="item-details">
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.item.nmitem)</div>
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.Cidade)</div>
-                            <div class="item-name">@Html.DisplayFor(modelItem => item.contato)</div>
-
-                            <div class="item-actions">
-                                <a href="@Url.Action("Edit", "Anuncios", new { id = item.id })" class="edit">Editar</a>
-                                <a href="@Url.Action("Details", "Anuncios", new { id = item.id })" class="details">Detalhes</a>
-                                <a href="@Url.Action("Delete", "Anuncios", new { id = item.id })" class="delete">Excluir</a>
-                            </div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-symbol"><i class="far fa-list-alt"></i></div>
+            <h2>Ainda não publicaste anúncios</h2>
+            <p>Começa por cadastrar um item com fotografias; depois escolhe o preço, a disponibilidade e a região.</p>
+            <a class="btn btn-primary" asp-controller="Items" asp-action="Create">Cadastrar um item</a>
+            <a class="btn btn-outline" asp-action="Create">Já tenho um item</a>
+        </div>
+    }
+    else
+    {
+        <div class="dashboard-grid">
+            @foreach (var ad in Model)
+            {
+                <article class="manage-card">
+                    @if (!string.IsNullOrWhiteSpace(ad.item?.imagem1))
+                    { <img class="manage-img" src="@Url.Content("~/imagens/" + ad.item.imagem1)" alt="@(ad.item?.nmitem ?? ad.modelo)" loading="lazy" /> }
+                    else { <div class="manage-img"><i class="far fa-image"></i></div> }
+                    <div class="manage-body">
+                        <span class="pill"><i class="fas fa-circle" style="font-size:.46rem" aria-hidden="true"></i> @(ad.Pais == "PT" ? "Anúncio · Portugal" : "Histórico · indisponível no mercado atual")</span>
+                        <h2>@(ad.item?.nmitem ?? ad.modelo)</h2>
+                        <p>@aluguel.Services.RentalLocalization.FormatPrice(ad.vlitem, ad.Pais) por dia · @ad.Cidade, @ad.Estado</p>
+                        <div class="manage-actions">
+                            <a asp-action="Details" asp-route-id="@ad.id"><i class="far fa-eye"></i> Ver</a>
+                            @if (ad.Pais == "PT") { <a asp-action="Edit" asp-route-id="@ad.id"><i class="fas fa-pen"></i> Editar</a> }
+                            <a class="danger-link" asp-action="Delete" asp-route-id="@ad.id"><i class="far fa-trash-alt"></i> Excluir</a>
                         </div>
                     </div>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-</body>
-
-</html>
-
+                </article>
+            }
+        </div>
+    }
+</div>

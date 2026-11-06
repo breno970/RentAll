@@ -1,131 +1,45 @@
-﻿
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
-
-
-
-                @model aluguel.Models.Item
-
-@{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tela de Detalhes</title>
-    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
-    <title>Rent All - Detalhes do Item</title>
-</head>
-<body>
-    <main id="container">
-
-        <form id="card-it" method="post">
-
-            <a href="c:\users\valda\source\repos\aluguel\aluguel\views\items\details.cshtml"></a>
-
-            <!-- FORM HEADER -->
-            <div class="card-it">
-                <h1>Tela de Detalhes</h1>
-
-
-
-
-                <div class="form-group">
-                    <label for="nmitem">Nome</label>
-                    <input type="text" id="nmitem" name="nmitem" class="form-control" value="@Model.nmitem" readonly />
+@model aluguel.Models.Item
+@{ ViewData["Title"] = Model.nmitem; }
+<link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
+<div class="page-width">
+    <div class="page-intro"><div><p class="eyebrow">Meus itens / Detalhes</p><h1>@Model.nmitem</h1><p>Consulta os dados do teu artigo.</p></div><a asp-action="Index" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Voltar</a></div>
+    <div class="detail-layout">
+        <div class="panel">
+            @{
+                var photos = new[] { Model.imagem1, Model.imagem2, Model.imagem3, Model.imagem4, Model.imagem5 }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+            }
+            @if (photos.Length > 0)
+            {
+                <div class="ra-photo-view" data-photo-carousel-view>
+                    @foreach (var photo in photos)
+                    {
+                        <span data-view-photo="@Url.Content("~/imagens/" + photo)" hidden></span>
+                    }
+                    <div class="ra-photo-stage">
+                        <button type="button" data-view-prev aria-label="Fotografia anterior"><i class="fas fa-chevron-left"></i></button>
+                        <div class="ra-photo-frame"><img class="detail-main-image" data-view-main alt="Fotografia do artigo" /><p data-view-counter></p></div>
+                        <button type="button" data-view-next aria-label="Próxima fotografia"><i class="fas fa-chevron-right"></i></button>
+                    </div>
                 </div>
-                <br />
-                <div class="form-group">
-                    <label for="dsitem">Descrição</label>
-                    <textarea id="dsitem" name="dsitem" class="form-control" readonly>@Model.dsitem</textarea>
-                </div>
-                <br />
-                <div class="form-group">
-                    <label for="dsitem">Data da Criação</label>
-                    <input type="text" id="dtcriacao" name="dtcriacao" class="form-control" value="@Model.dtcriacao" readonly />
-                </div>
-                <br />
-                <div class="form-group">
-                    <label for="snativo">Está Ativo?</label>
-                    <select asp-for="snativo" class="form-control" disabled>
-                        <option value="S" selected="@(Model.snativo == "S")">Sim</option>
-                        <option value="N" selected="@(Model.snativo == "N")">Não</option>
-                    </select>
-                </div>
-
-               
-                <a href="@Url.Action("Index")">Voltar para a lista</a>
-
+            }
+            else { <div class="detail-main-image image-empty"><i class="far fa-image"></i></div> }
+        </div>
+        <div class="panel">
+            <span class="pill @(Model.snativo == "N" ? "pill-warning" : "")">@(Model.snativo == "N" ? "Oculto" : "Ativo")</span>
+            <h1 class="detail-name" style="margin-top:14px">@Model.nmitem</h1>
+            <h2 style="font-size:1rem;margin-top:24px">Descrição</h2>
+            <p class="detail-description">@Model.dsitem</p>
+            <div class="detail-facts">
+                <div><small>Cadastrado</small><strong>@Model.dtcriacao.ToString("dd/MM/yyyy")</strong></div>
+                <div><small>Estado</small><strong>@(Model.snativo == "N" ? "Oculto" : "Ativo")</strong></div>
             </div>
-        </form>
-    </main>
-</body>
-
-
-<div class="footer-container">
-
-    <div class="footer-content-2">
-        <div>
-            <i class="fa fa-map-marker"></i>
-            <p>
-                <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
-                    Visconde de Mauá, Resende - RJ
-                </a>
-            </p>
-        </div>
-        <div>
-            <i class="fa fa-envelope"></i>
-            <p>
-                <a href="mailto:rent.all.bn@gmail.com">
-                    rent.all.bn@gmail.com
-                </a>
-            </p>
-        </div>
-        <div>
-            <i class="fa fa-phone"></i>
-            <p><a href="tel:2499965669">(24)999656679</a></p>
-        </div>
-        <div>
-            <i class="fa fa-whatsapp"></i>
-            <p>
-                <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
-                    +55 24-999656679
-                </a>
-            </p>
+            <div class="form-actions">
+                <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.id"><i class="fas fa-pen"></i> Editar artigo</a>
+                @if (Model.snativo != "N")
+                { <a class="btn btn-outline" asp-controller="Anuncios" asp-action="Create" asp-route-itemId="@Model.id">Criar anúncio</a> }
+            </div>
         </div>
     </div>
-
-
-    <div class="footer-content-3">
-        <p class="footer-empresa">
-            <span>Sobre a Empresa</span>
-            Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
-        </p>
-        <div class="footer-icons">
-
-            <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
-            <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
-            <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
-            <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
-
-        </div>
-        <hr>
-        <p>©2023 Rent All Ltda.</p>
-    </div>
-    <div class="copyright">
-        <hr>
-        <p>©Copyright. Todos os direitos reservados.</p>
-    </div>
-
 </div>
 
-</html>
-
+@section Scripts { <script src="~/js/photo-carousel.js" asp-append-version="true"></script> }

@@ -1,95 +1,159 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using aluguel.Areas.Identity.Data
-
 @inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
-
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    var signedIn = SignInManager.IsSignedIn(User);
+    var currentPath = Context.Request.Path.Value ?? "";
+    var currentCountry = "PT";
+}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt">
 <head>
-    <link rel="shortcut icon" href="./imagens/ico.png" type="image/x-icon" />
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-   
-    <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3045181554995684"
-            crossorigin="anonymous"></script>
-
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#153d32" />
+    <meta name="rentall-maps-browser-key" content="@Configuration["GoogleMaps:BrowserApiKey"]" />
+    <meta name="description" content="RentAll: aluga artigos que já existem. Encontra equipamentos, ferramentas e objetos em desuso em Portugal." />
+    <title>@(ViewData["Title"] ?? "Descobrir artigos") | RentAll</title>
+    <link rel="icon" href="@Url.Content("~/imagens/ico.png")" type="image/png" />
+    @* External font resources are loaded only after optional consent. *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/rentall-2026.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/marketplace-enhancements.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/rentall-editorial.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/legal-and-consent.css" asp-append-version="true" />
+    @* External icon kit is loaded after optional consent. *@
 </head>
-<body>
-
-    <nav>
-
-
-        <div class="nave">
-
-            <a class="logo" href="/"> <img src="~/imagens/ra.png" class="logo-img" /></a>
-
-            <div class="mobile-menu">
-                <div class="line1"></div>
-                <div class="line2"></div>
-                <div class="line3"></div>
-            </div>
-
-            <ul class="nav-list">
-                <li class="nav">
-                    <a class="nav-link text-white-50" asp-area="" asp-controller="Home" asp-action="Privacy">Sobre nós</a>
-                </li>
-                @if (User.Identity.IsAuthenticated)
-                { }
-                else
-                {
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Entrar</a>
-                    </li>
-                }
-                @if (SignInManager.IsSignedIn(User))
-                {
-                    <li class="nav-item">
-                        <a class="nav-link text-white-50" asp-area="" asp-controller="Items" asp-action="Index">Meus Itens</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white-50" asp-area="" asp-controller="Anuncios" asp-action="Index">Meus Anúncios</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a id="manage" class="nav-link text-white-50" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                            <i class="fas fa-user"></i>Sua Conta
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <form class="nav-link text-white-50" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                            <button type="submit" class="btn btn-link"><i class="fas fa-sign-out-alt"></i></button>
+<body class="rentall-app">
+    <a class="skip-link" href="#main-content">Ir para o conteúdo principal</a>
+    <div class="app-frame">
+        <header class="site-header">
+            <div class="header-inner page-width">
+                <a class="brand-link" asp-area="" asp-controller="Home" asp-action="Index" aria-label="RentAll, início">
+                    <img src="~/imagens/ra.png" width="250" height="48" alt="RentAll" />
+                </a>
+                <nav id="main-navigation" class="site-nav" aria-label="Navegação principal">
+                    <a class="nav-link @(currentPath.StartsWith("/Home") || currentPath == "/" ? "is-current" : "")"
+                        asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-compass" aria-hidden="true"></i> Explorar</a>
+                    <a class="nav-link" asp-controller="Experiencia" asp-action="ComoFunciona"><i class="fas fa-shield-alt" aria-hidden="true"></i> Como funciona</a>
+                    <a class="nav-link ra-mobile-publish" asp-area="" asp-controller="Publicar" asp-action="Index"><i class="fas fa-plus" aria-hidden="true"></i> Publicar artigo</a>
+                    @if (signedIn)
+                    {
+                        <a class="nav-link" asp-area="" asp-controller="Mensagens" asp-action="Index"><i class="far fa-comments" aria-hidden="true"></i> Mensagens</a>
+                        <a class="nav-link" asp-area="" asp-controller="Pedidos" asp-action="Index"><i class="far fa-calendar-check" aria-hidden="true"></i> Pedidos</a>
+                        <a class="nav-link" asp-area="" asp-controller="Favoritos" asp-action="Index"><i class="far fa-heart" aria-hidden="true"></i> Favoritos</a>
+                        <a class="nav-link" asp-area="" asp-controller="Items" asp-action="Index"><i class="fas fa-box" aria-hidden="true"></i> Meus itens</a>
+                        <a class="nav-link" asp-area="" asp-controller="Anuncios" asp-action="Index"><i class="fas fa-list-alt" aria-hidden="true"></i> Anúncios</a>
+                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="far fa-user" aria-hidden="true"></i> Conta</a>
+                        <form method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button class="nav-logout" type="submit"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sair</button>
                         </form>
-                    </li>
+                    }
+                    else
+                    {
+                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Login"><i class="far fa-user" aria-hidden="true"></i> Entrar</a>
+                    }
+                </nav>
+                <div class="header-actions">
+                    <a class="btn btn-brand header-cta" asp-area="" asp-controller="Publicar" asp-action="Index">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Anunciar item
+                    </a>
+                    <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-controls="main-navigation" aria-expanded="false" data-menu-toggle>
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-                }
-            </ul>
-        </div>
-
-    </nav>
-
-
-    <div class="container">
-
-
-        <main role="main" class="pb-3">
+        <main id="main-content" class="main-content">
+            @if (TempData["Success"] is string success)
+            {
+                <div class="page-width notice notice-success" role="status"><i class="fas fa-check-circle" aria-hidden="true"></i><span>@success</span><button class="notice-close" type="button" data-dismiss-parent aria-label="Fechar aviso"><i class="fas fa-times"></i></button></div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="page-width notice notice-danger" role="alert"><i class="fas fa-exclamation-circle" aria-hidden="true"></i><span>@error</span><button class="notice-close" type="button" data-dismiss-parent aria-label="Fechar aviso"><i class="fas fa-times"></i></button></div>
+            }
             @RenderBody()
         </main>
+        <footer class="site-footer">
+            <div class="page-width footer-main">
+                <div class="footer-about">
+                    <a class="footer-logo" asp-area="" asp-controller="Home" asp-action="Index" aria-label="RentAll, início"><img src="~/imagens/ra.png" width="220" height="43" alt="RentAll" /></a>
+                    <p>Mais uso, menos desperdício. Uma plataforma para dar novas oportunidades aos objetos que já temos.</p>
+                    <div class="social-links" aria-label="Redes sociais">
+                        <a href="https://github.com/RentAllBN" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+                        <a href="https://www.instagram.com/rent.all._/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                        <a href="https://twitter.com/RentAll_com" target="_blank" rel="noopener noreferrer" aria-label="X"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                        <a href="https://www.linkedin.com/in/rent-all-0576ab268/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h2>Explorar</h2>
+                    <a asp-area="" asp-controller="Home" asp-action="Index">Todos os artigos</a>
+                    <a asp-controller="Experiencia" asp-action="ComoFunciona">Como funciona e segurança</a>
+                    <a asp-controller="Planos" asp-action="Index">Preços e serviços</a>
+                    <a asp-area="" asp-controller="Termos" asp-action="Index">Termos de utilização</a>
+                    <a asp-area="" asp-controller="Privacidade" asp-action="Index">Privacidade e dados pessoais</a>
+                    <a asp-area="" asp-controller="Cookies" asp-action="Index">Política de cookies</a>
+                    <button type="button" class="ra-footer-cookie-link" data-cookie-reopen>Preferências de cookies</button>
+                    <a asp-area="" asp-controller="Favoritos" asp-action="Index">Favoritos</a>
+                    <a asp-area="" asp-controller="Mensagens" asp-action="Index">Mensagens</a>
+                    <a asp-area="" asp-controller="Pedidos" asp-action="Index">Pedidos de aluguer</a>
+                    <a asp-controller="Pagamentos" asp-action="Demonstracao">Como funciona o pagamento</a>
+                    <a asp-controller="Experiencia" asp-action="ComoFunciona">Entrega, devolução e segurança</a>
+                </div>
+                <div class="footer-links">
+                    <h2>A minha conta</h2>
+                    <a asp-area="" asp-controller="Items" asp-action="Create">Publicar um artigo</a>
+                    <a asp-area="" asp-controller="Items" asp-action="Index">Meus itens</a>
+                    <a asp-area="" asp-controller="Anuncios" asp-action="Index">Meus anúncios</a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index">Definições de conta</a>
+                </div>
+                <div class="footer-contact">
+                    <h2>Contactos</h2>
+                    <a href="mailto:rent.all.bn@gmail.com"><i class="far fa-envelope" aria-hidden="true"></i> rent.all.bn@gmail.com</a>
+                    <a asp-controller="Privacidade" asp-action="Index">Exercer direitos sobre dados pessoais</a>
+                    <a asp-controller="Legal" asp-action="Index">Informação legal e reclamações</a>
+                </div>
+            </div>
+            <div class="footer-bottom page-width"><span>© @DateTime.UtcNow.Year RentAll. Todos os direitos reservados.</span><span>Aluga. Partilha. Reutiliza.</span></div>
+        </footer>
     </div>
-
-    <!-- Scripts -->
-    <script src="~/js/cep.js"></script>
-    <script type="text/javascript" src="~/js/cadastro.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/mobile-navbar.js" asp-append-version="true"></script>
-
+    <section id="ra-cookie-consent" class="ra-cookie-consent" role="region" aria-label="Preferências de cookies" hidden>
+        <button type="button" data-cookie-close class="ra-cookie-dismiss" aria-label="Fechar aviso de cookies">×</button>
+        <h2>Privacidade e cookies</h2>
+        <p>A RentAll utiliza armazenamento e cookies necessários à autenticação, segurança e funcionamento do serviço. Fontes e ícones fornecidos por terceiros só são carregados se autorizares. Não usamos cookies de publicidade ou análise nesta versão.</p>
+        <div id="ra-cookie-preferences" class="ra-cookie-preferences" hidden>
+            <label class="ra-cookie-essential"><input type="checkbox" checked disabled />
+                <span>Estritamente necessários<small>Autenticação, prevenção de abuso, segurança e registo da escolha. Sempre ativos.</small></span>
+            </label>
+            <label><input id="ra-cookie-external" type="checkbox" />
+                <span>Recursos visuais externos<small>Permitir o carregamento opcional de fontes Google e ícones Font Awesome; podem existir comunicações técnicas com esses fornecedores.</small></span>
+            </label>
+        </div>
+        <div class="ra-cookie-actions">
+            <button type="button" class="btn btn-outline" data-cookie-reject>Rejeitar opcionais</button>
+            <button type="button" class="btn btn-outline" data-cookie-accept>Aceitar opcionais</button>
+            <button type="button" class="btn btn-outline" data-cookie-manage>Personalizar</button>
+            <button type="button" class="btn btn-primary" data-cookie-save hidden>Guardar preferências</button>
+        </div>
+        <div class="ra-cookie-references">
+            <a asp-controller="Cookies" asp-action="Index">Política de cookies</a>
+            <a asp-controller="Privacidade" asp-action="Index">Proteção de dados</a>
+        </div>
+        <span id="ra-cookie-status" role="status" class="visually-hidden"></span>
+    </section>
+    <script src="~/js/cookie-consent.js" asp-append-version="true" defer></script>
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/regions.js" asp-append-version="true" defer></script>
+    <script src="~/js/cep.js" asp-append-version="true" defer></script>
+    <script src="~/js/rentall-ui.js" asp-append-version="true" defer></script>
+    <script src="~/js/marketplace-enhancements.js" asp-append-version="true" defer></script>
+    <script src="~/js/google-maps.js" asp-append-version="true"></script>
+    <script src="~/js/maps-loader.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,31 @@
+@model IEnumerable<aluguel.ViewModel.ResumoConversa>
+@{ ViewData["Title"] = "Mensagens"; }
+<link rel="stylesheet" href="~/css/marketplace-messages.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/rental-dashboard.css" asp-append-version="true" />
+<div class="page-width ra-messages">
+    <div class="page-intro"><div><p class="eyebrow">A tua comunidade</p><h1>Conversas</h1><p>Fala com outros utilizadores sem divulgar contactos pessoais.</p></div><a class="btn btn-outline" asp-controller="Home" asp-action="Index">Explorar anúncios</a></div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state"><h2>Ainda não tens conversas</h2><p>Abre um anúncio e escolhe «Enviar mensagem» para começar.</p></div>
+    }
+    else
+    {
+        <div class="ra-inbox-intro"><p>@Model.Count() conversa(s) · Pedidos e mensagens organizados por atividade recente.</p><a asp-controller="Pedidos" asp-action="Index">Consultar pedidos</a></div>
+        <div class="ra-inbox">
+            @foreach (var thread in Model)
+            {
+                <a class="ra-thread" asp-action="Conversa" asp-route-anuncioId="@thread.AnuncioId" asp-route-peerId="@thread.OutroUtilizadorId">
+                    <div class="ra-thread-icon"><i class="far fa-comments"></i></div>
+                    <div class="ra-inbox-info">
+                        <strong>@thread.NomeArtigo</strong>
+                        <span>@(thread.SouAnunciante ? "Pessoa interessada" : "Anunciante")</span>
+                        <p class="ra-inbox-snippet">@(thread.UltimoTexto.Length > 110 ? thread.UltimoTexto[..110] + "…" : thread.UltimoTexto)</p>
+                    </div>
+                    @if (thread.PedidoPendente) { <span class="ra-inbox-alert">Pedido por responder</span> }
+                    <small>@thread.UltimaMensagem.ToString("dd/MM/yyyy")</small>
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                </a>
+            }
+        </div>
+    }
+</div>

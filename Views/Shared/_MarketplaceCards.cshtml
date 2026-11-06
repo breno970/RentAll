@@ -1,0 +1,53 @@
+@model IEnumerable<aluguel.Models.Anuncio>
+@{
+    var saved = ViewData["FavoriteIds"] as HashSet<int> ?? new HashSet<int>();
+}
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-symbol"><i class="fas fa-search" aria-hidden="true"></i></div>
+        <h2>Ainda não há artigos por aqui</h2>
+        <p>Experimenta outra região ou filtros diferentes. Também podes ser o primeiro a anunciar um objeto em desuso.</p>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index"><i class="fas fa-th-large" aria-hidden="true"></i> Ver todos os artigos</a>
+    </div>
+}
+else
+{
+    <div class="listing-grid">
+        @foreach (var ad in Model)
+        {
+            <article class="listing-card">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form class="fav-form" asp-controller="Favoritos" asp-action="Toggle" method="post">
+                        <input type="hidden" name="anuncioId" value="@ad.id" />
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        <button class="fav-button @(saved.Contains(ad.id) ? "active" : "")" type="submit" aria-label="@(saved.Contains(ad.id) ? "Remover dos favoritos" : "Adicionar aos favoritos")">
+                            <i class="@(saved.Contains(ad.id) ? "fas" : "far") fa-heart" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                }
+                <a class="listing-image" asp-controller="Anuncios" asp-action="Details" asp-route-id="@ad.id" aria-label="Ver @(ad.item?.nmitem ?? ad.modelo)">
+                    @if (!string.IsNullOrWhiteSpace(ad.item?.imagem1))
+                    {
+                        <img src="@Url.Content("~/imagens/" + ad.item.imagem1)" alt="@(ad.item?.nmitem ?? ad.modelo)" loading="lazy" decoding="async" />
+                    }
+                    else
+                    {
+                        <span class="image-empty" aria-hidden="true"><i class="far fa-image"></i></span>
+                    }
+                </a>
+                <div class="listing-body">
+                    <span class="listing-kicker">@(ad.categoria?.nmcategoria ?? "Objeto para alugar")</span>
+                    <h3><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@ad.id">@(ad.item?.nmitem ?? ad.modelo)</a></h3>
+                    <a class="listing-seller" asp-controller="Perfis" asp-action="Details" asp-route-id="@ad.iduser"><i class="far fa-user"></i> @(string.IsNullOrWhiteSpace(ad.NomeFantasia) ? "Anunciante" : ad.NomeFantasia)</a>
+                    <p class="listing-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> @ad.Cidade, @ad.Estado · @aluguel.Services.LocationCatalog.CountryName(ad.Pais)</p>
+                    <div class="listing-bottom">
+                        <div class="listing-price">@aluguel.Services.RentalLocalization.FormatPrice(ad.vlitem, ad.Pais)@if (ad.vlitem > 0) { <small>por dia</small> }</div>
+                        <span class="listing-tag">@(ad.diasAluguel > 0 ? $"{ad.diasAluguel} dia(s)" : "A combinar")</span>
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+}

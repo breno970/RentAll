@@ -1,39 +1,5 @@
-﻿@page
+@page
 @model LoginWith2faModel
-@{
-    ViewData["Title"] = "Two-factor authentication";
-}
-
-<h1>@ViewData["Title"]</h1>
-<hr />
-<p>Seu login é protegido por um aplicativo autenticador. Digite seu código autenticador abaixo.</p>
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
-            <input asp-for="RememberMe" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
-                <label asp-for="Input.TwoFactorCode" class="form-label"></label>
-                <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
-            </div>
-            <div class="checkbox mb-3">
-                <label asp-for="Input.RememberMachine" class="form-label">
-                    <input asp-for="Input.RememberMachine" />
-                    @Html.DisplayNameFor(m => m.Input.RememberMachine)
-                </label>
-            </div>
-            <div>
-                <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-            </div>
-        </form>
-    </div>
-</div>
-<p>
-    Não tem acesso ao seu dispositivo autenticador? Você pode
-    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">autentique com um código de recuperação</a>.
-</p>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+@{ ViewData["Title"] = "Verificação em dois passos"; }
+<div class="page-width"><section class="auth-shell"><div class="auth-panel"><div class="empty-symbol"><i class="fas fa-shield-alt" aria-hidden="true"></i></div><h1>Verificação em dois passos</h1><p class="auth-lead">Introduz o código da tua aplicação autenticadora para continuar.</p><form method="post" asp-route-returnUrl="@Model.ReturnUrl" data-submit-lock><input asp-for="RememberMe" type="hidden" /><div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div><div class="field"><label asp-for="Input.TwoFactorCode">Código de segurança</label><input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="one-time-code" inputmode="numeric" required /><span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span></div><label class="check-line" style="margin:13px 0"><input asp-for="Input.RememberMachine" /> Confiar neste dispositivo</label><button class="btn btn-brand auth-wide" type="submit">Confirmar acesso</button></form><p class="muted" style="font-size:.83rem;margin-top:19px"><a asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">Não tenho acesso à aplicação. Usar código de recuperação.</a></p></div></section></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

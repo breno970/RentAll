@@ -1,49 +1,19 @@
-﻿@{
-    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
-    {
-        Layout = parentLayout.ToString();
-    }
-    else
-    {
-        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
-    }
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/caditem.css" asp-append-version="true" />
-
-    <title>Rent All</title>
-</head>
-<body>
-
-
-
-
-    <div class="card-it">
-
-
-        <h1>Gerencie sua conta</h1>
-
-        <div>
-            <h2>Alterar as configurações da sua conta</h2>
-            <hr />
-            <div class="row">
-                <div class="col-md">
-                    <partial name="_ManageNav" />
-                </div>
-                <div class="col-md">
-                    @RenderBody()
-                </div>
-            </div>
-        </div>
-
+<div class="page-width">
+    <div class="page-intro">
+        <div><p class="eyebrow">Definições</p><h1>A minha conta</h1><p>Controla o teu perfil, a segurança e os dados pessoais.</p></div>
+        <a class="btn btn-outline" asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-arrow-left"></i> Voltar ao início</a>
     </div>
-</body>
-<
-@section Scripts {
-    @RenderSection("Scripts", required: false)
-}
+    <div class="panel account-layout">
+        <aside aria-label="Menu das definições">
+            <h2 style="font-size:1rem">Conta e segurança</h2>
+            <partial name="_ManageNav" />
+        </aside>
+        <section aria-label="Definições da conta">
+            @RenderBody()
+        </section>
+    </div>
+</div>
+@section Scripts { @RenderSection("Scripts", required: false) }

@@ -7,13 +7,13 @@ namespace aluguel.Areas.Identity.Data
         public static string GetFirstName(this ClaimsPrincipal principal)
         {
             var firstName = principal.Claims.FirstOrDefault(c => c.Type == "FirstName");
-            return firstName?.Value;
+            return firstName?.Value ?? string.Empty;
         }
 
         public static string GetLastName(this ClaimsPrincipal principal)
         {
             var lastName = principal.Claims.FirstOrDefault(c => c.Type == "LastName");
-            return lastName?.Value;
+            return lastName?.Value ?? string.Empty;
         }
     }
 

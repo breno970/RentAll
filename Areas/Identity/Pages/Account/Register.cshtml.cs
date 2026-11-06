@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.RateLimiting;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
@@ -51,6 +52,10 @@ namespace aluguel.Areas.Identity.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
+        [BindProperty]
+        
+        public bool AcceptTerms { get; set; }
+
         public string ReturnUrl { get; set; }
 
         /// <summary>
@@ -118,16 +123,25 @@ namespace aluguel.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+        [EnableRateLimiting("account-email")]
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            // Only a posted true value counts; never trust client-only required validation.
+            var accepted = Request.Form["AcceptTerms"].Any(v =>
+                string.Equals(v, "true", StringComparison.OrdinalIgnoreCase));
+            if (!accepted)
+                ModelState.AddModelError(nameof(AcceptTerms), "É necessário aceitar os termos de utilização.");
+            else
+                AcceptTerms = true;
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
 
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
+                user.CreatedAt = DateTime.UtcNow;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -137,28 +151,34 @@ namespace aluguel.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
                     await _userManager.AddClaimAsync(user, new Claim("Equipe RentAll", user.FirstName));
                     await _userManager.AddClaimAsync(user, new Claim("LastName", user.LastName));
-                    await _emailSender.SendEmailAsync(Input.Email, "Valide Sua Conta",
-                        $"Valide sua conta RentAll clicando <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>NESTE LINK</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId, code, returnUrl },
+                            protocol: Request.Scheme);
+                        try
+                        {
+                            await _emailSender.SendEmailAsync(Input.Email, "Confirma o teu email na RentAll",
+                                $"<p>Confirma o teu endereço de email para começares a usar a RentAll.</p><p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='display:inline-block;background:#135c47;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:bold'>Confirmar email</a></p><p>O link é válido por um período limitado.</p>");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "New-account confirmation could not be sent.");
+                            TempData["Error"] = "A conta foi criada, mas o email de confirmação não foi enviado. Usa a opção Reenviar confirmação.";
+                        }
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
                     }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
+
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)
                 {

@@ -6,8 +6,8 @@ namespace aluguel.Models
     {
         [Key]
         public int id { get; set; }
-        public string codimagem { get; set; }
-        public string format { get; set; }
+        public string codimagem { get; set; } = "";
+        public string format { get; set; } = "";
 
 
     }

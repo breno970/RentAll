@@ -7,5 +7,7 @@ public class ApplicationUser : IdentityUser
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    // Null for legacy accounts with no reliable registration timestamp.
+    public DateTime? CreatedAt { get; set; }
 }
 

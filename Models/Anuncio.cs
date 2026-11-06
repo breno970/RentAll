@@ -14,40 +14,40 @@ namespace aluguel.Models
         public int id { get; set; }
 
       
-        [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Informe um valor válido.")]
+        [Range(0, 10000000, ErrorMessage = "O valor não pode ser negativo.") ]
         public float vlitem { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Somente números positivos são permitidos.")]
+        [Range(0, 365, ErrorMessage = "Informe até 365 dias, ou deixe em aberto.") ]
         public int diasAluguel { get; set; }
 
-        [Required(ErrorMessage = "O modelo é obrigatório.")]
-        public string modelo { get; set; }
+        
+        public string modelo { get; set; } = "";
 
 
-        [Required(ErrorMessage = "O CEP é obrigatório.")]
-        [StringLength(9, MinimumLength = 8, ErrorMessage = "O campo CEP deve conter entre 8 e 9 caracteres.")]
-        public string CEP { get; set; }
-        public string Rua { get; set; }
+        
+        public string CEP { get; set; } = "";
+        public string Rua { get; set; } = "";
 
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Somente números são permitidos.")]
         public string? Numero { get; set; }
 
+        public string Bairro { get; set; } = "";
         [Required]
-        public string Bairro { get; set; }
+        public string Cidade { get; set; } = "";
         [Required]
-        public string Cidade { get; set; }
-        [Required]
-        public string Estado { get; set; }
+        public string Estado { get; set; } = "";
         public string? Complemento { get; set; }
 
-        [Required]
-        public string contato { get; set; }
+        public string contato { get; set; } = "";
 
+        public string NomeFantasia { get; set; } = "";
+
+        // Novos anúncios: Portugal. Os registos históricos BR são conservados na base de dados.
         [Required]
-        public string NomeFantasia { get; set; }
+        [RegularExpression("^(BR|PT)$")]
+        public string Pais { get; set; } = "PT";
 
         //AspNetUsers
-        public string iduser { get; set; }
+        public string iduser { get; set; } = "";
 
         //Item
         [ForeignKey("itemid")]
