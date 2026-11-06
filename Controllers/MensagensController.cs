@@ -46,7 +46,8 @@ public sealed class MensagensController : Controller
                 UltimaMensagem = g.Max(m => m.CriadaEm),
                 UltimoTexto = g.OrderByDescending(m => m.CriadaEm).First().Texto,
                 PedidoPendente = requests.Any(p => p.AnuncioId == g.Key.AnuncioId &&
-                    p.Estado == "Pendente" && p.AnuncianteId == me &&
+                    ((p.Estado == "Pendente" && p.AnuncianteId == me) ||
+                     (p.Estado == "Contraproposta" && p.PropostaPorId != me)) &&
                     p.InteressadoId == g.Key.PeerId),
                 SouAnunciante = ad?.iduser == me
             };
@@ -64,7 +65,8 @@ public sealed class MensagensController : Controller
                 NomeArtigo = ad?.item?.nmitem ?? "Anúncio",
                 UltimaMensagem = request.CriadoEm,
                 UltimoTexto = "Pedido de aluguer registado",
-                PedidoPendente = request.AnuncianteId == me && request.Estado == "Pendente",
+                PedidoPendente = (request.AnuncianteId == me && request.Estado == "Pendente") ||
+                    (request.Estado == "Contraproposta" && request.PropostaPorId != me),
                 SouAnunciante = request.AnuncianteId == me
             });
         }
