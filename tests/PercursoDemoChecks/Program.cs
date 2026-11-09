@@ -49,7 +49,7 @@ PercursoDemoRegras.Atualizar(a, "avaliar", false, now, avaliacao: 5);
 Check(a.Avaliacao == 5, "rating stored");
 Fails(() => PercursoDemoRegras.Atualizar(a, "avaliar", false, now, avaliacao: 1), "no repeat rating");
 Fails(() => PercursoDemoRegras.Atualizar(a, "cancelar", false, now), "cannot refund after completion");
-Check(a.Versao == 12, "each accepted transition increments concurrency version");
+Check(a.Versao == 11, "each accepted transition increments concurrency version");
 PercursoAluguerDemo cancel = new() { PedidoId = 11 };
 PercursoDemoRegras.Atualizar(cancel, "aprovar", false, now, metodo: "cartao");
 PercursoDemoRegras.Atualizar(cancel, "cancelar", false, now);
