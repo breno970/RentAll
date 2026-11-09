@@ -195,6 +195,12 @@ public sealed class ItemsController : Controller
     {
         var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
         if (item is null) return NotFound();
+        var adIds = await _db.Anuncios.Where(a => a.itemid == item.id).Select(a => a.id).ToListAsync();
+        if (await RentalDeletionGuard.HasOpenRentalsAsync(_db, adIds))
+        {
+            TempData["Error"] = RentalDeletionGuard.BlockedMessage;
+            return RedirectToAction(nameof(Index));
+        }
         var keys = Images(item);
         try
         {

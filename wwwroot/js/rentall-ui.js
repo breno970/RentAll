@@ -67,14 +67,27 @@
       });
     });
     document.querySelectorAll("[data-submit-lock]").forEach(form => {
-      form.addEventListener("submit", () => {
+      form.addEventListener("submit", event => {
         if (!form.checkValidity()) return;
-        const btn = form.querySelector("button[type=submit]");
-        if (!btn) return;
-        btn.setAttribute("aria-busy", "true");
-        btn.classList.add("is-loading");
-        // Do not disable submit; the browser must still send the form.
+        // A second click while the first request is in flight would repeat the operation.
+        if (form.dataset.submitting === "true") { event.preventDefault(); return; }
+        form.dataset.submitting = "true";
+        const btn = event.submitter || form.querySelector("button[type=submit]");
+        if (btn) {
+          btn.setAttribute("aria-busy", "true");
+          btn.classList.add("is-loading");
+        }
+        // Do not disable submit; the browser must still send the clicked button's name/value.
+        // Pages restored from the back/forward cache must be usable again.
+        window.addEventListener("pageshow", () => {
+          delete form.dataset.submitting;
+          btn?.removeAttribute("aria-busy");
+          btn?.classList.remove("is-loading");
+        }, { once: true });
       });
+    });
+    document.querySelectorAll("[data-print-page]").forEach(button => {
+      button.addEventListener("click", () => window.print());
     });
   });
 })();

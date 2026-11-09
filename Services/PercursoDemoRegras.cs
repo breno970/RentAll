@@ -8,17 +8,63 @@ namespace aluguel.Services;
 /// </summary>
 public static class PercursoDemoRegras
 {
+    public const int MaxNota = 500;
+    public const int MaxAcessorios = 300;
+    public static readonly IReadOnlyDictionary<string, string> EstadosArtigo = new Dictionary<string, string>
+    {
+        ["como_novo"] = "Como novo",
+        ["bom"] = "Bom estado",
+        ["marcas_uso"] = "Marcas de uso",
+        ["danificado"] = "Danificado / com defeito"
+    };
+
+    /// <summary>Operations whose detail only exists in the logistics trail table.</summary>
+    public static bool ExigeHistorico(string operacao) =>
+        operacao is "pedir_alteracao" or "divergencia" or "checklist_entrega" or "checklist_devolucao";
+
     public static string Atualizar(PercursoAluguerDemo p, string operacao, bool anunciante,
         DateTime agoraUtc, string? metodo = null, string? tipo = null,
-        string? local = null, DateTime? entregaUtc = null, int? avaliacao = null)
+        string? local = null, DateTime? entregaUtc = null, int? avaliacao = null,
+        string? nota = null, string? estadoArtigo = null, string? acessorios = null)
     {
         string estado = p.Estado;
         void Exigir(bool condicao, string mensagem)
         {
             if (!condicao) throw new InvalidOperationException(mensagem);
         }
+        nota = string.IsNullOrWhiteSpace(nota) ? null : nota.Trim();
+        acessorios = string.IsNullOrWhiteSpace(acessorios) ? null : acessorios.Trim();
+        Exigir(nota == null || nota.Length <= MaxNota, $"As observações podem ter até {MaxNota} caracteres.");
+        Exigir(acessorios == null || acessorios.Length <= MaxAcessorios,
+            $"A lista de acessórios pode ter até {MaxAcessorios} caracteres.");
         switch (operacao)
         {
+            case "pedir_alteracao":
+                Exigir(!anunciante, "Só o locatário pode pedir alterações à proposta de entrega.");
+                Exigir(estado == "EntregaProposta", "Não existe uma proposta de entrega para alterar.");
+                Exigir(nota is { Length: >= 3 }, "Explica que alteração pretendes (mínimo 3 caracteres).");
+                p.Estado = "PagamentoSimulado";
+                p.AcordadaEm = null;
+                break;
+            case "checklist_entrega":
+                Exigir(estado == "EntregaAcordada",
+                    "A checklist de entrega é registada depois de a entrega ser acordada e antes de ser confirmada.");
+                Exigir(estadoArtigo != null && EstadosArtigo.ContainsKey(estadoArtigo),
+                    "Indica o estado do artigo.");
+                break;
+            case "checklist_devolucao":
+                Exigir(estado is "EmCurso" or "DevolucaoPendente",
+                    "A checklist de devolução só pode ser registada durante o aluguer ou a devolução.");
+                Exigir(estadoArtigo != null && EstadosArtigo.ContainsKey(estadoArtigo),
+                    "Indica o estado do artigo.");
+                break;
+            case "divergencia":
+                Exigir(anunciante, "A divergência na devolução é registada pelo anunciante.");
+                Exigir(estado == "DevolucaoPendente" && !p.IncidenteAberto,
+                    "Só podes registar uma divergência enquanto a devolução está por confirmar.");
+                Exigir(nota is { Length: >= 3 }, "Descreve a divergência encontrada (mínimo 3 caracteres).");
+                p.IncidenteAberto = true;
+                break;
             case "aprovar":
             case "recusar":
                 Exigir(!anunciante, "Só o locatário pode avançar no checkout de demonstração.");
@@ -118,6 +164,10 @@ public static class PercursoDemoRegras
         p.Versao++;
         return operacao switch
         {
+            "pedir_alteracao" => "Pedido de alteração enviado. O anunciante pode propor nova data, hora ou local.",
+            "checklist_entrega" => "Checklist de entrega guardada no histórico partilhado.",
+            "checklist_devolucao" => "Checklist de devolução guardada no histórico partilhado.",
+            "divergencia" => "Divergência registada. A conclusão fica suspensa até ser resolvida.",
             "aprovar" => "Aprovação simulada guardada. Não foi cobrado dinheiro.",
             "recusar" => "Recusa simulada guardada. Podes repetir o checkout.",
             "propor" => "Proposta de entrega guardada. O locatário pode aceitá-la.",
@@ -126,7 +176,7 @@ public static class PercursoDemoRegras
             "devolver" => "Devolução registada. Aguarda confirmação do anunciante.",
             "concluir" => "Aluguer demonstrativo concluído. Não houve pagamento real.",
             "incidente" => "Ocorrência fictícia registada. O fecho fica suspenso.",
-            "resolver" => "Ocorrência fictícia resolvida.",
+            "resolver" => "Ocorrência resolvida e registada no histórico.",
             "cancelar" => "Cancelamento e reembolso fictícios registados. Não houve movimentos financeiros.",
             "avaliar" => "Avaliação demonstrativa guardada.",
             _ => "Operação guardada."
