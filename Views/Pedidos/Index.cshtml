@@ -187,6 +187,10 @@
                        asp-route-pedidoId="@request.Id" class="btn btn-outline" style="margin-top:12px">
                         Experimentar aluguer completo: checkout, entrega e devolução
                     </a>
+                    <a asp-controller="PercursoDemo" asp-action="Detalhes"
+                       asp-route-pedidoId="@request.Id" class="btn btn-primary" style="margin-top:12px">
+                        Acompanhar o aluguer demonstrativo entre as duas contas
+                    </a>
                 }
                 <div class="ra-journey-banner">
                     <i class="far fa-comments" aria-hidden="true"></i>

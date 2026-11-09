@@ -35,5 +35,7 @@ jobs:
         run: dotnet build aluguel.csproj --no-restore -c Release
       - name: Test server-side contact safeguards
         run: dotnet run --project tests/ContactSafetyChecks/ContactSafetyChecks.csproj -c Release
+      - name: Test persistent rental demo transitions and participant permissions
+        run: dotnet run --project tests/PercursoDemoChecks/PercursoDemoChecks.csproj -c Release
       - name: Verify Docker image
         run: docker build --tag rentall:ci .
