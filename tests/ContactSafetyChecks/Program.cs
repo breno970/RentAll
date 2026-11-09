@@ -52,3 +52,23 @@ var portugal = new aluguel.ViewModel.MarketplaceFilters { Pais = "PT", Estado = 
 portugal.Normalize();
 if (portugal.Estado != "Lisboa") throw new Exception("Keep a valid Portuguese district.");
 Console.WriteLine("Portugal-only country, district and price filters passed.");
+
+var validListings = new (string? Title, string? Description, bool Valid)[]
+{
+    ("Câmara Sony", "Disponível para alugar em Lisboa.", true),
+    (new string('T', 140), new string('D', 6000), true),
+    (new string('T', 141), "Descrição", false),
+    ("Artigo", new string('D', 6001), false),
+    ("   ", "Descrição", false),
+    ("Artigo", "   ", false),
+    (null, "Descrição", false),
+    ("Artigo", null, false)
+};
+foreach (var (title, description, expected) in validListings)
+{
+    bool actual = ListingContentValidation.ValidTitle(title)
+        && ListingContentValidation.ValidDescription(description);
+    if (actual != expected)
+        throw new Exception($"Unexpected listing content validation outcome: expected {expected}, got {actual}.");
+}
+Console.WriteLine($"Listing content boundaries passed: {validListings.Length}.");
