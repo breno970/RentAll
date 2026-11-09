@@ -33,6 +33,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
         builder.Entity<PagamentoAluguer>().HasIndex(p => p.StripeSessionId).IsUnique();
         builder.Entity<PedidoAluguer>().HasIndex(p => new { p.AnuncianteId, p.CriadoEm });
         builder.Entity<PedidoAluguer>().Property(p => p.Estado).IsConcurrencyToken();
+        builder.Entity<PercursoAluguerDemo>().HasKey(p => p.PedidoId);
+        builder.Entity<PercursoAluguerDemo>().Property(p => p.Versao).IsConcurrencyToken();
         builder.Entity<Mensagem>().HasIndex(m => new { m.DestinatarioId, m.AnuncioId, m.CriadaEm });
         builder.Entity<Favorito>()
             .HasIndex(f => new { f.UserId, f.AnuncioId }).IsUnique();
@@ -47,6 +49,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
     public DbSet<Favorito> Favoritos { get; set; } = null!;
     public DbSet<Mensagem> Mensagens { get; set; } = null!;
     public DbSet<PedidoAluguer> PedidosAluguer { get; set; } = null!;
+    public DbSet<PercursoAluguerDemo> PercursosAluguerDemo { get; set; } = null!;
     public DbSet<ContaStripeLocador> ContasStripeLocador { get; set; } = null!;
     public DbSet<PagamentoAluguer> PagamentosAluguer { get; set; } = null!;
     public DbSet<EventoStripeProcessado> EventosStripeProcessados { get; set; } = null!;
