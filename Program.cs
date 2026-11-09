@@ -83,6 +83,25 @@ services.AddRateLimiter(options =>
                 PermitLimit = 10, Window = TimeSpan.FromMinutes(10),
                 QueueLimit = 0, AutoReplenishment = true
             }));
+    // Each journey step is one click; a full rental has ~15 of them per participant.
+    options.AddPolicy("rental-journey", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60, Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0, AutoReplenishment = true
+            }));
+    options.OnRejected = async (context, ct) =>
+    {
+        context.HttpContext.Response.ContentType = "text/html; charset=utf-8";
+        await context.HttpContext.Response.WriteAsync(
+            "<!doctype html><html lang=\"pt\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width\">" +
+            "<title>Demasiados pedidos · RentAll</title><body style=\"font-family:system-ui;max-width:560px;margin:60px auto;padding:0 16px\">" +
+            "<h1>Muitas ações seguidas</h1><p>Por segurança, limitámos temporariamente esta operação. " +
+            "Aguarda alguns minutos e tenta novamente. Nada foi alterado.</p><p><a href=\"javascript:history.back()\">Voltar</a></p></body></html>", ct);
+    };
     options.AddPolicy("messages", context =>
         RateLimitPartition.GetFixedWindowLimiter(
             context.User.FindFirstValue(ClaimTypes.NameIdentifier)

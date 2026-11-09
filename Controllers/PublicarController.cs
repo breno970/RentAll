@@ -75,9 +75,9 @@ public sealed class PublicarController : Controller
         vm.Estado = vm.Estado?.Trim();
         vm.Cidade = vm.Cidade?.Trim();
 
-        if (string.IsNullOrWhiteSpace(vm.Nome) || vm.Nome.Length > 140)
+        if (!ListingContentValidation.ValidTitle(vm.Nome))
             ModelState.AddModelError(nameof(vm.Nome), "Indica o nome do objeto (até 140 caracteres).");
-        if (string.IsNullOrWhiteSpace(vm.Descricao) || vm.Descricao.Length > 6000)
+        if (!ListingContentValidation.ValidDescription(vm.Descricao))
             ModelState.AddModelError(nameof(vm.Descricao), "Descreve o objeto (até 6000 caracteres).");
         // Public profiles and advert copy must not publish direct contact details.
         // This is a privacy/anti-fraud safeguard; buyers can use the in-app chat.

@@ -52,3 +52,37 @@ var portugal = new aluguel.ViewModel.MarketplaceFilters { Pais = "PT", Estado = 
 portugal.Normalize();
 if (portugal.Estado != "Lisboa") throw new Exception("Keep a valid Portuguese district.");
 Console.WriteLine("Portugal-only country, district and price filters passed.");
+
+var validListings = new (string? Title, string? Description, bool Valid)[]
+{
+    ("Câmara Sony", "Disponível para alugar em Lisboa.", true),
+    (new string('T', 140), new string('D', 6000), true),
+    (new string('T', 141), "Descrição", false),
+    ("Artigo", new string('D', 6001), false),
+    ("   ", "Descrição", false),
+    ("Artigo", "   ", false),
+    (null, "Descrição", false),
+    ("Artigo", null, false)
+};
+foreach (var (title, description, expected) in validListings)
+{
+    bool actual = ListingContentValidation.ValidTitle(title)
+        && ListingContentValidation.ValidDescription(description);
+    if (actual != expected)
+        throw new Exception($"Unexpected listing content validation outcome: expected {expected}, got {actual}.");
+}
+Console.WriteLine($"Listing content boundaries passed: {validListings.Length}.");
+
+// Upload content must match the declared image type (Content-Type is client-controlled).
+var png = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13 };
+var jpeg = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
+var webp = "RIFF\0\0\0\0WEBPVP8 "u8.ToArray();
+var html = "<html><script>"u8.ToArray();
+if (!aluguel.Services.ImageSignature.Matches("image/png", png)) throw new Exception("PNG rejected");
+if (!aluguel.Services.ImageSignature.Matches("image/jpeg", jpeg)) throw new Exception("JPEG rejected");
+if (!aluguel.Services.ImageSignature.Matches("image/webp", webp)) throw new Exception("WebP rejected");
+if (aluguel.Services.ImageSignature.Matches("image/png", html)) throw new Exception("HTML accepted as PNG");
+if (aluguel.Services.ImageSignature.Matches("image/jpeg", png)) throw new Exception("PNG accepted as JPEG");
+if (aluguel.Services.ImageSignature.Matches("image/gif", png)) throw new Exception("Unsupported type accepted");
+if (aluguel.Services.ImageSignature.Matches("image/png", Array.Empty<byte>())) throw new Exception("Empty file accepted");
+Console.WriteLine("Image signature checks passed: 7.");

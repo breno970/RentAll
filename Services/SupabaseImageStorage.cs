@@ -43,6 +43,11 @@ public sealed class SupabaseImageStorage : IImageStorage
             throw new InvalidDataException("A imagem deve ter até 5 MB.");
         if (!Allowed.TryGetValue(image.ContentType, out var ext))
             throw new InvalidDataException("Apenas imagens JPG, PNG ou WebP são aceites.");
+        await using (var probe = image.OpenReadStream())
+        {
+            if (!await ImageSignature.MatchesAsync(image.ContentType, probe, ct))
+                throw new InvalidDataException("O ficheiro não é uma imagem JPG, PNG ou WebP válida.");
+        }
 
         var key = $"{userId}/{Guid.NewGuid():N}{ext}";
         using var request = new HttpRequestMessage(HttpMethod.Post,

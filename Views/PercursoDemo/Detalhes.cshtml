@@ -6,6 +6,8 @@
     var demo = Model.Percurso;
     var owner = Model.SouAnunciante;
     var stage = demo?.Estado ?? "NaoIniciado";
+    var trail = Model.HistoricoDisponivel;
+    var eventos = Model.Eventos;
     var tz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Lisbon");
     Func<DateTime?, string> when = d => d.HasValue
         ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(d.Value, DateTimeKind.Utc), tz).ToString("dd/MM/yyyy HH:mm")
@@ -13,7 +15,9 @@
     var daily = RentalLocalization.FormatPrice((float)pedido.PrecoDia, pedido.Pais);
     var total = RentalLocalization.FormatPrice((float)pedido.TotalEstimado, pedido.Pais);
     var fee = RentalLocalization.FormatPrice((float)pedido.ComissaoIndicativa, pedido.Pais);
+    var ownerShare = RentalLocalization.FormatPrice((float)(pedido.TotalEstimado - pedido.ComissaoIndicativa), pedido.Pais);
     var proposedDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(1), tz).ToString("yyyy-MM-ddTHH:mm");
+    var daysLabel = pedido.Dias == 1 ? "1 dia" : $"{pedido.Dias} dias";
     var labels = new Dictionary<string, string> {
         ["Checkout"] = "A aguardar checkout", ["PagamentoRecusado"] = "Pagamento de demonstração recusado",
         ["PagamentoSimulado"] = "Pagamento de demonstração aprovado",
@@ -22,14 +26,40 @@
         ["DevolucaoPendente"] = "Devolução por confirmar", ["Concluido"] = "Aluguer demonstrativo concluído",
         ["Cancelado"] = "Cancelado e reembolsado (demonstração)", ["NaoIniciado"] = "Pronto para iniciar"
     };
+    var steps = new[] {
+        ("Checkout", new[] { "Checkout", "PagamentoRecusado" }),
+        ("Entrega", new[] { "PagamentoSimulado", "EntregaProposta", "EntregaAcordada" }),
+        ("Em curso", new[] { "EmCurso" }),
+        ("Devolução", new[] { "DevolucaoPendente" }),
+        ("Concluído", new[] { "Concluido" })
+    };
+    int currentStep = Array.FindIndex(steps, s => s.Item2.Contains(stage));
+    if (stage == "NaoIniciado") currentStep = 0;
+    var opLabels = new Dictionary<string, string> {
+        ["aprovar"] = "Checkout fictício aprovado", ["recusar"] = "Checkout fictício recusado",
+        ["propor"] = "Proposta de entrega", ["pedir_alteracao"] = "Alteração pedida à proposta",
+        ["aceitar"] = "Proposta de entrega aceite", ["checklist_entrega"] = "Checklist de entrega",
+        ["entregar"] = "Entrega confirmada", ["receber"] = "Receção confirmada",
+        ["incidente"] = "Ocorrência registada", ["resolver"] = "Ocorrência resolvida",
+        ["checklist_devolucao"] = "Checklist de devolução", ["devolver"] = "Devolução registada",
+        ["divergencia"] = "Divergência na devolução", ["concluir"] = "Devolução recebida — concluído",
+        ["cancelar"] = "Cancelamento e reembolso simulados", ["avaliar"] = "Avaliação atribuída"
+    };
+    var lastChangeRequest = stage == "PagamentoSimulado"
+        ? eventos.LastOrDefault(e => e.Operacao == "pedir_alteracao") : null;
+    var lastIssue = demo?.IncidenteAberto == true
+        ? eventos.LastOrDefault(e => e.Operacao is "incidente" or "divergencia") : null;
+    var myChecklists = eventos.Where(e => e.AutorId == (owner ? pedido.AnuncianteId : pedido.InteressadoId)).Select(e => e.Operacao).ToHashSet();
+    var receiptRef = $"DEMO-{pedido.Id:D5}-{(demo?.PagamentoEm ?? DateTime.UtcNow):yyyyMMdd}";
+    var method = demo?.MetodoPagamento == "mbway" ? "MB WAY (simulado)" : "Cartão (simulado)";
 }
 <link rel="stylesheet" href="~/css/persistent-rental-demo.css" asp-append-version="true" />
 <div class="page-width ra-live-demo">
     <header class="ra-live-head">
         <div>
-            <p class="eyebrow">RentAll · Acompanhamento interativo</p>
+            <p class="eyebrow">RentAll · Acompanhamento do aluguer</p>
             <h1>@Model.Artigo</h1>
-            <p>Pedido #@pedido.Id · @pedido.Dias @(pedido.Dias == 1 ? "dia" : "dias") · @daily por dia</p>
+            <p>Pedido #@pedido.Id · @daysLabel · @daily por dia</p>
         </div>
         <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Voltar aos meus pedidos</a>
     </header>
@@ -38,6 +68,16 @@
         As confirmações são guardadas e visíveis para os dois participantes, mas não comprovam pagamentos,
         reservas, entregas físicas, reembolsos ou qualquer transferência. Não introduzas dados bancários.
     </div>
+    @if (stage != "Cancelado")
+    {
+        <ol class="ra-live-steps" aria-label="Etapas do aluguer">
+            @for (int i = 0; i < steps.Length; i++)
+            {
+                var cls = i < currentStep || stage == "Concluido" ? "is-done" : i == currentStep ? "is-current" : "";
+                <li class="@cls" aria-current="@(i == currentStep ? "step" : null)"><span>@(i + 1)</span>@steps[i].Item1</li>
+            }
+        </ol>
+    }
     <div class="ra-live-grid">
         <main class="ra-live-main">
             <section class="ra-live-card ra-live-status">
@@ -54,7 +94,7 @@
                     <p>Assim que o locatário iniciar, os dois participantes poderão acompanhar o mesmo fluxo com estados guardados na RentAll.</p>
                     @if (!owner)
                     {
-                        <form asp-controller="PercursoDemo" asp-action="Iniciar" method="post">
+                        <form asp-controller="PercursoDemo" asp-action="Iniciar" method="post" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
                             <button class="btn btn-primary" type="submit">Iniciar checkout de demonstração</button>
                         </form>
@@ -66,8 +106,15 @@
                     <h2>Checkout do aluguer</h2>
                     @if (!owner)
                     {
-                        <p>Revisa os valores e escolhe como seria pago o aluguer. Nenhum dinheiro será cobrado.</p>
-                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form">
+                        <p>Revisa o resumo e escolhe como seria pago o aluguer. Nenhum dinheiro será cobrado.</p>
+                        <dl class="ra-live-amounts ra-live-checkout-summary">
+                            <div><dt>Preço por dia</dt><dd>@daily</dd></div>
+                            <div><dt>Duração</dt><dd>@daysLabel</dd></div>
+                            <div><dt>Total do aluguer</dt><dd>@total</dd></div>
+                            <div><dt>Comissão indicativa RentAll (10%, incluída)</dt><dd>@fee</dd></div>
+                            <div class="is-total"><dt>A cobrar nesta demonstração</dt><dd>0,00 €</dd></div>
+                        </dl>
+                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
                             <label>Método de pagamento demonstrativo
                                 <select name="metodo" class="form-select" required>
@@ -75,46 +122,59 @@
                                     <option value="mbway">MB WAY (simulado)</option>
                                 </select>
                             </label>
-                            <div class="ra-live-faux-card"><small>CHECKOUT TESTE · SEM DADOS FINANCEIROS</small><strong>•••• •••• •••• 4242</strong><span>Pagamento meramente ilustrativo</span></div>
+                            <div class="ra-live-faux-card" aria-hidden="true"><small>CHECKOUT TESTE · SEM DADOS FINANCEIROS</small><strong>•••• •••• •••• 4242</strong><span>Pagamento meramente ilustrativo</span></div>
                             <div class="ra-live-actions">
                                 <button type="submit" name="operacao" value="aprovar" class="btn btn-primary">Simular pagamento aprovado</button>
                                 <button type="submit" name="operacao" value="recusar" class="btn btn-outline">Simular recusa</button>
                             </div>
                         </form>
-                        @if (stage == "PagamentoRecusado") { <p class="ra-live-hint">O pagamento fictício foi recusado. Podes repetir a tentativa.</p> }
+                        @if (stage == "PagamentoRecusado") { <p class="ra-live-alert" role="status">O pagamento fictício foi recusado. Podes repetir a tentativa com outro método.</p> }
                     }
                     else { <p class="ra-live-hint">Aguarda que o locatário termine o checkout. Nenhuma cobrança é efetuada.</p> }
                 }
                 else if (stage is "PagamentoSimulado" or "EntregaProposta")
                 {
                     <h2>Combinar a entrega</h2>
-                    <p>O pagamento foi apenas <strong>simulado</strong>. Falta definir como e quando o artigo seria entregue.</p>
+                    <p>O pagamento foi apenas <strong>simulado</strong>. Falta definir como, onde e quando o artigo é entregue.</p>
                     @if (demo.EntregaEm.HasValue && stage == "EntregaProposta")
                     {
                         <div class="ra-live-summary">
                             <strong>Proposta atual</strong>
-                            <p>@(demo.EntregaTipo == "em_maos" ? "Entrega em mãos" : demo.EntregaTipo == "ponto_recolha" ? "Ponto de recolha" : "Transportadora (exemplo)")</p>
+                            <p>@(demo.EntregaTipo == "em_maos" ? "Entrega em mãos, local público" : demo.EntregaTipo == "ponto_recolha" ? "Ponto de recolha" : "Transportadora (exemplo)")</p>
                             <p>@demo.EntregaLocal · @when(demo.EntregaEm) (hora de Portugal)</p>
+                        </div>
+                    }
+                    @if (lastChangeRequest != null)
+                    {
+                        <div class="ra-live-alert" role="status">
+                            <strong>O locatário pediu alterações</strong>
+                            <p>“@lastChangeRequest.Nota”</p>
                         </div>
                     }
                     @if (owner)
                     {
-                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form">
+                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
                             <input type="hidden" name="operacao" value="propor" />
                             <label>Como será entregue?
                                 <select class="form-select" name="tipo" required>
-                                    <option value="em_maos">Entrega em mãos, local público</option>
-                                    <option value="ponto_recolha">Ponto de recolha</option>
-                                    <option value="transportadora">Transportadora (exemplo, sem expedição real)</option>
+                                    <option value="em_maos" selected="@(demo.EntregaTipo is null or "em_maos")">Entrega em mãos, local público</option>
+                                    <option value="ponto_recolha" selected="@(demo.EntregaTipo == "ponto_recolha")">Recolha num ponto combinado</option>
+                                    <option value="transportadora" selected="@(demo.EntregaTipo == "transportadora")">Transportadora (exemplo, sem expedição real)</option>
                                 </select>
                             </label>
                             <label>Local público / ponto de recolha
-                                <input class="form-control" name="local" minlength="3" maxlength="120" required placeholder="Ex.: junto à estação de comboios" />
+                                <input class="form-control" name="local" minlength="3" maxlength="120" required value="@demo.EntregaLocal" placeholder="Ex.: junto à estação de comboios" />
                             </label>
                             <label>Data e hora em Portugal
-                                <input class="form-control" name="dataHora" type="datetime-local" value="@proposedDate" required />
+                                <input class="form-control" name="dataHora" type="datetime-local" value="@(demo.EntregaEm.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(demo.EntregaEm.Value, DateTimeKind.Utc), tz).ToString("yyyy-MM-ddTHH:mm") : proposedDate)" required />
                             </label>
+                            @if (trail)
+                            {
+                                <label>Condições ou observações (opcional)
+                                    <textarea class="form-control" name="nota" maxlength="500" rows="2" placeholder="Ex.: trazer documento de identificação; o artigo é entregue com a caixa original."></textarea>
+                                </label>
+                            }
                             <button type="submit" class="btn btn-primary">@(stage == "EntregaProposta" ? "Atualizar proposta" : "Propor entrega")</button>
                         </form>
                     }
@@ -122,14 +182,30 @@
                     {
                         @if (stage == "EntregaProposta")
                         {
-                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post">
-                                <input type="hidden" name="pedidoId" value="@pedido.Id" />
-                                <input type="hidden" name="operacao" value="aceitar" />
-                                <button type="submit" class="btn btn-primary">Aceitar modalidade, local e data</button>
-                            </form>
+                            <div class="ra-live-actions">
+                                <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" data-submit-lock>
+                                    <input type="hidden" name="pedidoId" value="@pedido.Id" />
+                                    <input type="hidden" name="operacao" value="aceitar" />
+                                    <button type="submit" class="btn btn-primary">Aceitar modalidade, local e data</button>
+                                </form>
+                            </div>
+                            @if (trail)
+                            {
+                                <details class="ra-live-details">
+                                    <summary>Pedir alterações à proposta</summary>
+                                    <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
+                                        <input type="hidden" name="pedidoId" value="@pedido.Id" />
+                                        <input type="hidden" name="operacao" value="pedir_alteracao" />
+                                        <label>O que pretendes alterar?
+                                            <textarea class="form-control" name="nota" minlength="3" maxlength="500" rows="3" required placeholder="Ex.: pode ser às 19h, na entrada principal?"></textarea>
+                                        </label>
+                                        <button type="submit" class="btn btn-outline">Enviar pedido de alteração</button>
+                                    </form>
+                                </details>
+                            }
                         }
-                        else { <p class="ra-live-hint">Aguarda que o anunciante faça uma proposta.</p> }
-                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-secondary">
+                        else { <p class="ra-live-hint">Aguarda que o anunciante faça @(lastChangeRequest != null ? "uma nova proposta" : "uma proposta").</p> }
+                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-secondary" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
                             <input type="hidden" name="operacao" value="cancelar" />
                             <button class="btn btn-outline" type="submit">Simular cancelamento e reembolso</button>
@@ -141,16 +217,23 @@
                     <h2>Confirmar a entrega</h2>
                     <p>Local: <strong>@demo.EntregaLocal</strong> · @when(demo.EntregaEm) (hora de Portugal).</p>
                     <div class="ra-live-party">
-                        <div><strong>Anunciante</strong><span>@(demo.EntreguePeloAnuncianteEm.HasValue ? "Entrega confirmada (demo)" : "Por confirmar")</span></div>
-                        <div><strong>Locatário</strong><span>@(demo.RecebidaPeloLocatarioEm.HasValue ? "Receção confirmada (demo)" : "Por confirmar")</span></div>
+                        <div><strong>Anunciante</strong><span>@(demo.EntreguePeloAnuncianteEm.HasValue ? "Entrega confirmada" : "Por confirmar")</span></div>
+                        <div><strong>Locatário</strong><span>@(demo.RecebidaPeloLocatarioEm.HasValue ? "Receção confirmada" : "Por confirmar")</span></div>
                     </div>
+                    @if (trail)
+                    {
+                        <details class="ra-live-details" open="@(!myChecklists.Contains("checklist_entrega"))">
+                            <summary>@(myChecklists.Contains("checklist_entrega") ? "Atualizar a checklist de entrega" : "Checklist de entrega (recomendado antes de confirmar)")</summary>
+                            @await Html.PartialAsync("_ChecklistForm", (pedido.Id, "checklist_entrega"))
+                        </details>
+                    }
                     @if ((owner && !demo.EntreguePeloAnuncianteEm.HasValue) || (!owner && !demo.RecebidaPeloLocatarioEm.HasValue))
                     {
-                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post">
+                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
                             <input type="hidden" name="operacao" value="@(owner ? "entregar" : "receber")" />
-                            <p class="ra-live-hint">Ao confirmar, declaras apenas uma entrega de exemplo, sem validação física do objeto.</p>
-                            <button class="btn btn-primary" type="submit">@(owner ? "Confirmar entrega simulada" : "Confirmar receção simulada")</button>
+                            <p class="ra-live-hint">Ao confirmar, declaras uma entrega de demonstração, sem validação física do objeto pela RentAll.</p>
+                            <button class="btn btn-primary" type="submit">@(owner ? "Confirmar entrega" : "Confirmar receção")</button>
                         </form>
                     }
                     else { <p class="ra-live-hint">A tua confirmação está guardada. Aguarda a outra pessoa.</p> }
@@ -158,46 +241,94 @@
                 else if (stage is "EmCurso" or "DevolucaoPendente")
                 {
                     <h2>@(stage == "EmCurso" ? "Aluguer em curso" : "Devolução por confirmar")</h2>
-                    <p>O artigo foi entregue na simulação. A entrega física e a receção não foram verificadas pela plataforma.</p>
+                    <p>Entregue em @when(demo.RecebidaPeloLocatarioEm ?? demo.EntreguePeloAnuncianteEm) · devolução prevista até
+                        <strong>@when((demo.RecebidaPeloLocatarioEm ?? demo.EntreguePeloAnuncianteEm)?.AddDays(pedido.Dias))</strong>.</p>
                     @if (demo.IncidenteAberto)
                     {
-                        <p class="ra-live-alert">Existe uma ocorrência de demonstração aberta. As ações de devolução/conclusão ficam suspensas.</p>
+                        <div class="ra-live-alert" role="status">
+                            <strong>Existe uma ocorrência aberta.</strong> A devolução e a conclusão ficam suspensas até ser resolvida.
+                            @if (lastIssue?.Nota is string issueNote) { <p>“@issueNote” — @(lastIssue.Papel == "anunciante" ? "anunciante" : "locatário")</p> }
+                        </div>
                         @if (owner)
                         {
-                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post">
+                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
                                 <input type="hidden" name="pedidoId" value="@pedido.Id" />
                                 <input type="hidden" name="operacao" value="resolver" />
-                                <button class="btn btn-outline" type="submit">Resolver ocorrência fictícia</button>
+                                @if (trail)
+                                {
+                                    <label>Como foi resolvida? (opcional)
+                                        <textarea class="form-control" name="nota" maxlength="500" rows="2"></textarea>
+                                    </label>
+                                }
+                                <button class="btn btn-outline" type="submit">Marcar ocorrência como resolvida</button>
                             </form>
                         }
+                        else { <p class="ra-live-hint">O anunciante confirma a resolução. Usa a conversa para combinar a solução.</p> }
                     }
                     else
                     {
                         @if (stage == "EmCurso" && !owner)
                         {
-                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post">
+                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
                                 <input type="hidden" name="pedidoId" value="@pedido.Id" />
                                 <input type="hidden" name="operacao" value="devolver" />
-                                <button class="btn btn-primary" type="submit">Confirmar devolução simulada</button>
+                                @if (trail)
+                                {
+                                    <label>Observações da devolução (opcional)
+                                        <textarea class="form-control" name="nota" maxlength="500" rows="2" placeholder="Ex.: devolvido com todos os acessórios."></textarea>
+                                    </label>
+                                }
+                                <button class="btn btn-primary" type="submit">Confirmar devolução</button>
                             </form>
                         }
                         @if (stage == "DevolucaoPendente" && owner)
                         {
-                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post">
+                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" data-submit-lock>
                                 <input type="hidden" name="pedidoId" value="@pedido.Id" />
                                 <input type="hidden" name="operacao" value="concluir" />
-                                <button class="btn btn-primary" type="submit">Confirmar receção e concluir demonstração</button>
+                                <button class="btn btn-primary" type="submit">Confirmar receção e concluir</button>
                             </form>
+                            @if (trail)
+                            {
+                                <details class="ra-live-details">
+                                    <summary>Encontraste alguma divergência?</summary>
+                                    <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
+                                        <input type="hidden" name="pedidoId" value="@pedido.Id" />
+                                        <input type="hidden" name="operacao" value="divergencia" />
+                                        <label>Descreve a divergência
+                                            <textarea class="form-control" name="nota" minlength="3" maxlength="500" rows="3" required placeholder="Ex.: falta a bolsa de transporte; risco novo no ecrã."></textarea>
+                                        </label>
+                                        <p class="ra-live-hint">Registar uma divergência suspende a conclusão. Não existe caução nem cobrança de danos nesta fase.</p>
+                                        <button class="btn btn-outline" type="submit">Registar divergência</button>
+                                    </form>
+                                </details>
+                            }
                         }
                         @if ((stage == "EmCurso" && owner) || (stage == "DevolucaoPendente" && !owner))
                         {
                             <p class="ra-live-hint">Aguarda a próxima confirmação do outro participante.</p>
                         }
-                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-secondary">
-                            <input type="hidden" name="pedidoId" value="@pedido.Id" />
-                            <input type="hidden" name="operacao" value="incidente" />
-                            <button class="btn btn-outline" type="submit">Registar ocorrência fictícia</button>
-                        </form>
+                        @if (trail)
+                        {
+                            <details class="ra-live-details">
+                                <summary>Checklist de devolução</summary>
+                                @await Html.PartialAsync("_ChecklistForm", (pedido.Id, "checklist_devolucao"))
+                            </details>
+                        }
+                        <details class="ra-live-details">
+                            <summary>Comunicar um problema</summary>
+                            <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
+                                <input type="hidden" name="pedidoId" value="@pedido.Id" />
+                                <input type="hidden" name="operacao" value="incidente" />
+                                @if (trail)
+                                {
+                                    <label>O que aconteceu?
+                                        <textarea class="form-control" name="nota" maxlength="500" rows="3" placeholder="Ex.: o comando deixou de funcionar."></textarea>
+                                    </label>
+                                }
+                                <button class="btn btn-outline" type="submit">Registar ocorrência</button>
+                            </form>
+                        </details>
                     }
                 }
                 else if (stage == "Concluido")
@@ -206,10 +337,10 @@
                     <p>Entrega, receção e devolução foram confirmadas por contas diferentes. Nenhum pagamento nem envio real foi efetuado.</p>
                     @if (!owner && !demo.Avaliacao.HasValue)
                     {
-                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form">
+                        <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
                             <input type="hidden" name="operacao" value="avaliar" />
-                            <label>Avaliar a experiência fictícia
+                            <label>Avaliar a experiência
                                 <select class="form-select" name="avaliacao" required>
                                     <option value="">Escolhe</option><option value="1">1/5</option>
                                     <option value="2">2/5</option><option value="3">3/5</option>
@@ -233,37 +364,77 @@
             @if (demo != null)
             {
                 <section class="ra-live-card">
-                    <h2>Histórico guardado</h2>
-                    <ol class="ra-live-timeline">
-                        <li><strong>Percurso iniciado</strong><span>@when(demo.CriadoEm)</span></li>
-                        @if (demo.PagamentoEm.HasValue) { <li><strong>Checkout fictício aprovado</strong><span>@when(demo.PagamentoEm)</span></li> }
-                        @if (demo.EntregaEm.HasValue) { <li><strong>Entrega proposta</strong><span>@demo.EntregaLocal · @when(demo.EntregaEm)</span></li> }
-                        @if (demo.AcordadaEm.HasValue) { <li><strong>Entrega aceite pelo locatário</strong><span>@when(demo.AcordadaEm)</span></li> }
-                        @if (demo.EntreguePeloAnuncianteEm.HasValue) { <li><strong>Anunciante confirmou entrega</strong><span>@when(demo.EntreguePeloAnuncianteEm)</span></li> }
-                        @if (demo.RecebidaPeloLocatarioEm.HasValue) { <li><strong>Locatário confirmou receção</strong><span>@when(demo.RecebidaPeloLocatarioEm)</span></li> }
-                        @if (demo.DevolvidaPeloLocatarioEm.HasValue) { <li><strong>Locatário confirmou devolução</strong><span>@when(demo.DevolvidaPeloLocatarioEm)</span></li> }
-                        @if (demo.RecebidaPeloAnuncianteEm.HasValue) { <li><strong>Anunciante recebeu de volta</strong><span>@when(demo.RecebidaPeloAnuncianteEm)</span></li> }
-                        @if (demo.Estado == "Cancelado") { <li><strong>Cancelamento e reembolso simulados</strong><span>@when(demo.AtualizadoEm)</span></li> }
-                        @if (demo.Avaliacao.HasValue) { <li><strong>Avaliação fictícia</strong><span>@demo.Avaliacao/5</span></li> }
-                    </ol>
+                    <h2>Histórico partilhado</h2>
+                    @if (trail && eventos.Count > 0)
+                    {
+                        <ol class="ra-live-timeline">
+                            <li><strong>Percurso iniciado</strong><span>@when(demo.CriadoEm)</span></li>
+                            @foreach (var e in eventos)
+                            {
+                                <li class="@(e.Operacao is "incidente" or "divergencia" ? "is-warning" : "")">
+                                    <strong>@(opLabels.TryGetValue(e.Operacao, out var opLabel) ? opLabel : e.Operacao)</strong>
+                                    <span>@when(e.CriadoEm) · @(e.Papel == "anunciante" ? "Anunciante" : "Locatário")@(e.AutorId == (owner ? pedido.AnuncianteId : pedido.InteressadoId) ? " (tu)" : "")</span>
+                                    @if (e.Operacao == "propor" && e == eventos.Last(x => x.Operacao == "propor") && demo.EntregaEm.HasValue) { <span>@demo.EntregaLocal · @when(demo.EntregaEm)</span> }
+                                    @if (e.EstadoArtigo != null) { <span>Estado: @(PercursoDemoRegras.EstadosArtigo.TryGetValue(e.EstadoArtigo, out var cond) ? cond : e.EstadoArtigo)</span> }
+                                    @if (e.Acessorios != null) { <span>Acessórios: @e.Acessorios</span> }
+                                    @if (e.Nota != null) { <span class="ra-live-note">“@e.Nota”</span> }
+                                    @if (e.FotoKey != null) { <a class="ra-live-photo" href="/imagens/@e.FotoKey" target="_blank" rel="noopener"><img src="/imagens/@e.FotoKey" alt="Fotografia da checklist" loading="lazy" width="120" height="90" /></a> }
+                                </li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {
+                        <ol class="ra-live-timeline">
+                            <li><strong>Percurso iniciado</strong><span>@when(demo.CriadoEm)</span></li>
+                            @if (demo.PagamentoEm.HasValue) { <li><strong>Checkout fictício aprovado</strong><span>@when(demo.PagamentoEm)</span></li> }
+                            @if (demo.EntregaEm.HasValue) { <li><strong>Entrega proposta</strong><span>@demo.EntregaLocal · @when(demo.EntregaEm)</span></li> }
+                            @if (demo.AcordadaEm.HasValue) { <li><strong>Entrega aceite pelo locatário</strong><span>@when(demo.AcordadaEm)</span></li> }
+                            @if (demo.EntreguePeloAnuncianteEm.HasValue) { <li><strong>Anunciante confirmou entrega</strong><span>@when(demo.EntreguePeloAnuncianteEm)</span></li> }
+                            @if (demo.RecebidaPeloLocatarioEm.HasValue) { <li><strong>Locatário confirmou receção</strong><span>@when(demo.RecebidaPeloLocatarioEm)</span></li> }
+                            @if (demo.DevolvidaPeloLocatarioEm.HasValue) { <li><strong>Locatário confirmou devolução</strong><span>@when(demo.DevolvidaPeloLocatarioEm)</span></li> }
+                            @if (demo.RecebidaPeloAnuncianteEm.HasValue) { <li><strong>Anunciante recebeu de volta</strong><span>@when(demo.RecebidaPeloAnuncianteEm)</span></li> }
+                            @if (demo.Estado == "Cancelado") { <li><strong>Cancelamento e reembolso simulados</strong><span>@when(demo.AtualizadoEm)</span></li> }
+                            @if (demo.Avaliacao.HasValue) { <li><strong>Avaliação fictícia</strong><span>@demo.Avaliacao/5</span></li> }
+                        </ol>
+                    }
                 </section>
             }
         </main>
         <aside class="ra-live-side">
             <section class="ra-live-card">
-                <h2>Resumo financeiro</h2>
+                <h2>Resumo do pedido</h2>
                 <dl class="ra-live-amounts">
-                    <div><dt>Aluguer</dt><dd>@total</dd></div>
+                    <div><dt>Preço por dia</dt><dd>@daily</dd></div>
+                    <div><dt>Duração</dt><dd>@daysLabel</dd></div>
+                    <div><dt>Total do aluguer</dt><dd>@total</dd></div>
                     <div><dt>Comissão indicativa RentAll</dt><dd>@fee</dd></div>
-                    <div><dt>Total realmente cobrado</dt><dd><strong>0,00 €</strong></dd></div>
+                    <div><dt>Valor indicativo para o anunciante</dt><dd>@ownerShare</dd></div>
+                    <div class="is-total"><dt>Total realmente cobrado</dt><dd>0,00 €</dd></div>
                 </dl>
-                <p>Não constitui comprovativo fiscal. A simulação não modifica a tabela de pagamentos Stripe.</p>
+                <p>A comissão é uma estimativa do modelo de negócio. Nenhum valor é cobrado nem transferido.</p>
             </section>
+            @if (demo?.PagamentoEm != null)
+            {
+                <section class="ra-live-card ra-live-receipt" aria-labelledby="receipt-title">
+                    <h2 id="receipt-title">Comprovativo demonstrativo</h2>
+                    <p class="ra-live-receipt-stamp">SEM VALOR FISCAL · NÃO É UM PAGAMENTO</p>
+                    <dl class="ra-live-amounts">
+                        <div><dt>Referência</dt><dd>@receiptRef</dd></div>
+                        <div><dt>Data</dt><dd>@when(demo.PagamentoEm)</dd></div>
+                        <div><dt>Método</dt><dd>@method</dd></div>
+                        <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
+                        <div><dt>Valor simulado</dt><dd>@total</dd></div>
+                        <div><dt>Estado</dt><dd>@(stage == "Cancelado" ? "Reembolso simulado" : "Aprovado (simulação)")</dd></div>
+                    </dl>
+                    <button type="button" class="btn btn-outline" data-print-page>Imprimir comprovativo</button>
+                </section>
+            }
             <section class="ra-live-card">
                 <h2>Os dois participantes</h2>
-                <p><strong>Anunciante:</strong> propõe e confirma entrega, confirma devolução.</p>
-                <p><strong>Locatário:</strong> simula checkout, aceita entrega, confirma receção e devolução.</p>
-                <p>Cada pessoa deve entrar com a sua própria conta. Atualiza esta página para consultar mudanças recentes.</p>
+                <p><strong>Anunciante:</strong> propõe a entrega, regista a checklist, confirma entrega e devolução.</p>
+                <p><strong>Locatário:</strong> faz o checkout simulado, aceita ou pede alterações, confirma receção e devolução.</p>
+                <p>Cada pessoa entra com a sua própria conta. Atualiza a página para ver mudanças recentes.</p>
                 <a asp-controller="Mensagens" asp-action="Conversa" asp-route-anuncioId="@pedido.AnuncioId"
                    asp-route-peerId="@(owner ? pedido.InteressadoId : pedido.AnuncianteId)" class="btn btn-outline">
                     Abrir conversa

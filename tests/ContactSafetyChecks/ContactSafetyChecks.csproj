@@ -8,6 +8,8 @@
   <ItemGroup>
     <Compile Include="../../Services/MarketplaceContactSafety.cs" Link="MarketplaceContactSafety.cs" />
     <Compile Include="../../Services/LocationCatalog.cs" Link="LocationCatalog.cs" />
+    <Compile Include="../../Services/ListingContentValidation.cs" Link="ListingContentValidation.cs" />
+    <Compile Include="../../Services/ImageSignature.cs" Link="ImageSignature.cs" />
     <Compile Include="../../ViewModel/MarketplaceFilters.cs" Link="MarketplaceFilters.cs" />
   </ItemGroup>
 </Project>

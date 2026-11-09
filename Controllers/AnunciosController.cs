@@ -236,6 +236,11 @@ public class AnunciosController : Controller
     {
         var ad = await _db.Anuncios.FirstOrDefaultAsync(a => a.id == id && a.iduser == UserId);
         if (ad is null) return NotFound();
+        if (await aluguel.Services.RentalDeletionGuard.HasOpenRentalsAsync(_db, new[] { ad.id }))
+        {
+            TempData["Error"] = aluguel.Services.RentalDeletionGuard.BlockedMessage;
+            return RedirectToAction(nameof(Index));
+        }
         try
         {
             _db.Anuncios.Remove(ad);

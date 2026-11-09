@@ -154,17 +154,26 @@
     const category = document.querySelector("#Categoria");
     const type = document.querySelector("#Tipo");
     if (!category || !type) return;
+    // Only the latest category change may fill the list. Older in-flight responses
+    // (e.g. the automatic category suggestion) are aborted so types never mix.
+    let pending = null;
     async function refresh() {
       const id = category.value;
-      type.replaceChildren(new Option("Selecione o tipo", ""));
-      type.disabled = !id;
+      pending?.abort();
+      const controller = new AbortController();
+      pending = controller;
+      type.replaceChildren(new Option(id ? "A carregar tipos…" : "Selecione o tipo", ""));
+      type.disabled = true;
       if (!id) return;
       try {
         const response = await fetch("/api/v1/catalogo/tipos?categoriaId=" + encodeURIComponent(id), {
-          credentials: "same-origin"
+          credentials: "same-origin", signal: controller.signal
         });
         if (!response.ok) throw new Error("Falha ao carregar tipos");
         const types = await response.json();
+        if (controller !== pending || category.value !== id) return;
+        type.replaceChildren(new Option("Selecione o tipo", ""));
+        type.disabled = false;
         for (const row of types) {
           const value = row.id ?? row.value ?? row.Value;
           const label = row.nome ?? row.text ?? row.Text;
@@ -175,8 +184,10 @@
           type.value = preferred;
           delete type.dataset.selectedType;
         }
-      } catch {
+      } catch (error) {
+        if (error?.name === "AbortError" || controller !== pending) return;
         type.replaceChildren(new Option("Não foi possível carregar os tipos", ""));
+        type.disabled = false;
       }
     }
     category.addEventListener("change", refresh);

@@ -1,0 +1,23 @@
+@model (int PedidoId, string Operacao)
+@using aluguel.Services
+<form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" enctype="multipart/form-data" class="ra-live-form" data-submit-lock>
+    <input type="hidden" name="pedidoId" value="@Model.PedidoId" />
+    <input type="hidden" name="operacao" value="@Model.Operacao" />
+    <fieldset class="ra-live-condition">
+        <legend>Estado do artigo</legend>
+        @foreach (var (value, label) in PercursoDemoRegras.EstadosArtigo)
+        {
+            <label class="ra-live-radio"><input type="radio" name="estadoArtigo" value="@value" required checked="@(value == "bom")" /> @label</label>
+        }
+    </fieldset>
+    <label>Acessórios incluídos
+        <input class="form-control" name="acessorios" maxlength="@PercursoDemoRegras.MaxAcessorios" placeholder="Ex.: cabo, carregador, bolsa, manual" />
+    </label>
+    <label>Observações
+        <textarea class="form-control" name="nota" maxlength="@PercursoDemoRegras.MaxNota" rows="2" placeholder="Ex.: pequeno risco na lateral, já existente."></textarea>
+    </label>
+    <label>Fotografia do estado (opcional, JPG/PNG/WebP até 5 MB)
+        <input class="form-control" name="foto" type="file" accept="image/jpeg,image/png,image/webp" />
+    </label>
+    <button class="btn btn-outline" type="submit">Guardar checklist</button>
+</form>

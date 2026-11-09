@@ -77,8 +77,8 @@ public sealed class ItemsController : Controller
     public async Task<IActionResult> Create(string nmitem, string dsitem, string snativo, List<IFormFile>? photos, string? photoOrder, CancellationToken ct)
     {
         photos ??= new List<IFormFile>();
-        if (string.IsNullOrWhiteSpace(nmitem) || string.IsNullOrWhiteSpace(dsitem))
-            ModelState.AddModelError("", "Preenche o nome e a descrição do artigo.");
+        if (!ListingContentValidation.ValidTitle(nmitem) || !ListingContentValidation.ValidDescription(dsitem))
+            ModelState.AddModelError("", "Indica um título até 140 caracteres e uma descrição até 6000 caracteres.");
         if (MarketplaceContactSafety.ContainsContactOrRedirect(nmitem) ||
             MarketplaceContactSafety.ContainsContactOrRedirect(dsitem))
             ModelState.AddModelError("", "Retira telefones, links e redes sociais do artigo. Os interessados devem contactar-te pela RentAll.");
@@ -131,9 +131,13 @@ public sealed class ItemsController : Controller
         if (item is null) return NotFound();
         photos ??= new List<IFormFile>();
         var current = Images(item);
-        if (string.IsNullOrWhiteSpace(nmitem) || string.IsNullOrWhiteSpace(dsitem))
+        // Keep a safe in-memory snapshot: on persistence failure the database may be unavailable.
+        var savedName = item.nmitem;
+        var savedDescription = item.dsitem;
+        var savedVisibility = item.snativo;
+        if (!ListingContentValidation.ValidTitle(nmitem) || !ListingContentValidation.ValidDescription(dsitem))
         {
-            ModelState.AddModelError("", "Nome e descrição são obrigatórios.");
+            ModelState.AddModelError("", "Indica um título até 140 caracteres e uma descrição até 6000 caracteres.");
             return View(item);
         }
         if (MarketplaceContactSafety.ContainsContactOrRedirect(nmitem) ||
@@ -168,8 +172,12 @@ public sealed class ItemsController : Controller
             ModelState.AddModelError("", ex is InvalidDataException ? ex.Message :
                 ex is ImageStorageException storageError ? storageError.UserMessage :
                 "Não foi possível guardar as alterações. Verifica o serviço de fotografias.");
-            // A failed database save should not display unsaved image keys.
-            await _db.Entry(item).ReloadAsync(ct);
+            // Do not query the failing database again merely to render the error screen.
+            // Restore values already loaded before the attempted save.
+            item.nmitem = savedName;
+            item.dsitem = savedDescription;
+            item.snativo = savedVisibility;
+            ApplyImages(item, current);
             return View(item);
         }
     }
@@ -187,6 +195,12 @@ public sealed class ItemsController : Controller
     {
         var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
         if (item is null) return NotFound();
+        var adIds = await _db.Anuncios.Where(a => a.itemid == item.id).Select(a => a.id).ToListAsync();
+        if (await RentalDeletionGuard.HasOpenRentalsAsync(_db, adIds))
+        {
+            TempData["Error"] = RentalDeletionGuard.BlockedMessage;
+            return RedirectToAction(nameof(Index));
+        }
         var keys = Images(item);
         try
         {

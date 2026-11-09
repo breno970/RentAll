@@ -121,7 +121,16 @@ public sealed class PagamentosController : Controller
             .FirstOrDefaultAsync(a => a.UserId == Me, ct);
         var origin = Origin();
         if (!checkout.Available || origin == null || current == null) return RedirectToAction(nameof(Conta));
-        return Redirect(await accounts.OnboardingUrlAsync(current.AccountId, origin, ct));
+        try
+        {
+            return Redirect(await accounts.OnboardingUrlAsync(current.AccountId, origin, ct));
+        }
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException or System.Text.Json.JsonException)
+        {
+            log.LogWarning(ex, "Stripe sandbox onboarding link refresh failed");
+            TempData["Error"] = "Não foi possível renovar a verificação Stripe de teste. Tenta novamente dentro de instantes.";
+            return RedirectToAction(nameof(Conta));
+        }
     }
 
     [HttpPost("Checkout")]
