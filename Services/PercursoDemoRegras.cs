@@ -93,7 +93,7 @@ public static class PercursoDemoRegras
                 p.IncidenteAberto = true;
                 break;
             case "resolver":
-                Exigir(estado is "EmCurso" or "DevolucaoPendente" && p.IncidenteAberto,
+                Exigir((estado is "EmCurso" or "DevolucaoPendente") && p.IncidenteAberto,
                     "Não existe ocorrência aberta para resolver.");
                 Exigir(anunciante, "A resolução demonstrativa deve ser confirmada pelo anunciante.");
                 p.IncidenteAberto = false;
