@@ -40,6 +40,97 @@ public class AnunciosController : Controller
         return View(ads);
     }
 
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateDemoListings()
+    {
+        if (await _db.Anuncios.AnyAsync(a => a.iduser == UserId && a.modelo.StartsWith("[DEMO] ")))
+        {
+            TempData["Error"] = "Esta conta já tem anúncios de demonstração. Apague-os antes de gerar outro conjunto.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var samples = new[]
+        {
+            (1, "Consola Nintendo Switch OLED", "Nintendo Switch OLED · 2 comandos", 18f, "Lisboa", "Lisboa"),
+            (1, "PlayStation 5 Slim", "PS5 Slim · comando DualSense", 25f, "Porto", "Porto"),
+            (1, "Xbox Series S", "Xbox Series S · 512 GB", 20f, "Braga", "Braga"),
+            (2, "Câmara Sony Alpha", "Sony Alpha · lente 18–55 mm", 32f, "Lisboa", "Lisboa"),
+            (2, "Câmara de ação GoPro", "GoPro Hero · caixa estanque", 16f, "Faro", "Faro"),
+            (2, "Projetor Full HD", "Projetor portátil · HDMI e Wi-Fi", 22f, "Coimbra", "Coimbra"),
+            (3, "Guitarra acústica", "Guitarra acústica · capa incluída", 12f, "Porto", "Porto"),
+            (3, "Teclado digital 88 teclas", "Teclado digital · suporte incluído", 24f, "Lisboa", "Lisboa"),
+            (3, "Coluna amplificada", "Coluna portátil · Bluetooth", 15f, "Setúbal", "Setúbal"),
+            (4, "Bicicleta de montanha", "Bicicleta MTB · capacete incluído", 19f, "Braga", "Braga"),
+            (4, "Prancha de paddle insuflável", "Kit de paddle · bomba e remo", 23f, "Faro", "Faro"),
+            (4, "Tenda de campismo para 4", "Tenda familiar · montagem rápida", 14f, "Coimbra", "Coimbra"),
+            (5, "Berbequim sem fios", "Berbequim 18 V · bateria e mala", 11f, "Lisboa", "Lisboa"),
+            (5, "Máquina de lavar a pressão", "Lavadora compacta · acessórios", 17f, "Porto", "Porto"),
+            (5, "Escadote telescópico", "Escadote de alumínio · 3,8 m", 10f, "Setúbal", "Setúbal"),
+            (6, "Máquina de café automática", "Máquina de café · depósito 1,5 L", 16f, "Lisboa", "Lisboa"),
+            (6, "Robot de cozinha", "Robot de cozinha · vários acessórios", 21f, "Porto", "Porto"),
+            (6, "Desumidificador portátil", "Desumidificador · depósito 2 L", 13f, "Coimbra", "Coimbra")
+        };
+
+        var categories = await _db.Categorias.AsNoTracking()
+            .Where(c => c.id >= 1 && c.id <= 6).Select(c => c.id).ToListAsync();
+        var types = await _db.Tipos.AsNoTracking().OrderBy(t => t.id).ToListAsync();
+        var typeByCategory = types.GroupBy(t => t.categoriaid)
+            .ToDictionary(group => group.Key, group => group.First().id);
+        var available = samples.Where(sample => categories.Contains(sample.Item1) &&
+            typeByCategory.ContainsKey(sample.Item1)).ToArray();
+
+        if (available.Length == 0)
+        {
+            TempData["Error"] = "Não existem categorias e tipos configurados para gerar anúncios de demonstração.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        foreach (var sample in available)
+        {
+            var item = new Item
+            {
+                nmitem = "[DEMO] " + sample.Item2,
+                dsitem = "Exemplo fictício para demonstração da RentAll. Este anúncio pode ser removido no painel da conta que o criou.",
+                dtcriacao = DateTime.UtcNow,
+                snativo = "S",
+                imagem1 = "ra.png",
+                iduser = UserId
+            };
+            _db.Items.Add(item);
+            _db.Anuncios.Add(new Anuncio
+            {
+                item = item,
+                vlitem = sample.Item4,
+                diasAluguel = 7,
+                modelo = "[DEMO] " + sample.Item3,
+                CEP = "",
+                Rua = "",
+                Bairro = "Centro",
+                Cidade = sample.Item5,
+                Estado = sample.Item6,
+                contato = "",
+                NomeFantasia = "RentAll · Demonstração",
+                Pais = "PT",
+                iduser = UserId,
+                categoriaid = sample.Item1,
+                tipoid = typeByCategory[sample.Item1]
+            });
+        }
+
+        try
+        {
+            await _db.SaveChangesAsync();
+            TempData["Success"] = $"Foram criados {available.Length} anúncios fictícios, distribuídos pelas categorias disponíveis. Estão identificados como [DEMO] e podem ser apagados nesta área.";
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Could not create demo rental listings.");
+            TempData["Error"] = "Não foi possível criar os anúncios de demonstração. Tente novamente.";
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     [AllowAnonymous]
     public async Task<IActionResult> Details(int? id)
     {
@@ -243,7 +334,12 @@ public class AnunciosController : Controller
         }
         try
         {
+            var demoItem = await _db.Items.FirstOrDefaultAsync(item =>
+                item.id == ad.itemid && item.iduser == UserId && item.nmitem.StartsWith("[DEMO] "));
             _db.Anuncios.Remove(ad);
+            if (demoItem != null && !await _db.Anuncios.AnyAsync(other =>
+                other.itemid == demoItem.id && other.id != ad.id))
+                _db.Items.Remove(demoItem);
             await _db.SaveChangesAsync();
             TempData["Success"] = "Anúncio excluído.";
             return RedirectToAction(nameof(Index));
