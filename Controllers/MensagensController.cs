@@ -120,7 +120,12 @@ public sealed class MensagensController : Controller
             .Where(p => p.AnuncioId == anuncioId &&
                 p.InteressadoId == (owner ? other : me) && p.AnuncianteId == ad.iduser)
             .OrderByDescending(p => p.CriadoEm).ThenByDescending(p => p.Id)
-            .Select(p => new { p.Id, p.Estado, p.TotalEstimado, p.Dias, p.Pais })
+            .Select(p => new
+            {
+                p.Id, p.Estado, p.TotalEstimado, p.Dias,
+                Etapa = _db.PercursosAluguerDemo.Where(journey => journey.PedidoId == p.Id)
+                    .Select(journey => journey.Estado).FirstOrDefault()
+            })
             .FirstOrDefaultAsync(ct);
         return new ConversaViewModel {
             AnuncioId = ad.id, NomeArtigo = ad.item?.nmitem ?? ad.modelo,
@@ -132,7 +137,7 @@ public sealed class MensagensController : Controller
             PrecoDia = ad.vlitem, PrazoMaximo = ad.diasAluguel > 0 ? ad.diasAluguel : 365,
             Pais = ad.Pais, PedidoId = latestRequest?.Id,
             EstadoPedido = latestRequest?.Estado, DiasPedido = latestRequest?.Dias,
-            TotalPedido = latestRequest?.TotalEstimado
+            TotalPedido = latestRequest?.TotalEstimado, EtapaAluguer = latestRequest?.Etapa
         };
     }
 

@@ -6,6 +6,5 @@ public sealed class CartaoDemoViewModel
     public decimal Total { get; init; } = 50m;
     public decimal Comissao { get; init; } = 5m;
     public string Pais { get; init; } = "PT";
-    public bool PedidoAssociado { get; init; }
-    public int? PedidoId { get; init; }
+    public string? Foto { get; init; }
 }

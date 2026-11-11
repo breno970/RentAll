@@ -60,6 +60,10 @@ public sealed class PedidosController : Controller
         ViewBag.Me = me;
         ViewBag.StripeSandboxReady = _stripe.Available;
         var requestIds = requests.Select(r => r.Id).ToArray();
+        var acceptedIds = requests.Where(r => r.Estado == "Aceite sem pagamento").Select(r => r.Id).ToArray();
+        ViewBag.JourneyStates = await _db.PercursosAluguerDemo.AsNoTracking()
+            .Where(journey => acceptedIds.Contains(journey.PedidoId))
+            .ToDictionaryAsync(journey => journey.PedidoId, journey => journey.Estado, ct);
         ViewBag.PaymentStates = await _db.PagamentosAluguer.AsNoTracking()
             .Where(p => requestIds.Contains(p.PedidoId))
             .ToDictionaryAsync(p => p.PedidoId, p => p.Estado, ct);

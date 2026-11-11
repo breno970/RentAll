@@ -9,9 +9,9 @@
         <div>
             <p class="eyebrow">RentAll · Demonstração interativa</p>
             <h1>Um aluguer completo, do checkout à devolução</h1>
-            <p>Explora os dois lados da experiência: quem aluga e quem disponibiliza o artigo.</p>
+            <p>Experimenta os dois papéis na mesma sessão, do pagamento simulado à confirmação da receção.</p>
         </div>
-        <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Consultar pedidos</a>
+        <a class="btn btn-outline" asp-controller="Home" asp-action="Exemplos">Escolher outro artigo</a>
     </div>
     <div class="ra-demo-warning" role="note">
         <strong>Ambiente de demonstração — esta experiência é simulada, não cobra dinheiro e não recolhe dados bancários.</strong>
@@ -33,12 +33,16 @@
             <section class="ra-demo-box" data-demo-screen="0" aria-labelledby="ra-demo-agreement">
                 <span class="ra-demo-tag">ETAPA 1 DE 8 · ACORDO</span>
                 <h2 id="ra-demo-agreement" tabindex="-1">Confirmar o aluguer</h2>
-                <p>Este percurso começa com um pedido aceite pelo anunciante. Os valores e prazos abaixo são exemplificativos e não implicam reserva.</p>
+                <p>O anunciante aceitou o pedido neste cenário. Podes agora experimentar o checkout.</p>
+                @if (Model.Foto is not null)
+                {
+                    <img class="demo-order-photo" src="~/catalogo/@Model.Foto" alt="@Model.Artigo" width="120" height="120" />
+                }
                 <dl class="ra-demo-order">
                     <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
                     <div><dt>Valor de referência</dt><dd>@money(Model.Total)</dd></div>
                     <div><dt>Tipo de operação</dt><dd>Aluguer entre particulares</dd></div>
-                    <div><dt>Pedido</dt><dd>@(Model.PedidoAssociado ? $"#{Model.PedidoId} — usado apenas como referência" : "Exemplo independente")</dd></div>
+                    @if (Model.Foto is not null) { <div><dt>Duração</dt><dd>3 dias</dd></div> }
                 </dl>
                 <label class="ra-demo-agreement">
                     <input type="checkbox" data-demo-ack />
@@ -131,14 +135,14 @@
                 </label>
                 <p>Para avançar, cada participante confirma separadamente. Não existe entrega, verificação presencial ou assinatura real.</p>
                 <div class="ra-demo-party-grid">
-                    <div><strong>Anunciante</strong><p data-demo-handover-owner>Por confirmar</p><button type="button" class="btn btn-outline" data-demo-handover="owner">Confirmar como anunciante</button></div>
-                    <div><strong>Locatário</strong><p data-demo-handover-renter>Por confirmar</p><button type="button" class="btn btn-outline" data-demo-handover="renter">Confirmar como locatário</button></div>
+                    <div><strong>Anunciante</strong><p data-demo-handover-owner>Por confirmar</p><button type="button" class="btn btn-outline" data-demo-handover="owner">Confirmar entrega</button></div>
+                    <div><strong>Locatário</strong><p data-demo-handover-renter>Por confirmar</p><button type="button" class="btn btn-primary" data-demo-handover="renter">Confirmar receção do artigo</button></div>
                 </div>
             </section>
 
             <section class="ra-demo-box" data-demo-screen="5" aria-labelledby="ra-demo-active" hidden>
                 <span class="ra-demo-tag">ETAPA 6 DE 8 · ALUGUER EM CURSO</span>
-                <h2 id="ra-demo-active" tabindex="-1">Artigo em utilização (simulada)</h2>
+                <h2 id="ra-demo-active" tabindex="-1">Artigo recebido na simulação</h2>
                 <div class="ra-demo-result"><strong>Entrega confirmada pelos dois participantes</strong><p>Nesta demonstração, o artigo está agora na posse do locatário. O histórico abaixo apresenta notificações ilustrativas.</p></div>
                 <div class="ra-demo-controls">
                     <button class="btn btn-primary" type="button" data-demo-start-return>Iniciar devolução</button>
@@ -174,7 +178,7 @@
                     <strong>Comprovativo DEMO — não é fatura nem recibo fiscal</strong>
                     <dl class="ra-demo-order">
                         <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
-                        <div><dt>Referência demonstrativa</dt><dd>REN-DEMO-@(Model.PedidoId?.ToString() ?? "EXEMPLO")</dd></div>
+                        <div><dt>Referência demonstrativa</dt><dd>REN-DEMO-EXEMPLO</dd></div>
                         <div><dt>Pagamento ilustrativo</dt><dd>@money(Model.Total)</dd></div>
                         <div><dt>Comissão ilustrativa (10%)</dt><dd>@money(Model.Comissao)</dd></div>
                         <div><dt>Recebimento do anunciante (hipotético)</dt><dd>@money(Model.Total - Model.Comissao)</dd></div>

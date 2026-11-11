@@ -61,7 +61,13 @@
             <h1>@Model.Artigo</h1>
             <p>Pedido #@pedido.Id · @daysLabel · @daily por dia</p>
         </div>
-        <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Voltar aos meus pedidos</a>
+        <div class="ra-live-actions">
+            <a class="btn btn-outline" asp-controller="Mensagens" asp-action="Conversa"
+               asp-route-anuncioId="@pedido.AnuncioId"
+               asp-route-peerId="@(owner ? pedido.InteressadoId : pedido.AnuncianteId)">Abrir conversa</a>
+            <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index"
+               asp-route-pedido="@pedido.Id">Voltar ao pedido</a>
+        </div>
     </header>
     <div class="ra-live-warning" role="note">
         <strong>DEMONSTRAÇÃO — pagamento e entrega simulados.</strong>
@@ -96,7 +102,7 @@
                     {
                         <form asp-controller="PercursoDemo" asp-action="Iniciar" method="post" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
-                            <button class="btn btn-primary" type="submit">Iniciar checkout de demonstração</button>
+                            <button class="btn btn-primary" type="submit">Avançar para pagamento simulado</button>
                         </form>
                     }
                     else { <p class="ra-live-hint">Aguarda que o locatário inicie o checkout fictício.</p> }

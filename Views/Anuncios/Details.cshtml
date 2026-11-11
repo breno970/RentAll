@@ -1,8 +1,9 @@
 @model aluguel.Models.Anuncio
 @{
     ViewData["Title"] = Model.item?.nmitem ?? Model.modelo;
+    var sample = aluguel.ViewModel.DemoCatalogItem.ForListing(Model.item?.nmitem);
     var photos = aluguel.ViewModel.MarketplaceCategory.ListingPhotos(Model.item).ToArray();
-    var illustration = Url.Content("~/catalogo/" + aluguel.ViewModel.MarketplaceCategory.PhotoFor(Model.categoriaid));
+    var illustration = Url.Content("~/catalogo/" + aluguel.ViewModel.MarketplaceCategory.IllustrationFor(Model.item, Model.categoriaid));
     var place = string.Join(", ", new[] { Model.Cidade, Model.Estado, aluguel.Services.LocationCatalog.CountryName(Model.Pais) });
     var mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + Uri.EscapeDataString(place);
     var isSaved = ViewData["IsFavorite"] is bool value && value;
@@ -87,11 +88,15 @@
                     <a asp-controller="Pedidos" asp-action="Index" class="btn btn-outline" style="margin-top:10px">Consultar pedidos</a>
                 </div>
             }
-            <div class="ra-proto-detail-note">
-                <strong>Entrega e devolução: o que deves saber</strong>
-                <p>Confirma o estado do artigo, os acessórios e as condições antes da entrega. Conhece também as funcionalidades de verificação e caução que estamos a preparar.</p>
-                <a asp-controller="Experiencia" asp-action="ComoFunciona" class="ra-proto-textlink">Como funciona o aluguer</a>
-            </div>
+            @if (sample is not null)
+            {
+                <div class="ra-rental-motivation">
+                    <strong>Artigo de demonstração</strong>
+                    <p>Experimenta o pagamento e a receção deste artigo na simulação individual.</p>
+                    <a class="btn btn-primary" asp-controller="Pagamentos" asp-action="Demonstracao"
+                       asp-route-artigo="@sample.Slug">Simular aluguer</a>
+                </div>
+            }
             <div class="ra-rental-safety">
                 <h3><i class="fas fa-shield-alt" aria-hidden="true"></i> Aluguer com mais confiança</h3>
                 <ul>

@@ -17,7 +17,7 @@ else
         @foreach (var ad in Model)
         {
             var photo = aluguel.ViewModel.MarketplaceCategory.ListingPhotos(ad.item).FirstOrDefault();
-            var illustration = Url.Content("~/catalogo/" + aluguel.ViewModel.MarketplaceCategory.PhotoFor(ad.categoriaid));
+            var illustration = Url.Content("~/catalogo/" + aluguel.ViewModel.MarketplaceCategory.IllustrationFor(ad.item, ad.categoriaid));
             <article class="listing-card">
                 @if (User.Identity?.IsAuthenticated == true)
                 {

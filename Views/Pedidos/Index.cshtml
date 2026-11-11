@@ -1,5 +1,6 @@
 @model X.PagedList.IPagedList<aluguel.Models.PedidoAluguer>
 @using aluguel.Services
+@using aluguel.ViewModel
 @using X.PagedList.Mvc.Core
 @{
     ViewData["Title"] = "Pedidos de aluguer";
@@ -7,6 +8,7 @@
     var me = ViewBag.Me as string ?? "";
     var paymentsReady = ViewBag.StripeSandboxReady == true;
     var paymentStates = ViewBag.PaymentStates as Dictionary<int, string> ?? new();
+    var journeyStates = ViewBag.JourneyStates as Dictionary<int, string> ?? new();
     var selectedView = ViewBag.SelectedView as string ?? "todos";
     var totalRequests = (int)(ViewBag.TotalRequests ?? 0);
     var receivedCount = (int)(ViewBag.ReceivedCount ?? 0);
@@ -67,18 +69,15 @@
         {
             var owner = request.AnuncianteId == me;
             var name = names.TryGetValue(request.AnuncioId, out var label) ? label : "Anúncio";
+            var accepted = request.Estado == "Aceite sem pagamento";
+            var stage = journeyStates.GetValueOrDefault(request.Id);
             <article class="ra-request-card" id="pedido-@request.Id">
                 <div class="ra-request-top">
                     <span class="ra-request-kind">@(owner ? "Pedido recebido" : "Pedido enviado")</span>
-                    <span class="ra-request-status @((owner && request.Estado == "Pendente") || (request.Estado == "Contraproposta" && request.PropostaPorId != me) ? "is-awaiting-action" : "")">@request.Estado</span>
+                    <span class="ra-request-status @((owner && request.Estado == "Pendente") || (request.Estado == "Contraproposta" && request.PropostaPorId != me) ? "is-awaiting-action" : "")">@(accepted ? RentalJourneyProgress.Label(stage) : request.Estado)</span>
                 </div>
                 <h2><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@request.AnuncioId">@name</a></h2>
                 <p class="muted">@request.Dias @(request.Dias == 1 ? "dia" : "dias") · @request.CriadoEm.ToString("dd/MM/yyyy")</p>
-                <div class="ra-request-steps" aria-label="Etapas do pedido">
-                    <span class="is-current"><i class="fas fa-check" aria-hidden="true"></i> Pedido registado</span>
-                    <span class="@(request.Estado == "Pendente" ? "is-current" : "")">@(request.Estado == "Pendente" ? "Aguardar resposta" : request.Estado == "Recusado" ? "Recusado" : request.Estado == "Cancelado" ? "Cancelado" : "Resposta recebida")</span>
-                    <span>Pagamento na RentAll: ainda indisponível</span>
-                </div>
                 <dl class="ra-request-values">
                     <div><dt>Valor estimado</dt><dd>@RentalLocalization.FormatPrice((float)request.TotalEstimado, request.Pais)</dd></div>
                     <div><dt>Comissão futura ilustrativa (10%)</dt><dd>@RentalLocalization.FormatPrice((float)request.ComissaoIndicativa, request.Pais)</dd></div>
@@ -159,7 +158,7 @@
                         <button class="btn btn-outline" type="submit">Cancelar pedido</button>
                     </form>
                 }
-                @if (request.Estado == "Aceite sem pagamento")
+                @if (accepted)
                 {
                     @if (paymentStates.TryGetValue(request.Id, out var paymentState))
                     {
@@ -184,15 +183,11 @@
                         <p class="ra-request-note"><a asp-controller="Pagamentos" asp-action="Conta">Configurar recebimentos de teste Stripe</a></p>
                     }
                 }
-                @if (request.Estado == "Aceite sem pagamento")
+                @if (accepted)
                 {
-                    <a asp-controller="Pagamentos" asp-action="Demonstracao"
-                       asp-route-pedidoId="@request.Id" class="btn btn-outline" style="margin-top:12px">
-                        Experimentar aluguer completo: checkout, entrega e devolução
-                    </a>
                     <a asp-controller="PercursoDemo" asp-action="Detalhes"
                        asp-route-pedidoId="@request.Id" class="btn btn-primary" style="margin-top:12px">
-                        Acompanhar o aluguer demonstrativo entre as duas contas
+                        @RentalJourneyProgress.Action(stage, owner)
                     </a>
                 }
                 <div class="ra-journey-banner">
@@ -203,7 +198,6 @@
                        asp-route-peerId="@(owner ? request.InteressadoId : request.AnuncianteId)"
                        class="btn btn-outline btn-sm">Abrir conversa</a>
                 </div>
-                <p class="ra-request-note">@(request.Estado == "Aceite sem pagamento" ? "Pedido aceite, mas sem pagamento processado. Combina apenas os próximos passos nas mensagens." : "Este pedido não comprova pagamento nem garante disponibilidade.")</p>
             </article>
         }
         </div>

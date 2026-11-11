@@ -17,6 +17,7 @@
                 <div class="market-banner-copy">
                     <h1 id="market-title">Aluga o que precisas,<br />perto de ti.</h1>
                     <p>Encontra ferramentas, equipamento e outros artigos para alugar em Portugal.</p>
+                    <a class="btn btn-outline market-banner-demo" asp-action="Exemplos">Experimentar um aluguer</a>
                 </div>
                 <img class="market-banner-photo" src="~/catalogo/aluguer.jpg" alt="" width="750" height="500" fetchpriority="high" />
             </div>
@@ -47,33 +48,9 @@
     </section>
 }
 
-<section id="procurar" class="market-results page-width" aria-labelledby="results-heading">
-    @if (browsing && Model.TotalItemCount == 0)
-    {
-        <div class="results-heading">
-            <div>
-                <h2 id="results-heading">Exemplos de aluguer</h2>
-                <p>Artigos e preços ilustrativos. Escolhe uma categoria para procurar anúncios publicados.</p>
-            </div>
-        </div>
-        <div class="listing-grid">
-            @foreach (var category in MarketplaceCategory.All)
-            {
-                <article class="listing-card">
-                    <a class="listing-image" asp-action="@category.Action" aria-label="Explorar @category.Name">
-                        <img src="~/catalogo/@category.Photo" alt="" width="512" height="512" loading="lazy" />
-                    </a>
-                    <div class="listing-body">
-                        <span class="listing-kicker">@category.Name</span>
-                        <h3><a asp-action="@category.Action">@category.Example</a></h3>
-                        <div class="listing-price">@aluguel.Services.RentalLocalization.FormatPrice(category.DailyPrice, "PT") <small>/ dia</small></div>
-                    </div>
-                </article>
-            }
-        </div>
-    }
-    else
-    {
+@if (!browsing || Model.TotalItemCount > 0)
+{
+    <section id="procurar" class="market-results page-width" aria-labelledby="results-heading">
         <div class="results-heading">
             <div>
                 <h2 id="results-heading">@(browsing ? "Anúncios recentes" : "Resultados da pesquisa")</h2>
@@ -87,5 +64,18 @@
                 @Html.PagedListPager(Model, page => Url.Action("Index", new { page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter, filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort }))
             </div>
         }
-    }
-</section>
+    </section>
+}
+@if (browsing)
+{
+    <section class="page-width market-results market-demo-preview" aria-labelledby="demo-catalog-title">
+        <div class="section-heading">
+            <div>
+                <h2 id="demo-catalog-title">Experimenta um aluguer</h2>
+                <p>Artigos fictícios para testar o pagamento, a entrega e a devolução.</p>
+            </div>
+            <a class="btn btn-outline" asp-action="Exemplos">Ver os @DemoCatalogItem.All.Count artigos</a>
+        </div>
+        <partial name="_DemoCatalogCards" model="DemoCatalogItem.All.Take(8)" />
+    </section>
+}

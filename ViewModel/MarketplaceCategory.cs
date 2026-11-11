@@ -1,15 +1,15 @@
 namespace aluguel.ViewModel;
 
-public sealed record MarketplaceCategory(int Id, string Action, string Name, string Photo, string Example, float DailyPrice)
+public sealed record MarketplaceCategory(int Id, string Action, string Name, string Photo)
 {
     public static IReadOnlyList<MarketplaceCategory> All { get; } = Array.AsReadOnly(new MarketplaceCategory[]
     {
-        new(5, "Ferramentas", "Ferramentas", "ferramentas.jpg", "Berbequim sem fios com mala", 12),
-        new(2, "AudioVisual", "Áudio e vídeo", "camera.jpg", "Câmara digital com objetiva", 25),
-        new(4, "EsporteGinastica", "Desporto e lazer", "bicicleta.jpg", "Bicicleta de montanha", 18),
-        new(1, "VideoGame", "Consolas e jogos", "consolas.jpg", "Consola com comando", 15),
-        new(3, "MusicaHobbie", "Música e hobbies", "guitarra.jpg", "Guitarra acústica", 10),
-        new(6, "Eletrodomesticos", "Casa e cozinha", "cafe.jpg", "Máquina de café expresso", 14)
+        new(5, "Ferramentas", "Ferramentas", "ferramentas.jpg"),
+        new(2, "AudioVisual", "Áudio e vídeo", "camera.jpg"),
+        new(4, "EsporteGinastica", "Desporto e lazer", "bicicleta.jpg"),
+        new(1, "VideoGame", "Consolas e jogos", "consolas.jpg"),
+        new(3, "MusicaHobbie", "Música e hobbies", "guitarra.jpg"),
+        new(6, "Eletrodomesticos", "Casa e cozinha", "cafe.jpg")
     });
 
     public static IEnumerable<string> ListingPhotos(aluguel.Models.Item? item)
@@ -25,4 +25,7 @@ public sealed record MarketplaceCategory(int Id, string Action, string Name, str
 
     public static string PhotoFor(int? categoryId) =>
         All.FirstOrDefault(category => category.Id == categoryId)?.Photo ?? "aluguer.jpg";
+
+    public static string IllustrationFor(aluguel.Models.Item? item, int? categoryId) =>
+        DemoCatalogItem.ForListing(item?.nmitem)?.Photo ?? PhotoFor(categoryId);
 }

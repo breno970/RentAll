@@ -100,6 +100,8 @@ public class HomeController : Controller
     }
 
     public Task<IActionResult> Index([FromQuery] MarketplaceFilters filters) => Results(filters, "Index");
+    [HttpGet("exemplos")]
+    public IActionResult Exemplos() => View(DemoCatalogItem.All);
     public Task<IActionResult> VideoGame([FromQuery] MarketplaceFilters filters) => Results(filters, "VideoGame", 1);
     public Task<IActionResult> AudioVisual([FromQuery] MarketplaceFilters filters) => Results(filters, "AudioVisual", 2);
     public Task<IActionResult> MusicaHobbie([FromQuery] MarketplaceFilters filters) => Results(filters, "MusicaHobbie", 3);

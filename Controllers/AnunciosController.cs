@@ -43,41 +43,24 @@ public class AnunciosController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateDemoListings()
     {
-        if (await _db.Anuncios.AnyAsync(a => a.iduser == UserId && a.modelo.StartsWith("[DEMO] ")))
+        var samples = aluguel.ViewModel.DemoCatalogItem.All;
+        var existing = (await _db.Anuncios.AsNoTracking()
+            .Where(a => a.iduser == UserId && a.modelo.StartsWith("[DEMO] ") && a.item != null)
+            .Select(a => a.item!.nmitem).ToListAsync()).ToHashSet(StringComparer.Ordinal);
+        var missing = samples.Where(sample => !existing.Contains("[DEMO] " + sample.Name)).ToArray();
+        if (missing.Length == 0)
         {
-            TempData["Error"] = "Esta conta já tem anúncios de demonstração. Apague-os antes de gerar outro conjunto.";
+            TempData["Success"] = "Já tens todos os artigos de demonstração.";
             return RedirectToAction(nameof(Index));
         }
-
-        var samples = new[]
-        {
-            (1, "Consola Nintendo Switch OLED", "Nintendo Switch OLED · 2 comandos", 18f, "Lisboa", "Lisboa"),
-            (1, "PlayStation 5 Slim", "PS5 Slim · comando DualSense", 25f, "Porto", "Porto"),
-            (1, "Xbox Series S", "Xbox Series S · 512 GB", 20f, "Braga", "Braga"),
-            (2, "Câmara Sony Alpha", "Sony Alpha · lente 18–55 mm", 32f, "Lisboa", "Lisboa"),
-            (2, "Câmara de ação GoPro", "GoPro Hero · caixa estanque", 16f, "Faro", "Faro"),
-            (2, "Projetor Full HD", "Projetor portátil · HDMI e Wi-Fi", 22f, "Coimbra", "Coimbra"),
-            (3, "Guitarra acústica", "Guitarra acústica · capa incluída", 12f, "Porto", "Porto"),
-            (3, "Teclado digital 88 teclas", "Teclado digital · suporte incluído", 24f, "Lisboa", "Lisboa"),
-            (3, "Coluna amplificada", "Coluna portátil · Bluetooth", 15f, "Setúbal", "Setúbal"),
-            (4, "Bicicleta de montanha", "Bicicleta MTB · capacete incluído", 19f, "Braga", "Braga"),
-            (4, "Prancha de paddle insuflável", "Kit de paddle · bomba e remo", 23f, "Faro", "Faro"),
-            (4, "Tenda de campismo para 4", "Tenda familiar · montagem rápida", 14f, "Coimbra", "Coimbra"),
-            (5, "Berbequim sem fios", "Berbequim 18 V · bateria e mala", 11f, "Lisboa", "Lisboa"),
-            (5, "Máquina de lavar a pressão", "Lavadora compacta · acessórios", 17f, "Porto", "Porto"),
-            (5, "Escadote telescópico", "Escadote de alumínio · 3,8 m", 10f, "Setúbal", "Setúbal"),
-            (6, "Máquina de café automática", "Máquina de café · depósito 1,5 L", 16f, "Lisboa", "Lisboa"),
-            (6, "Robot de cozinha", "Robot de cozinha · vários acessórios", 21f, "Porto", "Porto"),
-            (6, "Desumidificador portátil", "Desumidificador · depósito 2 L", 13f, "Coimbra", "Coimbra")
-        };
 
         var categories = await _db.Categorias.AsNoTracking()
             .Where(c => c.id >= 1 && c.id <= 6).Select(c => c.id).ToListAsync();
         var types = await _db.Tipos.AsNoTracking().OrderBy(t => t.id).ToListAsync();
         var typeByCategory = types.GroupBy(t => t.categoriaid)
             .ToDictionary(group => group.Key, group => group.First().id);
-        var available = samples.Where(sample => categories.Contains(sample.Item1) &&
-            typeByCategory.ContainsKey(sample.Item1)).ToArray();
+        var available = missing.Where(sample => categories.Contains(sample.CategoryId) &&
+            typeByCategory.ContainsKey(sample.CategoryId)).ToArray();
 
         if (available.Length == 0)
         {
@@ -89,7 +72,7 @@ public class AnunciosController : Controller
         {
             var item = new Item
             {
-                nmitem = "[DEMO] " + sample.Item2,
+                nmitem = "[DEMO] " + sample.Name,
                 dsitem = "Exemplo fictício para demonstração da RentAll. Este anúncio pode ser removido no painel da conta que o criou.",
                 dtcriacao = DateTime.UtcNow,
                 snativo = "S",
@@ -100,20 +83,20 @@ public class AnunciosController : Controller
             _db.Anuncios.Add(new Anuncio
             {
                 item = item,
-                vlitem = sample.Item4,
+                vlitem = sample.DailyPrice,
                 diasAluguel = 7,
-                modelo = "[DEMO] " + sample.Item3,
+                modelo = "[DEMO] " + sample.Description,
                 CEP = "",
                 Rua = "",
                 Bairro = "Centro",
-                Cidade = sample.Item5,
-                Estado = sample.Item6,
+                Cidade = sample.City,
+                Estado = sample.City,
                 contato = "",
                 NomeFantasia = "RentAll · Demonstração",
                 Pais = "PT",
                 iduser = UserId,
-                categoriaid = sample.Item1,
-                tipoid = typeByCategory[sample.Item1]
+                categoriaid = sample.CategoryId,
+                tipoid = typeByCategory[sample.CategoryId]
             });
         }
 

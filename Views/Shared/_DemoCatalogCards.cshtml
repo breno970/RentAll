@@ -1,0 +1,20 @@
+@model IEnumerable<aluguel.ViewModel.DemoCatalogItem>
+@using aluguel.ViewModel
+<div class="listing-grid">
+    @foreach (var sample in Model)
+    {
+        var category = MarketplaceCategory.All.First(c => c.Id == sample.CategoryId);
+        <article class="listing-card">
+            <a class="listing-image" asp-controller="Pagamentos" asp-action="Demonstracao" asp-route-artigo="@sample.Slug" aria-label="Simular aluguer de @sample.Name">
+                <img src="~/catalogo/@sample.Photo" alt="" width="384" height="384" loading="lazy" decoding="async" />
+            </a>
+            <div class="listing-body">
+                <span class="listing-kicker">@category.Name</span>
+                <h3><a asp-controller="Pagamentos" asp-action="Demonstracao" asp-route-artigo="@sample.Slug">@sample.Name</a></h3>
+                <p class="listing-location">@sample.City</p>
+                <p class="listing-price">@aluguel.Services.RentalLocalization.FormatPrice(sample.DailyPrice, "PT") <small>/ dia</small></p>
+                <a class="btn btn-outline btn-sm" asp-controller="Pagamentos" asp-action="Demonstracao" asp-route-artigo="@sample.Slug">Simular aluguer</a>
+            </div>
+        </article>
+    }
+</div>

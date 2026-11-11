@@ -1,4 +1,5 @@
 @model aluguel.ViewModel.ConversaViewModel
+@using aluguel.ViewModel
 @{ ViewData["Title"] = "Conversa sobre " + Model.NomeArtigo; }
 <link rel="stylesheet" href="~/css/marketplace-messages.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/in-platform-journey.css" asp-append-version="true" />
@@ -11,18 +12,24 @@
     </div>
     <section class="ra-chat-journey" aria-label="Próximo passo do aluguer">
         <div class="ra-journey-intro">
-            <span class="ra-journey-tag"><i class="fas fa-lock" aria-hidden="true"></i> Conversa na RentAll</span>
-            <h2>Combina os detalhes deste aluguer.</h2>
-            <p>Fala sobre disponibilidade, entrega e estado do artigo. Regista o pedido para manteres as condições organizadas.</p>
+            <h2>Pedido de aluguer</h2>
         </div>
         @if (Model.PedidoId.HasValue)
         {
             <div class="ra-request-linked">
-                <div><small>Último pedido</small><strong>@Model.EstadoPedido</strong>
+                <div><small>Pedido #@Model.PedidoId</small><strong>@(Model.EstadoPedido == "Aceite sem pagamento" ? RentalJourneyProgress.Label(Model.EtapaAluguer) : Model.EstadoPedido)</strong>
                     <p>@Model.DiasPedido @(Model.DiasPedido == 1 ? "dia" : "dias") · @aluguel.Services.RentalLocalization.FormatPrice((float)(Model.TotalPedido ?? 0), Model.Pais)</p>
                 </div>
-                <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index"
-                   asp-route-pedido="@Model.PedidoId" asp-fragment="@($"pedido-{Model.PedidoId}")">Acompanhar pedido</a>
+                @if (Model.EstadoPedido == "Aceite sem pagamento")
+                {
+                    <a class="btn btn-primary" asp-controller="PercursoDemo" asp-action="Detalhes"
+                       asp-route-pedidoId="@Model.PedidoId">@RentalJourneyProgress.Action(Model.EtapaAluguer, Model.SouAnunciante)</a>
+                }
+                else
+                {
+                    <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index"
+                       asp-route-pedido="@Model.PedidoId" asp-fragment="@($"pedido-{Model.PedidoId}")">Acompanhar pedido</a>
+                }
             </div>
         }
         @if (!Model.SouAnunciante && Model.AnuncioAtivo && Model.PrecoDia > 0 &&
@@ -46,7 +53,7 @@
         }
     </section>
     <div class="ra-conversation">
-        <div class="ra-safety-chat"><i class="fas fa-shield-alt" aria-hidden="true"></i> Mantém a negociação nesta conversa para consultares as condições acordadas. Não partilhes contactos, links ou dados bancários. Não existem pagamentos reais ativados na RentAll.</div>
+        <div class="ra-safety-chat"><i class="fas fa-shield-alt" aria-hidden="true"></i> Combina a disponibilidade e a entrega nesta conversa. Mantém os teus contactos e dados bancários privados.</div>
             @if (Model.OlderThanId.HasValue || Model.ShowingOlderMessages)
             {
                 <nav class="ra-chat-history-links" aria-label="Páginas de mensagens">

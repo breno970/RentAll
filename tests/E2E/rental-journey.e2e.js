@@ -48,6 +48,37 @@ async function shot(page, name) {
   if (SHOTS) await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: true });
 }
 
+async function publicDemo(browser) {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  try {
+    await page.goto(`${BASE}/exemplos`);
+    const photos = await page.locator('.listing-image img').evaluateAll(images => images.map(image => image.getAttribute('src')));
+    assert.strictEqual(photos.length, 22);
+    assert.strictEqual(new Set(photos).size, photos.length, 'Fotos repetidas no catálogo de demonstração');
+    await page.locator('a[aria-label="Simular aluguer de Projetor Full HD"]').click();
+    assert((await page.locator('[data-demo-screen="0"]').innerText()).includes('Projetor Full HD'));
+    await page.locator('[data-demo-ack]').check();
+    await page.locator('[data-demo-next]').click();
+    await page.locator('[data-demo-authorize]').click();
+    await page.locator('[data-demo-after-pay]').click();
+    await page.locator('[data-demo-delivery-place]').fill('Estação de Coimbra');
+    await page.locator('[data-demo-delivery-form] button[type=submit]').click();
+    await page.locator('[data-demo-confirm-delivery]').click();
+    await page.locator('[data-demo-handover-check]').check();
+    await page.locator('[data-demo-handover="owner"]').click();
+    await page.getByRole('button', { name: 'Confirmar receção do artigo' }).click();
+    assert(await page.getByRole('heading', { name: 'Artigo recebido na simulação' }).isVisible());
+    await page.locator('[data-demo-start-return]').click();
+    await page.locator('[data-demo-return-check]').check();
+    await page.locator('[data-demo-return="renter"]').click();
+    await page.locator('[data-demo-return="owner"]').click();
+    assert(await page.getByRole('heading', { name: 'Aluguer demonstrativo concluído' }).isVisible());
+    log('Catálogo público: 22 fotos distintas e simulação individual até à devolução');
+  } finally {
+    await page.close();
+  }
+}
+
 // Submits the demo-journey form that carries the given operation.
 async function operacao(page, op, fill) {
   const form = page.locator(`form:has(input[name=operacao][value="${op}"]), form:has(button[name=operacao][value="${op}"])`).first();
@@ -64,6 +95,7 @@ async function operacao(page, op, fill) {
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE });
   try {
+    await publicDemo(browser);
     const anunciante = await newUser(browser, 'Ana');
     const locatario = await newUser(browser, 'Bruno', { width: 390, height: 844 });
     const intruso = await newUser(browser, 'Carla');
@@ -175,7 +207,8 @@ async function operacao(page, op, fill) {
     log('Conta não participante recebe 404 no percurso e no checkout');
 
     // 5. Persistent journey: checkout, delivery, rental, return, rating.
-    await b.goto(`${BASE}/PercursoDemo/${pedidoId}`);
+    await b.goto(`${BASE}/Mensagens/Conversa?anuncioId=${anuncioId}`);
+    await b.getByRole('link', { name: 'Ir para pagamento simulado', exact: true }).click();
     await Promise.all([b.waitForNavigation(), b.locator('form[action*="/PercursoDemo/Iniciar"] button[type=submit]').click()]);
     await shot(b, '03-checkout-mobile');
     f = await operacao(b, 'recusar', form => form.locator('[name=metodo]').first().check().catch(() => form.locator('select[name=metodo]').selectOption('cartao')));
@@ -270,6 +303,10 @@ async function operacao(page, op, fill) {
     assert(f.ok.includes('Avaliação'), `Avaliação falhou: ${f.err} | ${f.ok} | ${b.url()} | ${await b.locator('.ra-live-status').innerText()}`);
     await b.reload();
     assert((await b.content()).match(/Conclu[ií]do/), 'Estado concluído não persistiu após recarregar');
+    await b.goto(`${BASE}/Mensagens/Conversa?anuncioId=${anuncioId}`);
+    assert(await b.getByText('Aluguer demonstrativo concluído', { exact: true }).isVisible(),
+      'Conversa não mostra o aluguer concluído');
+    await b.getByRole('link', { name: 'Ver resumo do aluguer', exact: true }).click();
     await shot(b, '05-concluido-mobile');
     await a.goto(`${BASE}/PercursoDemo/${pedidoId}`);
     await shot(a, '06-concluido-desktop');

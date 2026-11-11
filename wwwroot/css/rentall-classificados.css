@@ -1,31 +1,21 @@
-:root {
-  --ink: #092e32;
-  --ink-soft: #315154;
-  --muted: #536b6d;
-  --paper: #f2f5f5;
-  --border: #dbe4e4;
-  --border-strong: #b9cdcd;
-  --forest: #096366;
-  --gold: #a7f1e0;
-  --max: 1200px;
-}
+:root { --max: 1200px; }
 body.rentall-app { font-family: "DM Sans", system-ui, sans-serif; }
-.site-header, .site-nav, .site-footer { background: #062e31; }
+.site-header, .site-nav, .site-footer { background: #173c32; }
 .header-inner { min-height: 70px; }
 .brand-link, .footer-logo { display: inline-flex; align-items: center; }
 .brand-wordmark { color: #fff; font-size: 2rem; font-weight: 850; letter-spacing: -.075em; line-height: 1; }
-.brand-wordmark span { color: #a7f1e0; }
+.brand-wordmark span { color: var(--gold); }
 body.rentall-app .header-cta {
-  background: #fff; color: #062e31; border: 2px solid #fff; border-radius: 6px; padding-inline: 16px;
+  background: var(--gold); color: #173c32; border: 2px solid var(--gold); border-radius: 6px; padding-inline: 16px;
 }
-body.rentall-app .header-cta:hover { background: #a7f1e0; border-color: #a7f1e0; }
-body.rentall-app .btn-primary, body.rentall-app .search-submit { background: #062e31; border-color: #062e31; color: #fff; }
-body.rentall-app .btn-primary:hover, body.rentall-app .search-submit:hover { background: #145256; border-color: #145256; }
+body.rentall-app .header-cta:hover { background: var(--gold-soft); border-color: var(--gold-soft); }
+body.rentall-app .btn-primary, body.rentall-app .search-submit { background: #173c32; border-color: #173c32; color: #fff; }
+body.rentall-app .btn-primary:hover, body.rentall-app .search-submit:hover { background: #135c47; border-color: #135c47; }
 .market-search { padding-bottom: 18px; }
 body.rentall-app .market-search-title { font-size: clamp(1.7rem, 3vw, 2.5rem); margin: 0; }
 .market-banner {
   display: grid; grid-template-columns: 1.12fr 1fr; align-items: stretch;
-  overflow: hidden; border-radius: 12px; background: #b9eee1;
+  overflow: hidden; border-radius: 12px; background: var(--gold-soft);
 }
 .market-banner-copy { padding: clamp(24px, 4.2vw, 60px); align-self: center; }
 body.rentall-app .market-banner h1 {
@@ -56,14 +46,14 @@ body.rentall-app .search-submit { min-height: 44px; }
 .results-heading p { margin: 4px 0 0; color: var(--muted); }
 .listing-grid { gap: 16px; }
 .listing-grid .listing-card { border-radius: 9px; background: #fff; }
-.listing-grid .listing-image { margin: 8px 8px 0; border-radius: 6px; aspect-ratio: 1.35; background: #e0eded; }
+.listing-grid .listing-image { margin: 8px 8px 0; border-radius: 6px; aspect-ratio: 1.35; background: var(--mint); }
 .listing-body { padding: 12px 13px 15px; }
 .listing-kicker { color: var(--muted); }
 .listing-price { color: var(--ink); }
 .listing-price small { display: inline; margin-left: 3px; }
 .photo-note {
   position: absolute; inset: auto auto 8px 8px; margin: 0; padding: 3px 7px; z-index: 1;
-  border-radius: 4px; color: #fff; background: #062e31; font-size: .72rem;
+  border-radius: 4px; color: #fff; background: #173c32; font-size: .72rem;
 }
 .detail-illustration, .ra-photo-frame { position: relative; margin: 0; }
 .detail-illustration img { display: block; width: 100%; }
@@ -92,7 +82,7 @@ body.rentall-app .search-submit { min-height: 44px; }
   .listing-grid .listing-image { margin: 5px 5px 0; aspect-ratio: 1.1; }
 }
 .market-category-intro {
-  align-items: center; background: #d8f4ed; border-radius: 10px; padding: clamp(16px, 3vw, 32px);
+  align-items: center; background: var(--mint); border-radius: 10px; padding: clamp(16px, 3vw, 32px);
 }
 .market-category-intro img {
   width: clamp(70px, 15vw, 136px); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%;
@@ -105,8 +95,13 @@ body.rentall-app .search-submit { min-height: 44px; }
 }
 body.rentall-app .market-publish-intro {
   display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px;
-  max-width: none; padding: clamp(16px, 3vw, 32px); border-radius: 10px; background: #d8f4ed; color: var(--ink);
+  max-width: none; padding: clamp(16px, 3vw, 32px); border-radius: 10px; background: var(--mint); color: var(--ink);
 }
 body.rentall-app .market-publish-intro p { color: var(--ink-soft); }
 .market-publish-intro img { width: clamp(68px, 16vw, 144px); height: auto; border-radius: 9px; }
 .market-publish-intro .ra-progress-track { grid-column: 1 / -1; }
+
+.market-banner-demo { margin-top: 8px; }
+.market-demo-preview { margin-top: 20px; }
+.market-demo-preview .section-heading p { color: var(--muted); margin: 5px 0 0; }
+.demo-order-photo { border-radius: 8px; margin-bottom: 14px; object-fit: cover; }

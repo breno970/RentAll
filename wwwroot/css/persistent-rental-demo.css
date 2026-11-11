@@ -83,3 +83,6 @@
   .site-header,.site-footer,.ra-live-head .btn,.ra-live-main,.ra-live-steps,.ra-live-side>section:not(.ra-live-receipt),[data-print-page],.ra-cookie-banner{display:none!important}
   .ra-live-grid{display:block}.ra-live-receipt{border:1px solid #000;box-shadow:none}
 }
+
+.ra-live-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ra-live-warning { border-left-color: var(--gold); background: var(--gold-soft); }

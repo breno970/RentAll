@@ -40,10 +40,22 @@ public sealed class PagamentosController : Controller
     [AllowAnonymous]
     [HttpGet("Demonstracao")]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-    public async Task<IActionResult> Demonstracao(int? pedidoId, CancellationToken ct)
+    public async Task<IActionResult> Demonstracao(int? pedidoId, string? artigo, CancellationToken ct)
     {
         if (!pedidoId.HasValue)
-            return View(new CartaoDemoViewModel());
+        {
+            if (string.IsNullOrWhiteSpace(artigo)) return View(new CartaoDemoViewModel());
+            var sample = DemoCatalogItem.All.FirstOrDefault(item => item.Slug == artigo);
+            if (sample is null) return NotFound();
+            var total = (decimal)sample.DailyPrice * 3;
+            return View(new CartaoDemoViewModel
+            {
+                Artigo = sample.Name,
+                Total = total,
+                Comissao = total * 0.10m,
+                Foto = sample.Photo
+            });
+        }
         if (User.Identity?.IsAuthenticated != true) return Challenge();
 
         var me = Me;
@@ -53,20 +65,7 @@ public sealed class PagamentosController : Controller
             .FirstOrDefaultAsync(ct);
         if (request == null || request.Pais != "PT") return NotFound();
 
-        var itemName = await db.Anuncios.AsNoTracking().Include(a => a.item)
-            .Where(a => a.id == request.AnuncioId)
-            .Select(a => a.item != null ? a.item.nmitem : a.modelo)
-            .FirstOrDefaultAsync(ct);
-
-        return View(new CartaoDemoViewModel
-        {
-            PedidoId = request.Id,
-            PedidoAssociado = true,
-            Artigo = itemName ?? "Aluguer de artigo",
-            Total = request.TotalEstimado,
-            Comissao = request.ComissaoIndicativa,
-            Pais = request.Pais
-        });
+        return RedirectToAction("Detalhes", "PercursoDemo", new { pedidoId = request.Id });
     }
 
     [HttpGet("Conta")]
