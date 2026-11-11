@@ -1,0 +1,215 @@
+@{
+    ViewData["Title"] = "Como funciona a RentAll";
+}
+<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
+<div class="page-width ra-proto" data-rental-prototype>
+    <header class="ra-proto-hero">
+        <div class="ra-proto-hero-copy">
+            <span class="ra-proto-kicker">RentAll · Portugal</span>
+            <h1>Aluga com confiança. Tudo começa com um bom acordo.</h1>
+            <p>Descobre artigos em Portugal, fala com quem os anuncia e organiza os pedidos sem sair da RentAll.</p>
+            <div class="ra-proto-actions">
+                <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Encontrar artigos</a>
+                <a class="btn btn-outline" href="#simulador">Conhecer todas as etapas</a>
+            </div>
+        </div>
+        <div class="ra-proto-snapshot" aria-label="Como utilizar a RentAll">
+            <p class="ra-proto-kicker">Já podes começar</p>
+            <div><span>01</span><strong>Descobrir artigos</strong><small>Pesquisa por categoria, distrito e preço</small></div>
+            <div><span>02</span><strong>Conversar na RentAll</strong><small>Esclarece dúvidas sem trocar contactos</small></div>
+            <div><span>03</span><strong>Gerir o pedido</strong><small>Negocia preço e duração e acompanha a resposta</small></div>
+        </div>
+    </header>
+
+    <div class="ra-proto-disclaimer" role="note">
+        <strong>Serviços disponíveis e próximos passos:</strong>
+        os anúncios, mensagens, pedidos e contrapropostas já funcionam. A verificação formal de identidade, os pagamentos, as cauções e os registos de entrega estão em preparação e não oferecem proteção financeira nesta fase.
+    </div>
+
+    <section class="ra-proto-intro" aria-labelledby="prot-why">
+        <div>
+            <p class="ra-proto-kicker">Boas práticas para alugar</p>
+            <h2 id="prot-why">O que deves confirmar antes de entregar um artigo.</h2>
+            <p>Conversa pela plataforma, acorda as condições por escrito, encontra-te num local seguro e verifica o estado do artigo. Estas boas práticas ajudam a reduzir conflitos, embora não eliminem todos os riscos.</p>
+        </div>
+        <a asp-controller="Termos" asp-action="Index" class="ra-proto-textlink">Consultar regras e direitos</a>
+    </section>
+    <div class="ra-proto-principles">
+        <article>
+            <span>01 · Confiança</span>
+            <h3>Conhece o anunciante</h3>
+            <p>Consulta os artigos publicados, confirma as características e esclarece dúvidas nas mensagens antes de combinares a entrega.</p>
+            <small>Perfis e mensagens disponíveis</small>
+        </article>
+        <article>
+            <span>02 · Estado do artigo</span>
+            <h3>Documenta a entrega</h3>
+            <p>Confere acessórios, marcas de uso e funcionamento. Guarda fotografias do estado inicial e final, sem partilhar documentos pessoais.</p>
+            <small>Boa prática recomendada</small>
+        </article>
+        <article>
+            <span>03 · Condições</span>
+            <h3>Negocia na RentAll</h3>
+            <p>Utiliza os pedidos e contrapropostas para acordar preço e duração. O registo do pedido não equivale a uma reserva paga.</p>
+            <small>Pedidos e contrapropostas disponíveis</small>
+        </article>
+        <article>
+            <span>04 · Incidentes</span>
+            <h3>Age perante suspeitas</h3>
+            <p>Guarda o histórico e denuncia anúncios suspeitos. Em situações de furto ou crime, contacta as autoridades competentes.</p>
+            <small>Denúncias de anúncios disponíveis</small>
+        </article>
+    </div>
+
+    <section id="simulador" class="ra-proto-workflow" aria-labelledby="sim-heading">
+        <div class="ra-proto-section-heading">
+            <div><p class="ra-proto-kicker">Guia interativo</p><h2 id="sim-heading">Do acordo à devolução</h2><p>Percorre as etapas, ajusta os valores e descobre como será a experiência completa de aluguer.</p></div>
+            <button type="button" class="ra-proto-reset" data-proto-reset>Recomeçar</button>
+        </div>
+        <p class="ra-proto-simulation-note" role="note"><strong>Percurso interativo de demonstração:</strong> os valores e estados seguintes são apenas exemplos. Não são recolhidos documentos, não se guarda informação, não há cobranças ou cauções e nenhuma ação altera pedidos reais.</p>
+        <div class="ra-proto-workflow-layout">
+            <nav class="ra-proto-step-list" aria-label="Etapas do percurso demonstrativo" data-proto-tabs>
+                <button type="button" data-proto-tab="0" aria-current="step"><span>01</span><strong>Verificação</strong><small>Antes do pedido</small></button>
+                <button type="button" data-proto-tab="1"><span>02</span><strong>Condições</strong><small>Preço e duração</small></button>
+                <button type="button" data-proto-tab="2"><span>03</span><strong>Pagamento</strong><small>Resumo e caução</small></button>
+                <button type="button" data-proto-tab="3"><span>04</span><strong>Entrega</strong><small>Estado e confirmação</small></button>
+                <button type="button" data-proto-tab="4"><span>05</span><strong>Devolução</strong><small>Inspeção do artigo</small></button>
+                <button type="button" data-proto-tab="5"><span>06</span><strong>Resolução</strong><small>Conclusão ou incidente</small></button>
+            </nav>
+            <div class="ra-proto-stage">
+                <section data-proto-panel="0" class="ra-proto-stage-content" aria-labelledby="p0">
+                    <span class="ra-proto-label">Etapa 1 de 6</span>
+                    <h3 id="p0" tabindex="-1">Identificar os participantes</h3>
+                    <p>O objetivo é limitar anúncios falsos e reduzir a probabilidade de entregar um objeto a alguém que não pode ser responsabilizado.</p>
+                    <div class="ra-proto-checkrows">
+                        <div><span class="ra-proto-check">1</span><div><strong>Conta e identidade</strong><small>Verificação por um fornecedor especializado, sujeita a consentimento, minimização de dados e critérios de risco.</small></div></div>
+                        <div><span class="ra-proto-check">2</span><div><strong>Legitimidade do anúncio</strong><small>Descrição e número de série quando adequado; prova de propriedade apenas se necessária e por canal protegido.</small></div></div>
+                        <div><span class="ra-proto-check">3</span><div><strong>Comunicação interna</strong><small>Mensagens, preços e contrapropostas registados na RentAll. O contacto externo é desencorajado.</small></div></div>
+                    </div>
+                    <p class="ra-proto-footnote">A RentAll não verifica identidade nem propriedade automaticamente nesta versão.</p>
+                    <button class="btn btn-primary" type="button" data-proto-next>Continuar para condições</button>
+                </section>
+
+                <section data-proto-panel="1" class="ra-proto-stage-content" aria-labelledby="p1" hidden>
+                    <span class="ra-proto-label">Etapa 2 de 6</span>
+                    <h3 id="p1" tabindex="-1">Definir condições do aluguer</h3>
+                    <p>Exemplo de proposta com valores ilustrativos. Estes campos não alteram anúncios reais.</p>
+                    <div class="ra-proto-form">
+                        <label>Tipo de artigo
+                            <select class="form-select" data-proto-type>
+                                <option value="drill">Berbequim e ferramentas</option>
+                                <option value="camera">Câmara fotográfica</option>
+                                <option value="bike">Bicicleta</option>
+                            </select>
+                        </label>
+                        <label>Preço por dia (€)
+                            <input class="form-control" data-proto-price type="number" min="1" max="1000" step="1" value="18" />
+                        </label>
+                        <label>Número de dias
+                            <input class="form-control" data-proto-days type="number" min="1" max="30" step="1" value="3" />
+                        </label>
+                        <label>Valor declarado do artigo (€)
+                            <input class="form-control" data-proto-value type="number" min="20" max="5000" step="10" value="300" />
+                        </label>
+                    </div>
+                    <div class="ra-proto-inline-summary">
+                        <div><small>Aluguer estimado</small><strong data-proto-rent>54,00 €</strong></div>
+                        <div><small>Comissão ilustrativa (10%)</small><strong data-proto-fee>5,40 €</strong></div>
+                        <div><small>Parte ilustrativa do anunciante</small><strong data-proto-owner>48,60 €</strong></div>
+                    </div>
+                    <p class="ra-proto-footnote">A comissão está incluída no preço do aluguer e não é acrescentada ao valor pago pelo comprador. Taxas do prestador e impostos não estão incluídos na simulação.</p>
+                    <button class="btn btn-primary" type="button" data-proto-next>Rever pagamento e caução</button>
+                </section>
+
+                <section data-proto-panel="2" class="ra-proto-stage-content" aria-labelledby="p2" hidden>
+                    <span class="ra-proto-label">Etapa 3 de 6</span>
+                    <h3 id="p2" tabindex="-1">Confirmar valores, antes da entrega</h3>
+                    <p>O modelo futuro poderia utilizar um prestador de pagamentos para cobrar o aluguer e, quando elegível, efetuar uma autorização de caução separada.</p>
+                    <div class="ra-proto-ledger">
+                        <div><span>Aluguer</span><strong data-proto-rent>54,00 €</strong></div>
+                        <div><span>Caução ilustrativa (não cobrada)</span><strong data-proto-deposit>90,00 €</strong></div>
+                        <div><span>Comissão RentAll incluída no aluguer</span><strong data-proto-fee>5,40 €</strong></div>
+                    </div>
+                    <p class="ra-proto-deposit">A caução seria uma garantia separada, com limites e condições comunicados antecipadamente. <strong>Não pode ser retida automaticamente por uma denúncia.</strong> A disponibilidade de pré-autorização depende do prestador, do método e dos prazos de captura.</p>
+                    <a class="ra-proto-textlink" asp-controller="Pagamentos" asp-action="Demonstracao">Ver a demonstração de pagamento com cartão</a>
+                    <button class="btn btn-primary" type="button" data-proto-next>Simular confirmação e entrega</button>
+                </section>
+
+                <section data-proto-panel="3" class="ra-proto-stage-content" aria-labelledby="p3" hidden>
+                    <span class="ra-proto-label">Etapa 4 de 6</span>
+                    <h3 id="p3" tabindex="-1">Registar a entrega</h3>
+                    <p>Na entrega presencial, ambas as partes deverão conferir o mesmo artigo e registar o estado inicial antes de iniciar o prazo.</p>
+                    <div class="ra-proto-checklist" data-proto-handover>
+                        <label><input type="checkbox" /><span>Fotografias do estado inicial analisadas por ambas as partes</span></label>
+                        <label><input type="checkbox" /><span>Acessórios e marcas de uso descritos no registo</span></label>
+                        <label><input type="checkbox" /><span>Número de série ou referência conferidos, quando existirem</span></label>
+                        <label><input type="checkbox" /><span>Entrega presencial confirmada pelos dois participantes</span></label>
+                    </div>
+                    <p class="ra-proto-footnote">O código de entrega e as fotografias seriam gerados e armazenados com controlos de acesso numa versão futura. Não introduzas aqui códigos, documentos ou imagens reais.</p>
+                    <div class="ra-proto-feedback" role="status" data-proto-handover-status></div>
+                    <button class="btn btn-primary" type="button" data-proto-confirm-handover>Simular entrega concluída</button>
+                </section>
+
+                <section data-proto-panel="4" class="ra-proto-stage-content" aria-labelledby="p4" hidden>
+                    <span class="ra-proto-label">Etapa 5 de 6</span>
+                    <h3 id="p4" tabindex="-1">Comparar o artigo na devolução</h3>
+                    <p>O estado final é comparado com o registo inicial. As divergências devem ser descritas e analisadas, sem decisões automáticas.</p>
+                    <div class="ra-proto-form">
+                        <label>O que aconteceu? 
+                            <select class="form-select" data-proto-outcome>
+                                <option value="ok">Devolução sem ocorrências</option>
+                                <option value="scratch">Foi identificado um dano</option>
+                                <option value="late">A devolução está atrasada</option>
+                                <option value="missing">O artigo não foi devolvido</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="ra-proto-checklist" data-proto-return>
+                        <label><input type="checkbox" /><span>O relatório inicial foi consultado</span></label>
+                        <label><input type="checkbox" /><span>O estado final ou a ausência de devolução foram documentados</span></label>
+                    </div>
+                    <div class="ra-proto-feedback" role="status" data-proto-return-status></div>
+                    <button class="btn btn-primary" type="button" data-proto-confirm-return>Ver o resultado ilustrativo</button>
+                </section>
+
+                <section data-proto-panel="5" class="ra-proto-stage-content" aria-labelledby="p5" hidden>
+                    <span class="ra-proto-label">Etapa 6 de 6</span>
+                    <h3 id="p5" tabindex="-1">Resultado e resolução</h3>
+                    <div class="ra-proto-result" data-proto-result role="status">
+                        <strong data-proto-result-title>Escolhe um resultado de devolução</strong>
+                        <p data-proto-result-text>Volta à etapa anterior e seleciona uma ocorrência para explorar os próximos passos.</p>
+                    </div>
+                    <div class="ra-proto-checkrows">
+                        <div><span class="ra-proto-check">1</span><div><strong>Comunicar o problema</strong><small>Recolher apenas provas pertinentes e dar a ambas as partes oportunidade de responder.</small></div></div>
+                        <div><span class="ra-proto-check">2</span><div><strong>Rever condições e provas</strong><small>Análise humana; desgaste normal, dano novo, atraso e suspeita de furto são situações diferentes.</small></div></div>
+                        <div><span class="ra-proto-check">3</span><div><strong>Decidir e informar</strong><small>Qualquer reembolso ou execução de caução exigiria regras contratuais, fundamento, prestador apto e forma de contestação.</small></div></div>
+                    </div>
+                    <p class="ra-proto-footnote">Em caso de suspeita de crime, os participantes deverão recorrer às autoridades competentes. A plataforma não substitui a polícia, os tribunais ou um seguro.</p>
+                    <button class="btn btn-outline" type="button" data-proto-reset>Experimentar outro cenário</button>
+                </section>
+            </div>
+        </div>
+        <p class="ra-proto-memory">Esta experiência é ilustrativa: não altera pedidos nem guarda os dados introduzidos. Para os teus pedidos, utiliza a <a asp-controller="Pedidos" asp-action="Index">área de alugueres</a>.</p>
+    </section>
+
+    <section class="ra-proto-business" aria-labelledby="business-heading">
+        <div>
+            <p class="ra-proto-kicker">Preços e condições</p>
+            <h2 id="business-heading">Publicar é gratuito. Os valores são sempre claros.</h2>
+            <p>Podes publicar artigos, enviar mensagens e negociar pedidos sem pagar. A comissão prevista para futuros alugueres pagos é de 10%, incluída no preço indicado, e só será aplicada quando os pagamentos estiverem disponíveis.</p>
+            <a class="ra-proto-textlink" asp-controller="Planos" asp-action="Index">Consultar preços e serviços</a>
+        </div>
+        <div class="ra-proto-business-card">
+            <span class="ra-proto-kicker">Exemplo de cálculo</span>
+            <div class="ra-proto-business-values">
+                <div><small>Preço do aluguer</small><strong>100,00 €</strong></div>
+                <div><small>Comissão prevista (10%)</small><strong>10,00 €</strong></div>
+                <div><small>Valor ilustrativo para o anunciante</small><strong>90,00 €</strong></div>
+            </div>
+            <small>Exemplo informativo. Não são cobradas comissões nesta fase. Impostos e custos do prestador de pagamentos serão apresentados quando aplicáveis.</small>
+        </div>
+    </section>
+</div>
+@section Scripts {
+    <script src="~/js/rental-prototype.js" asp-append-version="true" defer></script>
+}

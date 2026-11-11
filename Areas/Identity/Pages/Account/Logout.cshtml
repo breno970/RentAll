@@ -1,21 +1,15 @@
-﻿@page
+@page
 @model LogoutModel
-@{
-    ViewData["Title"] = "Log out";
+@{ ViewData["Title"] = "Sair da conta"; }
+<div class="page-width"><section class="auth-shell"><div class="auth-panel"><div class="empty-symbol"><i class="fas fa-sign-out-alt" aria-hidden="true"></i></div><h1>Até breve!</h1>@if (User.Identity?.IsAuthenticated == true)
+{
+    <p class="auth-lead">Tens a certeza de que pretendes terminar esta sessão?</p>
+    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+        <button type="submit" class="btn btn-brand auth-wide">Terminar sessão</button>
+    </form>
 }
-
-<header>
-    <h1>@ViewData["Title"]</h1>
-    @{
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" id="login_button" class="nav-link btn btn-link text-dark">Sair</button>
-            </form>
-        }
-        else
-        {
-            <p>Yvocê saiu do aplicativo com sucesso.</p>
-        }
-    }
-</header>
+else
+{
+    <p class="auth-lead">A tua sessão foi terminada com sucesso.</p>
+    <a class="btn btn-brand auth-wide" asp-area="" asp-controller="Home" asp-action="Index">Voltar à RentAll</a>
+}</div></section></div>

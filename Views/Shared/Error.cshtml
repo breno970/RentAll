@@ -1,25 +1,12 @@
-﻿@model ErrorViewModel
-@{
-    ViewData["Title"] = "Error";
-}
-
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
-
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
-
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+@model ErrorViewModel
+@{ ViewData["Title"] = "Algo não correu bem"; }
+<div class="page-width">
+    <div class="error-page panel">
+        <span class="error-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></span>
+        <h1>Não foi possível abrir esta página.</h1>
+        <p class="muted">Ocorreu um problema inesperado. Experimenta novamente ou volta à página inicial.</p>
+        @if (Model?.ShowRequestId == true)
+        { <p class="muted" style="font-size:.76rem">Referência de suporte: <code>@Model.RequestId</code></p> }
+        <div class="form-actions" style="justify-content:center"><a class="btn btn-primary" asp-controller="Home" asp-action="Index"><i class="fas fa-home"></i> Voltar ao início</a></div>
+    </div>
+</div>

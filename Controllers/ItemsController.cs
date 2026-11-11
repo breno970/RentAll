@@ -1,276 +1,219 @@
-﻿using aluguel.Areas.Identity.Data;
+using aluguel.Areas.Identity.Data;
 using aluguel.Models;
-using aluguel.ViewModel;
+using aluguel.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace aluguel.Controllers
+namespace aluguel.Controllers;
+
+[Authorize]
+public sealed class ItemsController : Controller
 {
-    public class ItemsController : Controller
+    private readonly ApplicationDbContext _db;
+    private readonly IImageStorage _storage;
+    private readonly ILogger<ItemsController> _logger;
+
+    public ItemsController(ApplicationDbContext db, IImageStorage storage, ILogger<ItemsController> logger)
     {
-        private readonly ILogger<ItemsController> _logger;
-        private readonly ApplicationDbContext Context;
-        private readonly IWebHostEnvironment WebHostEnvironment;
+        _db = db;
+        _storage = storage;
+        _logger = logger;
+    }
 
-        public ItemsController(ILogger<ItemsController> logger, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? throw new UnauthorizedAccessException();
+
+    private static List<string> Images(Item item)
+        => new[] { item.imagem1, item.imagem2, item.imagem3, item.imagem4, item.imagem5 }
+           .Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
+
+    private static void ApplyImages(Item item, IReadOnlyList<string> keys)
+    {
+        item.imagem1 = keys.ElementAtOrDefault(0)!;
+        item.imagem2 = keys.ElementAtOrDefault(1);
+        item.imagem3 = keys.ElementAtOrDefault(2);
+        item.imagem4 = keys.ElementAtOrDefault(3);
+        item.imagem5 = keys.ElementAtOrDefault(4);
+    }
+
+    private static List<string> ParseOrder(string? raw, IReadOnlyCollection<string> existing, int fileCount)
+    {
+        var tokens = (raw ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
+        if (tokens.Length != existing.Count + fileCount || tokens.Length is < 1 or > 5)
+            throw new InvalidDataException("Seleciona entre 1 e 5 fotografias.");
+        var allowed = new HashSet<string>(existing.Select(k => "e:" + k), StringComparer.Ordinal);
+        for (var i = 0; i < fileCount; i++) allowed.Add("n:" + i);
+        if (tokens.Distinct(StringComparer.Ordinal).Count() != tokens.Length || tokens.Any(t => !allowed.Contains(t)))
+            throw new InvalidDataException("A ordem das fotografias é inválida. Atualiza a página e tenta novamente.");
+        return tokens.ToList();
+    }
+
+    private async Task CleanupAsync(IEnumerable<string> keys, CancellationToken ct = default)
+    {
+        foreach (var key in keys)
         {
-            _logger = logger;
-            Context = context;
-            WebHostEnvironment = webHostEnvironment;
+            try { await _storage.DeleteAsync(key, ct); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Não foi possível limpar imagem órfã."); }
         }
+    }
 
-        public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index()
+        => View(await _db.Items.Where(x => x.iduser == CurrentUserId).ToListAsync());
+
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id is null) return NotFound();
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        return item is null ? NotFound() : View(item);
+    }
+
+    public IActionResult Create() => RedirectToAction("Index", "Publicar");
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(35_000_000)]
+    public async Task<IActionResult> Create(string nmitem, string dsitem, string snativo, List<IFormFile>? photos, string? photoOrder, CancellationToken ct)
+    {
+        photos ??= new List<IFormFile>();
+        if (!ListingContentValidation.ValidTitle(nmitem) || !ListingContentValidation.ValidDescription(dsitem))
+            ModelState.AddModelError("", "Indica um título até 140 caracteres e uma descrição até 6000 caracteres.");
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(nmitem) ||
+            MarketplaceContactSafety.ContainsContactOrRedirect(dsitem))
+            ModelState.AddModelError("", "Retira telefones, links e redes sociais do artigo. Os interessados devem contactar-te pela RentAll.");
+        if (!ModelState.IsValid) return View();
+        var uploaded = new List<string>();
+        try
         {
-            var model = await Context.Items
-                            .Where(a => a.iduser == HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value)
-                            .ToListAsync();
-            return View(model);
-
-        }
-
-        // GET: Items/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || Context.Items == null)
-            {
-                return NotFound();
-            }
-
-            var item = await Context.Items
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            return View(item);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        public IActionResult GetTipos(int id)
-        {
-            //get state list as SelectListItem
-            var statesList = Context.Tipos.Where(s => s.categoriaid == id).ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmtipo }).ToList();
-            return Json(statesList);
-        }
-
-        [HttpPost]
-        public IActionResult Create(ItemViewModel vm)
-        {
-            string imagem1 = Imagem1(vm);
-            string? imagem2 = Imagem2(vm);
-            string? imagem3 = Imagem3(vm);
-            string? imagem4 = Imagem4(vm);
-            string? imagem5 = Imagem5(vm);
+            var order = ParseOrder(photoOrder, Array.Empty<string>(), photos.Count);
+            foreach (var photo in photos) uploaded.Add(await _storage.UploadAsync(photo, CurrentUserId, ct));
+            var arranged = order.Select(token => uploaded[int.Parse(token[2..])]).ToList();
             var item = new Item
             {
-                nmitem = vm.nmitem,
-                dsitem = vm.dsitem,
-                dtcriacao = vm.dtcriacao = DateTime.Now,
-                snativo = vm.snativo,
-                iduser = vm.iduser,
-                imagem1 = imagem1,
-                imagem2 = imagem2,
-                imagem3 = imagem3,
-                imagem4 = imagem4,
-                imagem5 = imagem5
-
+                nmitem = nmitem.Trim(), dsitem = dsitem.Trim(),
+                dtcriacao = DateTime.UtcNow,
+                snativo = snativo == "N" ? "N" : "S",
+                iduser = CurrentUserId
             };
-            ViewBag.Categoria = Context.Categorias.ToList().Select(c => new SelectListItem { Value = c.id.ToString(), Text = c.nmcategoria }).ToList();
-
-            Context.Items.Add(item);
-            Context.SaveChanges();
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: Items/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || Context.Items == null)
-            {
-                return NotFound();
-            }
-
-            var item = await Context.Items.FindAsync(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            return View(item);
-        }
-
-        // POST: Items/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,nmitem,dsitem,dtcriacao,snativo,imagem1,imagem2,imagem3,imagem4,imagem5,iduser")] Item item)
-        {
-            if (id != item.id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    Context.Update(item);
-                    await Context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ItemExists(item.id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(item);
-        }
-
-        // GET: Items/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || Context.Items == null)
-            {
-                return NotFound();
-            }
-
-            var item = await Context.Items
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            return View(item);
-        }
-
-        // POST: Items/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (Context.Items == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Items'  is null.");
-            }
-            var item = await Context.Items.FindAsync(id);
-            if (item != null)
-            {
-                Context.Items.Remove(item);
-            }
-
-            await Context.SaveChangesAsync();
+            ApplyImages(item, arranged);
+            _db.Items.Add(item);
+            await _db.SaveChangesAsync(ct);
+            TempData["Success"] = "Artigo guardado. Agora podes criar o anúncio.";
+            if (item.snativo != "N")
+                return RedirectToAction("Create", "Anuncios", new { itemId = item.id });
             return RedirectToAction(nameof(Index));
         }
-
-        private string Imagem1(ItemViewModel vm)
+        catch (Exception ex) when (ex is InvalidDataException or IOException or HttpRequestException or InvalidOperationException or DbUpdateException)
         {
-            string imagem = null;
-            if (vm.imagem1 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem1.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem1.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
+            _logger.LogError(ex, "Failed to create item or upload photos");
+            await CleanupAsync(uploaded);
+            ModelState.AddModelError("", ex is InvalidDataException ? ex.Message :
+                ex is ImageStorageException storageError ? storageError.UserMessage :
+                "Não foi possível guardar o artigo. O serviço de imagens ou a base de dados não está disponível.");
+            return View();
         }
+    }
 
-        private string Imagem2(ItemViewModel vm)
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id is null) return NotFound();
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        return item is null ? NotFound() : View(item);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(35_000_000)]
+    public async Task<IActionResult> Edit(int id, string nmitem, string dsitem, string snativo, List<IFormFile>? photos, string? photoOrder, CancellationToken ct)
+    {
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId, ct);
+        if (item is null) return NotFound();
+        photos ??= new List<IFormFile>();
+        var current = Images(item);
+        // Keep a safe in-memory snapshot: on persistence failure the database may be unavailable.
+        var savedName = item.nmitem;
+        var savedDescription = item.dsitem;
+        var savedVisibility = item.snativo;
+        if (!ListingContentValidation.ValidTitle(nmitem) || !ListingContentValidation.ValidDescription(dsitem))
         {
-            string imagem = null;
-            if (vm.imagem2 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem2.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem2.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
+            ModelState.AddModelError("", "Indica um título até 140 caracteres e uma descrição até 6000 caracteres.");
+            return View(item);
         }
-
-        private string Imagem3(ItemViewModel vm)
+        if (MarketplaceContactSafety.ContainsContactOrRedirect(nmitem) ||
+            MarketplaceContactSafety.ContainsContactOrRedirect(dsitem))
         {
-            string imagem = null;
-            if (vm.imagem3 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem3.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem3.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
+            ModelState.AddModelError("", "Retira contactos pessoais, links e redes sociais. As negociações devem ficar na RentAll.");
+            return View(item);
         }
-
-        private string Imagem4(ItemViewModel vm)
+        var uploaded = new List<string>();
+        try
         {
-            string imagem = null;
-            if (vm.imagem4 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem4.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem4.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
+            // Only the image keys that belong to this item may be retained.
+            var tokens = (photoOrder ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var retained = current.Where(k => tokens.Contains("e:" + k, StringComparer.Ordinal)).ToList();
+            var order = ParseOrder(photoOrder, retained, photos.Count);
+            foreach (var file in photos) uploaded.Add(await _storage.UploadAsync(file, CurrentUserId, ct));
+            var arranged = order.Select(token => token.StartsWith("e:", StringComparison.Ordinal)
+                ? token[2..] : uploaded[int.Parse(token[2..])]).ToList();
+            item.nmitem = nmitem.Trim();
+            item.dsitem = dsitem.Trim();
+            item.snativo = snativo == "N" ? "N" : "S";
+            ApplyImages(item, arranged);
+            await _db.SaveChangesAsync(ct);
+            await CleanupAsync(current.Except(retained));
+            TempData["Success"] = "Artigo atualizado.";
+            return RedirectToAction(nameof(Index));
         }
-
-        private string Imagem5(ItemViewModel vm)
+        catch (Exception ex) when (ex is InvalidDataException or IOException or HttpRequestException or InvalidOperationException or DbUpdateException)
         {
-            string imagem = null;
-            if (vm.imagem5 != null)
-            {
-                string uploadDir = Path.Combine(WebHostEnvironment.WebRootPath, "imagens");
-                imagem = Guid.NewGuid().ToString() + "-" + vm.imagem5.FileName;
-                string filePath = Path.Combine(uploadDir, imagem);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    vm.imagem5.CopyTo(fileStream);
-                }
-
-            }
-            return imagem;
-
+            _logger.LogError(ex, "Failed to update item {ItemId}", id);
+            await CleanupAsync(uploaded);
+            ModelState.AddModelError("", ex is InvalidDataException ? ex.Message :
+                ex is ImageStorageException storageError ? storageError.UserMessage :
+                "Não foi possível guardar as alterações. Verifica o serviço de fotografias.");
+            // Do not query the failing database again merely to render the error screen.
+            // Restore values already loaded before the attempted save.
+            item.nmitem = savedName;
+            item.dsitem = savedDescription;
+            item.snativo = savedVisibility;
+            ApplyImages(item, current);
+            return View(item);
         }
+    }
 
-        private bool ItemExists(int id)
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id is null) return NotFound();
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        return item is null ? NotFound() : View(item);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var item = await _db.Items.FirstOrDefaultAsync(x => x.id == id && x.iduser == CurrentUserId);
+        if (item is null) return NotFound();
+        var adIds = await _db.Anuncios.Where(a => a.itemid == item.id).Select(a => a.id).ToListAsync();
+        if (await RentalDeletionGuard.HasOpenRentalsAsync(_db, adIds))
         {
-            return (Context.Items?.Any(e => e.id == id)).GetValueOrDefault();
+            TempData["Error"] = RentalDeletionGuard.BlockedMessage;
+            return RedirectToAction(nameof(Index));
         }
+        var keys = Images(item);
+        try
+        {
+            _db.Items.Remove(item);
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogWarning(ex, "Cannot remove item because related records still exist.");
+            TempData["Error"] = "Não foi possível excluir o artigo: existem registos associados.";
+            return RedirectToAction(nameof(Index));
+        }
+        await CleanupAsync(keys);
+        return RedirectToAction(nameof(Index));
     }
 }

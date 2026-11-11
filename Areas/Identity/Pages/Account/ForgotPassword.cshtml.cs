@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.RateLimiting;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -18,11 +19,13 @@ namespace aluguel.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _configuration;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -47,12 +50,18 @@ namespace aluguel.Areas.Identity.Pages.Account
             public string Email { get; set; }
         }
 
+        [EnableRateLimiting("account-email")]
         public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)
             {
+                if (string.IsNullOrWhiteSpace(_configuration["SendGridKey"]) || string.IsNullOrWhiteSpace(_configuration["EmailFromAddress"]))
+                {
+                    ModelState.AddModelError(string.Empty, "A recuperação por e-mail está temporariamente indisponível. Contacta o suporte.");
+                    return Page();
+                }
                 var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToPage("./ForgotPasswordConfirmation");
@@ -68,10 +77,16 @@ namespace aluguel.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Redefinição",
-                    $"Crie uma nova senha clicando <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>NESTE LINK</a>.");
+                try
+                {
+                    await _emailSender.SendEmailAsync(Input.Email, "Redefinir a palavra-passe da RentAll",
+                        $"<p>Recebemos um pedido para alterar a palavra-passe da tua conta.</p><p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='display:inline-block;background:#135c47;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:bold'>Criar nova palavra-passe</a></p><p>Este link expira após um período limitado. Se não fizeste o pedido, ignora este email.</p>");
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError(string.Empty, "Não foi possível enviar o email neste momento. Tenta novamente mais tarde.");
+                    return Page();
+                }
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

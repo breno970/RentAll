@@ -1,0 +1,208 @@
+@model IEnumerable<aluguel.Models.PedidoAluguer>
+@using aluguel.Services
+@{
+    ViewData["Title"] = "Pedidos de aluguer";
+    var names = ViewBag.AdNames as Dictionary<int, string> ?? new();
+    var me = ViewBag.Me as string ?? "";
+    var paymentsReady = ViewBag.StripeSandboxReady == true;
+    var paymentStates = ViewBag.PaymentStates as Dictionary<int, string> ?? new();
+    var selectedView = ViewBag.SelectedView as string ?? "todos";
+    var totalRequests = (int)(ViewBag.TotalRequests ?? 0);
+    var receivedCount = (int)(ViewBag.ReceivedCount ?? 0);
+    var sentCount = (int)(ViewBag.SentCount ?? 0);
+    var pendingToAnswer = (int)(ViewBag.PendingToAnswer ?? 0);
+}
+<link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/in-platform-journey.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/rental-dashboard.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true"/>
+<div class="page-width ra-request-page">
+    <div class="page-intro">
+        <div><p class="eyebrow">RentAll · Alugueres</p><h1>Pedidos de aluguer</h1>
+            <p>Acompanha os pedidos dos teus artigos e os que enviaste a outros anunciantes.</p></div>
+        <a class="btn btn-outline" asp-controller="Home" asp-action="Index">Explorar artigos</a>
+    </div>
+    <div class="ra-fee-disclosure"><i class="fas fa-info-circle" aria-hidden="true"></i>
+        Os pedidos registam apenas interesse no aluguer. Não existem cobranças, reservas pagas nem proteção financeira ativadas nesta fase. A comissão indicativa não é cobrada.
+    </div>
+    <div class="ra-proto-detail-note">
+        <strong>Prepara a entrega e a devolução</strong>
+        <p>Consulta as recomendações para confirmar o estado do artigo e explora as próximas funcionalidades de caução e gestão de danos. A experiência interativa não altera os teus pedidos.</p>
+        <a asp-controller="Experiencia" asp-action="ComoFunciona" class="ra-proto-textlink">Consultar o percurso completo</a>
+    </div>
+    <section class="ra-pipeline-overview" aria-label="Resumo dos alugueres">
+        <div class="ra-pipeline-heading">
+            <div><h2>O teu painel de alugueres</h2><p>Vê rapidamente o que precisa de resposta e acompanha as conversas.</p></div>
+            @if (pendingToAnswer > 0)
+            {
+                <a class="btn btn-primary" asp-action="Index" asp-route-vista="pendentes">
+                    <i class="far fa-clock" aria-hidden="true"></i> Responder a pedidos (@pendingToAnswer)
+                </a>
+            }
+        </div>
+        <div class="ra-pipeline-kpis">
+            <div><span>Pedidos</span><strong>@totalRequests</strong><small>no teu histórico recente</small></div>
+            <div><span>Recebidos</span><strong>@receivedCount</strong><small>pelos teus artigos</small></div>
+            <div><span>Enviados</span><strong>@sentCount</strong><small>a anunciantes</small></div>
+            <div class="@(pendingToAnswer > 0 ? "needs-attention" : "")"><span>A aguardar resposta tua</span><strong>@pendingToAnswer</strong><small>@(pendingToAnswer == 0 ? "Tudo acompanhado" : "Pedidos por responder")</small></div>
+        </div>
+        <nav class="ra-pipeline-tabs" aria-label="Filtrar pedidos">
+            <a asp-action="Index" class="@(selectedView == "todos" ? "is-active" : "")" asp-route-vista="todos" aria-current="@(selectedView == "todos" ? "page" : null)">Todos</a>
+            <a asp-action="Index" class="@(selectedView == "recebidos" ? "is-active" : "")" asp-route-vista="recebidos" aria-current="@(selectedView == "recebidos" ? "page" : null)">Recebidos</a>
+            <a asp-action="Index" class="@(selectedView == "enviados" ? "is-active" : "")" asp-route-vista="enviados" aria-current="@(selectedView == "enviados" ? "page" : null)">Enviados</a>
+            <a asp-action="Index" class="@(selectedView == "pendentes" ? "is-active" : "")" asp-route-vista="pendentes" aria-current="@(selectedView == "pendentes" ? "page" : null)">Por responder @if (pendingToAnswer > 0) { <span class="ra-pipeline-count">@pendingToAnswer</span> }</a>
+        </nav>
+    </section>
+    @if (!Model.Any())
+    {
+        <div class="empty-state"><i class="far fa-calendar-check"></i>
+            <h2>@(totalRequests == 0 ? "Ainda não existem pedidos" : "Sem pedidos neste filtro")</h2>
+            <p>@(totalRequests == 0 ? "Quando alguém demonstrar interesse num artigo, os pedidos aparecerão aqui." : "Experimenta outro separador para veres o restante histórico.")</p>
+        </div>
+    }
+    else
+    {
+        <div class="ra-requests-grid">
+        @foreach (var request in Model)
+        {
+            var owner = request.AnuncianteId == me;
+            var name = names.TryGetValue(request.AnuncioId, out var label) ? label : "Anúncio";
+            <article class="ra-request-card">
+                <div class="ra-request-top">
+                    <span class="ra-request-kind">@(owner ? "Pedido recebido" : "Pedido enviado")</span>
+                    <span class="ra-request-status @((owner && request.Estado == "Pendente") || (request.Estado == "Contraproposta" && request.PropostaPorId != me) ? "is-awaiting-action" : "")">@request.Estado</span>
+                </div>
+                <h2><a asp-controller="Anuncios" asp-action="Details" asp-route-id="@request.AnuncioId">@name</a></h2>
+                <p class="muted">@request.Dias @(request.Dias == 1 ? "dia" : "dias") · @request.CriadoEm.ToString("dd/MM/yyyy")</p>
+                <div class="ra-request-steps" aria-label="Etapas do pedido">
+                    <span class="is-current"><i class="fas fa-check" aria-hidden="true"></i> Pedido registado</span>
+                    <span class="@(request.Estado == "Pendente" ? "is-current" : "")">@(request.Estado == "Pendente" ? "Aguardar resposta" : request.Estado == "Recusado" ? "Recusado" : request.Estado == "Cancelado" ? "Cancelado" : "Resposta recebida")</span>
+                    <span>Pagamento na RentAll: ainda indisponível</span>
+                </div>
+                <dl class="ra-request-values">
+                    <div><dt>Valor estimado</dt><dd>@RentalLocalization.FormatPrice((float)request.TotalEstimado, request.Pais)</dd></div>
+                    <div><dt>Comissão futura ilustrativa (10%)</dt><dd>@RentalLocalization.FormatPrice((float)request.ComissaoIndicativa, request.Pais)</dd></div>
+                </dl>
+                @if (request.Estado == "Pendente")
+                {
+                    <details class="ra-counteroffer-details">
+                        <summary>Propor outro preço ou duração</summary>
+                        <form asp-action="Propor" method="post" class="ra-counteroffer-form">
+                            <input type="hidden" name="id" value="@request.Id" />
+                            <label>Valor por dia
+                                <input class="form-control" type="number" name="precoDia" min="0.50" max="10000" step="0.01"
+                                       value="@request.PrecoDia.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" required />
+                            </label>
+                            <label>Número de dias
+                                <input class="form-control" type="number" name="dias" min="1" max="365"
+                                       value="@request.Dias" required />
+                            </label>
+                            <button class="btn btn-outline" type="submit">Enviar contraproposta</button>
+                        </form>
+                        <p class="ra-counteroffer-help">A outra pessoa terá de aceitar. O preço original só muda após essa aceitação. Não existe pagamento nesta fase.</p>
+                    </details>
+                }
+                else if (request.Estado == "Contraproposta" && request.PropostaDias.HasValue && request.PropostaPrecoDia.HasValue)
+                {
+                    <div class="ra-counteroffer-active">
+                        <strong>Nova proposta de @(request.PropostaPorId == me ? "tua autoria" : "outro participante")</strong>
+                        <p>@request.PropostaDias dia(s) × @RentalLocalization.FormatPrice((float)request.PropostaPrecoDia.Value, request.Pais) / dia</p>
+                        <p><strong>Total proposto: @RentalLocalization.FormatPrice((float)(request.PropostaDias.Value * request.PropostaPrecoDia.Value), request.Pais)</strong></p>
+                        @if (request.PropostaPorId == me)
+                        {
+                            <p>Aguarda a decisão da outra pessoa. Podes retirar a proposta.</p>
+                            <form asp-action="RetirarProposta" method="post">
+                                <input type="hidden" name="id" value="@request.Id" />
+                                <button type="submit" class="btn btn-outline">Retirar contraproposta</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <p>Confirma os novos valores antes de aceitares. O pedido não implica pagamento.</p>
+                            <div class="ra-request-actions">
+                                <form asp-action="DecidirProposta" method="post">
+                                    <input type="hidden" name="id" value="@request.Id" />
+                                    <input type="hidden" name="aceitar" value="true" />
+                                    <button type="submit" class="btn btn-primary">Aceitar contraproposta</button>
+                                </form>
+                                <form asp-action="DecidirProposta" method="post">
+                                    <input type="hidden" name="id" value="@request.Id" />
+                                    <input type="hidden" name="aceitar" value="false" />
+                                    <button type="submit" class="btn btn-outline">Recusar contraproposta</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (request.Estado == "Pendente" && owner)
+                {
+                    <div class="ra-request-actions">
+                        <form asp-controller="Pedidos" asp-action="Responder" method="post">
+                            <input type="hidden" name="id" value="@request.Id"/>
+                            <input type="hidden" name="aceitar" value="true"/>
+                            <button class="btn btn-primary" type="submit">Aceitar pedido</button>
+                        </form>
+                        <form asp-controller="Pedidos" asp-action="Responder" method="post">
+                            <input type="hidden" name="id" value="@request.Id"/>
+                            <input type="hidden" name="aceitar" value="false"/>
+                            <button class="btn btn-outline" type="submit">Recusar</button>
+                        </form>
+                    </div>
+                }
+                else if ((request.Estado == "Pendente" || request.Estado == "Contraproposta") && !owner)
+                {
+                    <form asp-controller="Pedidos" asp-action="Cancelar" method="post">
+                        <input type="hidden" name="id" value="@request.Id"/>
+                        <button class="btn btn-outline" type="submit">Cancelar pedido</button>
+                    </form>
+                }
+                @if (request.Estado == "Aceite sem pagamento")
+                {
+                    @if (paymentStates.TryGetValue(request.Id, out var paymentState))
+                    {
+                        <p class="ra-request-note"><strong>Pagamento de teste:</strong> @paymentState. Não constitui pagamento real.</p>
+                        @if (!owner && paymentsReady && paymentState == "Checkout criado")
+                        {
+                            <form asp-controller="Pagamentos" asp-action="Checkout" method="post" style="margin-top:12px">
+                                <input type="hidden" name="pedidoId" value="@request.Id" />
+                                <button class="btn btn-outline" type="submit">Retomar pagamento de teste</button>
+                            </form>
+                        }
+                    }
+                    else if (paymentsReady && !owner && request.Pais == "PT")
+                    {
+                        <form asp-controller="Pagamentos" asp-action="Checkout" method="post" style="margin-top:12px">
+                            <input name="pedidoId" type="hidden" value="@request.Id"/>
+                            <button class="btn btn-primary" type="submit">Simular pagamento seguro (Stripe)</button>
+                        </form>
+                    }
+                    else if (owner && request.Pais == "PT" && paymentsReady)
+                    {
+                        <p class="ra-request-note"><a asp-controller="Pagamentos" asp-action="Conta">Configurar recebimentos de teste Stripe</a></p>
+                    }
+                }
+                @if (request.Estado == "Aceite sem pagamento")
+                {
+                    <a asp-controller="Pagamentos" asp-action="Demonstracao"
+                       asp-route-pedidoId="@request.Id" class="btn btn-outline" style="margin-top:12px">
+                        Experimentar aluguer completo: checkout, entrega e devolução
+                    </a>
+                    <a asp-controller="PercursoDemo" asp-action="Detalhes"
+                       asp-route-pedidoId="@request.Id" class="btn btn-primary" style="margin-top:12px">
+                        Acompanhar o aluguer demonstrativo entre as duas contas
+                    </a>
+                }
+                <div class="ra-journey-banner">
+                    <i class="far fa-comments" aria-hidden="true"></i>
+                    <span>Guarda o acordo numa conversa da RentAll.</span>
+                    <a asp-controller="Mensagens" asp-action="Conversa"
+                       asp-route-anuncioId="@request.AnuncioId"
+                       asp-route-peerId="@(owner ? request.InteressadoId : request.AnuncianteId)"
+                       class="btn btn-outline btn-sm">Abrir conversa</a>
+                </div>
+                <p class="ra-request-note">@(request.Estado == "Aceite sem pagamento" ? "Pedido aceite, mas sem pagamento processado. Combina apenas os próximos passos nas mensagens." : "Este pedido não comprova pagamento nem garante disponibilidade.")</p>
+            </article>
+        }
+        </div>
+    }
+</div>

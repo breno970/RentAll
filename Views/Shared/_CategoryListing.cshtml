@@ -1,0 +1,26 @@
+@model X.PagedList.IPagedList<aluguel.Models.Anuncio>
+@using X.PagedList.Mvc.Core
+@using aluguel.ViewModel
+@{
+    var filters = ViewData["Filters"] as MarketplaceFilters ?? new MarketplaceFilters();
+    var heading = ViewData["CategoryName"] as string ?? "Categoria";
+    var icon = ViewData["CategoryIcon"] as string ?? "fas fa-box";
+    var action = ViewData["FilterAction"] as string ?? "Index";
+}
+<div class="page-width">
+    <div class="page-intro">
+        <div>
+            <p class="eyebrow"><a asp-controller="Home" asp-action="Index" asp-route-Pais="@filters.Pais">Explorar</a> / Categorias</p>
+            <h1><i class="@icon" aria-hidden="true"></i> @heading</h1>
+            <p>Encontra objetos disponíveis para alugar na tua região.</p>
+        </div>
+        <a class="btn btn-outline" asp-controller="Home" asp-action="Index" asp-route-Pais="@filters.Pais"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todas as categorias</a>
+    </div>
+    <partial name="_MarketplaceFilters" model="filters" />
+    <div class="results-heading"><h2>@Model.TotalItemCount anúncio(s)</h2><span class="pill">@aluguel.Services.LocationCatalog.CountryName(filters.Pais)</span></div>
+    <partial name="_MarketplaceCards" model="Model" />
+    @if (Model.PageCount > 1)
+    {
+        <div class="pagination-wrap">@Html.PagedListPager(Model, page => Url.Action(action, new { page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter, filters.Bairro, filters.MinPrice, filters.MaxPrice, filters.Sort }))</div>
+    }
+</div>

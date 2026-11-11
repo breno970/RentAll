@@ -1,63 +1,168 @@
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using System.Security.Claims;
 using aluguel.Areas.Identity.Data;
 using aluguel.IServices;
 using aluguel.Services;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
+var connectionString = configuration.GetConnectionString("ApplicationDbContextConnection")
+    ?? throw new InvalidOperationException("Configure ConnectionStrings__ApplicationDbContextConnection.");
 
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
+services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+services.AddDataProtection().SetApplicationName("RentAll")
+    .PersistKeysToDbContext<ApplicationDbContext>();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
-
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
-builder.Services.AddScoped<IItemService, ItemService>();
-// Add services to the container.
-builder.Services.AddControllersWithViews()
-    .AddJsonOptions(o =>
-    {
-        o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-        o.JsonSerializerOptions.PropertyNamingPolicy = null;
-    });
-
-services.AddAuthentication().AddGoogle(googleOptions =>
+// Email verification is enabled when a functioning provider is configured.
+// On the free prototype without email service, registration remains usable.
+var hasEmailProvider = !string.IsNullOrWhiteSpace(configuration["SendGridKey"]) &&
+    !string.IsNullOrWhiteSpace(configuration["EmailFromAddress"]);
+services.AddDefaultIdentity<ApplicationUser>(options =>
 {
-    googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-});
-//services.AddAuthentication().AddFacebook(facebookOptions =>
-//{
-//    facebookOptions.AppId = configuration["Authentication:Facebook:AppId"];
-//    facebookOptions.AppSecret = configuration["Authentication:Facebook:AppSecret"];
-//});
+    options.SignIn.RequireConfirmedAccount = hasEmailProvider;
+    options.User.RequireUniqueEmail = true;
+}).AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Essential session and antiforgery cookies must be protected on HTTPS.
+services.ConfigureApplicationCookie(o =>
+{
+    o.Cookie.HttpOnly = true;
+    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    o.Cookie.SameSite = SameSiteMode.Lax;
+});
+services.AddAntiforgery(o =>
+{
+    o.Cookie.HttpOnly = true;
+    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    o.Cookie.SameSite = SameSiteMode.Strict;
+});
+
+services.AddTransient<IEmailSender, EmailSender>();
+services.Configure<AuthMessageSenderOptions>(configuration);
+services.Configure<Microsoft.AspNetCore.Identity.DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(3));
+services.AddScoped<IItemService, ItemService>();
+services.AddHttpClient<IImageStorage, SupabaseImageStorage>();
+services.Configure<StripePaymentOptions>(configuration.GetSection("StripePayments"));
+services.AddSingleton<StripeTestGateway>();
+services.AddHttpClient<StripeV2Accounts>();
+services.AddControllersWithViews().AddJsonOptions(o =>
+{
+    o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    o.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
+services.AddRazorPages();
+services.AddRateLimiter(options =>
+{
+    options.AddPolicy("account-email", context =>
+        RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(15), QueueLimit = 0, AutoReplenishment = true }));
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("publish", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 6,
+                Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+    options.AddPolicy("rental-requests", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10, Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0, AutoReplenishment = true
+            }));
+    // Each journey step is one click; a full rental has ~15 of them per participant.
+    options.AddPolicy("rental-journey", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60, Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0, AutoReplenishment = true
+            }));
+    options.OnRejected = async (context, ct) =>
+    {
+        context.HttpContext.Response.ContentType = "text/html; charset=utf-8";
+        await context.HttpContext.Response.WriteAsync(
+            "<!doctype html><html lang=\"pt\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width\">" +
+            "<title>Demasiados pedidos · RentAll</title><body style=\"font-family:system-ui;max-width:560px;margin:60px auto;padding:0 16px\">" +
+            "<h1>Muitas ações seguidas</h1><p>Por segurança, limitámos temporariamente esta operação. " +
+            "Aguarda alguns minutos e tenta novamente. Nada foi alterado.</p><p><a href=\"javascript:history.back()\">Voltar</a></p></body></html>", ct);
+    };
+    options.AddPolicy("messages", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20, Window = TimeSpan.FromMinutes(5),
+                QueueLimit = 0, AutoReplenishment = true
+            }));
+});
+
+var googleClientId = configuration["Authentication:Google:ClientId"];
+var googleClientSecret = configuration["Authentication:Google:ClientSecret"];
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    services.AddAuthentication().AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+    });
+}
 
 var app = builder.Build();
+var forwardedOptions = new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto };
+// Render's ingress supplies the forwarded scheme. The container is not exposed directly.
+forwardedOptions.KnownIPNetworks.Clear();
+forwardedOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedOptions);
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Permissions-Policy"] = "geolocation=(self), camera=(), microphone=()";
+    await next();
+});
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
-
+app.MapGet("/healthz", async (ApplicationDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        return await db.Database.CanConnectAsync(ct)
+            ? Results.Ok(new { status = "ready" })
+            : Results.StatusCode(503);
+    }
+    catch
+    {
+        return Results.StatusCode(503);
+    }
+});
 app.Run();

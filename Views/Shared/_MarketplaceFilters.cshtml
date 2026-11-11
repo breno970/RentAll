@@ -1,0 +1,79 @@
+@model aluguel.ViewModel.MarketplaceFilters
+@using aluguel.Services
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var action = ViewData["FilterAction"] as string ?? "Index";
+    var categories = ViewData["Categories"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+<form class="search-card" data-marketplace-filters asp-controller="Home" asp-action="@action" method="get" role="search" aria-label="Pesquisar artigos">
+    <div class="search-main">
+        <div class="field search-query">
+            <label for="filter-search">O que procura?</label>
+            <input class="form-control" id="filter-search" type="search" name="SearchString" placeholder="Ferramenta, bicicleta, câmara..." value="@Model.SearchString" autocomplete="off" />
+        </div>
+        <input type="hidden" name="Pais" value="PT" data-region-country />
+        <div class="field ra-pt-only">
+            <span class="ra-pt-only-label">Mercado</span>
+            <strong>Portugal <small>EUR (€)</small></strong>
+        </div>
+        <div class="field">
+            <label for="filter-region" data-region-label>@LocationCatalog.RegionLabel(Model.Pais)</label>
+            <select class="form-select" id="filter-region" name="Estado" data-region-uf>
+                <option value="">Todas as regiões</option>
+                @foreach (var region in LocationCatalog.RegionsFor(Model.Pais))
+                {
+                    <option value="@region.Code" selected="@(region.Code == Model.Estado)">@region.Name</option>
+                }
+            </select>
+        </div>
+        <div class="field search-city">
+            <label for="filter-city">Cidade / município</label>
+            <input class="form-control" id="filter-city" name="RegionFilter" value="@Model.RegionFilter" data-region-city list="filter-cities" placeholder="Todas as cidades" autocomplete="off" aria-describedby="filter-city-help" />
+            <small id="filter-city-help" class="ra-filter-city-help" data-city-status aria-live="polite">Podes escrever qualquer cidade. As sugestões são de anúncios publicados.</small>
+            <datalist id="filter-cities"></datalist>
+        </div>
+        <button class="btn btn-brand search-submit" type="submit"><i class="fas fa-search" aria-hidden="true"></i> Pesquisar</button>
+    </div>
+    <details class="advanced-filters" @(Model.CategoriaId.HasValue || Model.MinPrice.HasValue || Model.MaxPrice.HasValue || !string.IsNullOrEmpty(Model.Bairro) || Model.Sort != "recentes" ? "open" : "")>
+        <summary><i class="fas fa-sliders-h" aria-hidden="true"></i> Mais filtros: categoria, preço, bairro e ordenação</summary>
+        <div class="search-extra">
+            @if (action == "Index")
+            {
+                <div class="field">
+                    <label for="filter-category">Categoria</label>
+                    <select class="form-select" name="CategoriaId" id="filter-category">
+                        <option value="">Todas</option>
+                        @foreach (var c in categories)
+                        {
+                            <option value="@c.Value" selected="@(Model.CategoriaId?.ToString() == c.Value)">@c.Text</option>
+                        }
+                    </select>
+                </div>
+            }
+            <div class="field">
+                <label for="filter-bairro">Bairro / freguesia</label>
+                <input class="form-control" id="filter-bairro" name="Bairro" value="@Model.Bairro" placeholder="Qualquer zona" />
+            </div>
+            <div class="field">
+                <label for="filter-price-min" data-filter-min-price>Preço mínimo por dia</label>
+                <input class="form-control" id="filter-price-min" type="number" min="0" step="0.01" name="MinPrice" value="@(Model.MinPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
+            </div>
+            <div class="field">
+                <label for="filter-price-max" data-filter-max-price>Preço máximo por dia</label>
+                <input class="form-control" id="filter-price-max" type="number" min="0" step="0.01" name="MaxPrice" value="@(Model.MaxPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
+            </div>
+            <div class="field">
+                <label for="filter-sort">Ordenar por</label>
+                <select class="form-select" name="Sort" id="filter-sort">
+                    <option value="recentes" selected="@(Model.Sort == "recentes")">Mais recentes</option>
+                    <option value="preco-menor" selected="@(Model.Sort == "preco-menor")">Menor preço</option>
+                    <option value="preco-maior" selected="@(Model.Sort == "preco-maior")">Maior preço</option>
+                </select>
+            </div>
+        </div>
+        <div class="search-foot">
+            <a class="btn btn-outline" asp-controller="Home" asp-action="@action" asp-route-Pais="PT"><i class="fas fa-undo-alt" aria-hidden="true"></i> Limpar</a>
+            <button class="btn btn-primary" type="submit"><i class="fas fa-check" aria-hidden="true"></i> Aplicar filtros</button>
+        </div>
+    </details>
+</form>

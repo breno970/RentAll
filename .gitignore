@@ -1,0 +1,9 @@
+.vs/
+**/bin/
+**/obj/
+node_modules/
+*.user
+*.pubxml.user
+.env
+.env.*
+appsettings.Production.json

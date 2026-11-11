@@ -1,176 +1,73 @@
-﻿@model X.PagedList.IPagedList<aluguel.Models.Anuncio>
-@using X.PagedList.Mvc.Core;
-
+@model X.PagedList.IPagedList<aluguel.Models.Anuncio>
+@using X.PagedList.Mvc.Core
+@using aluguel.ViewModel
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Aluga o que precisas, perto de ti";
+    var filters = ViewData["Filters"] as MarketplaceFilters ?? new MarketplaceFilters();
 }
+<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
+<div class="page-width">
+    <section class="hero" aria-labelledby="hero-heading">
+        <div>
+            <div class="eyebrow">RentAll · Exclusivamente em Portugal</div>
+            <h1 id="hero-heading">Encontra artigos para alugar<br /><em>perto de ti, em Portugal.</em></h1>
+            <p>Ferramentas para um projeto, material para um fim de semana ou equipamentos para uma ocasião. Descobre artigos disponíveis na tua região.</p>
+            <div class="hero-actions">
+                <a class="btn btn-brand" href="#procurar"><i class="fas fa-search" aria-hidden="true"></i> Explorar artigos</a>
+                <a class="btn btn-secondary" asp-controller="Publicar" asp-action="Index"><i class="fas fa-plus" aria-hidden="true"></i> Publicar um artigo</a>
+            </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+            <div class="hero-orbit"><img src="~/imagens/ico.png" alt="" /></div>
+            <span class="hero-mini one"><i class="fas fa-check-circle"></i> Aluga localmente</span>
+            <span class="hero-mini two"><i class="fas fa-recycle"></i> Menos desperdício</span>
+        </div>
+    </section>
 
-<!DOCTYPE html>
-<html lang="pt-br">
+    <section class="benefit-strip" aria-label="Benefícios da plataforma">
+        <div class="benefit"><i class="fas fa-wallet" aria-hidden="true"></i><span><b>Aluga só quando precisas</b><small>Sem comprar para uma única ocasião</small></span></div>
+        <div class="benefit"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span><b>Em Portugal</b><small>Pesquisa por distrito e concelho</small></span></div>
+        <div class="benefit"><i class="fas fa-comments" aria-hidden="true"></i><span><b>Conversa e negocia</b><small>Mensagens e pedidos na RentAll</small></span></div>
+    </section>
 
+    <section class="ra-proto-teaser" aria-labelledby="trust-first-heading">
+        <div>
+            <p class="ra-proto-kicker">Alugar com confiança</p>
+            <h2 id="trust-first-heading">Do pedido à devolução, com mais clareza.</h2>
+            <p>Encontra artigos, conversa com o anunciante e acompanha os pedidos. Consulta as recomendações de entrega e devolução e as próximas funcionalidades de proteção.</p>
+        </div>
+        <a class="btn btn-outline" asp-controller="Experiencia" asp-action="ComoFunciona">Ver como funciona</a>
+    </section>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/f9a4013b2c.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="~/css/voltartopo.css" asp-append-version="true" />
-    <title>Rent All</title>
-</head>
-<body>
+    <section aria-labelledby="category-heading">
+        <div class="section-heading">
+            <div><p class="eyebrow">Categorias</p><h2 id="category-heading">Explora por categoria</h2></div>
+        </div>
+        <nav class="category-grid" aria-label="Categorias disponíveis">
+            <a class="category-link" asp-controller="Home" asp-action="VideoGame" asp-route-Pais="@filters.Pais"><i class="fas fa-gamepad" aria-hidden="true"></i> Consolas e jogos</a>
+            <a class="category-link" asp-controller="Home" asp-action="AudioVisual" asp-route-Pais="@filters.Pais"><i class="fas fa-camera" aria-hidden="true"></i> Áudio e vídeo</a>
+            <a class="category-link" asp-controller="Home" asp-action="MusicaHobbie" asp-route-Pais="@filters.Pais"><i class="fas fa-guitar" aria-hidden="true"></i> Música e hobbies</a>
+            <a class="category-link" asp-controller="Home" asp-action="EsporteGinastica" asp-route-Pais="@filters.Pais"><i class="fas fa-bicycle" aria-hidden="true"></i> Desporto e lazer</a>
+            <a class="category-link" asp-controller="Home" asp-action="Ferramentas" asp-route-Pais="@filters.Pais"><i class="fas fa-tools" aria-hidden="true"></i> Ferramentas</a>
+            <a class="category-link" asp-controller="Home" asp-action="Eletrodomesticos" asp-route-Pais="@filters.Pais"><i class="fas fa-blender" aria-hidden="true"></i> Casa e cozinha</a>
+        </nav>
+    </section>
 
-    <form method="get" action="/Home/Index">
-        <table>
-            <tr>
-                <td>
-                    <input class="form-control" type="text" placeholder="Pesquisar por..." name="SearchString" value="@ViewData["CurrentFilter"]" aria-label="Search" aria-describedby="btnNavbarSearch" />
-                </td>
-                <td>
-                    <select name="RegionFilter" class="form-control">
-                        <option value="">Todas as Regiões</option>
-                        <optgroup label="Sul Fluminense">
-                            <option value="Angra dos Reis">Angra dos Reis</option>
-                            <!-- Outras opções de cidades do Sul Fluminense -->
-                        </optgroup>
-                        <!-- Adicione outras regiões, se aplicável -->
-                    </select>
-                </td>
-                <td>
-                    <input type="submit" value="Buscar" class="btn btn-outline-dark" />
-                </td>
-            </tr>
-        </table>
-    </form>
-
-
-    <div class="form-se">
-
-
-        <form method="get" action="/Home/Index">
-            <td>
-                <input class="form-control" type="text" placeholder="Pesquisar por..." name="SearchString" value="@ViewData["CurrentFilter"]" aria-label="Search" aria-describedby="btnNavbarSearch" />
-            </td>
-            <td>
-                <input type="submit" value="Buscar" class="btn btn-outline-dark" />
-            </td>
-        </form>
-
-
-    </div>
-
-    <label>  build_1.0.203</label>
-  
-   <br />
-
-   <div class="mil">
-    <div class="form">
-        <a class="btn btn-primary" asp-action="VideoGame">VideoGame</a>
-        <a class="btn btn-primary" asp-action="AudioVisual">ÁudioVisual</a>
-        <a class="btn btn-primary" asp-action="MusicaHobbie">Música&Hobbies</a>
-        <a class="btn btn-primary" asp-action="EsporteGinastica">Esporte&Ginástica</a>
-        <a class="btn btn-primary" asp-action="Ferramentas">Ferramentas</a>
-        <a class="btn btn-primary" asp-action="EletroDomesticos">EletroDomésticos</a>
-    </div>
-    </div>
-
-
-    <div class="l-cards">
-        @foreach (var item in Model)
+    <section id="procurar" style="scroll-margin-top:105px" aria-labelledby="search-heading">
+        <div class="section-heading">
+            <div><p class="eyebrow">Pesquisa por zona</p><h2 id="search-heading">Encontra na tua região</h2></div>
+        </div>
+        <partial name="_MarketplaceFilters" model="filters" />
+        <div class="results-heading">
+            <div><p class="eyebrow">Artigos disponíveis</p><h2>@Model.TotalItemCount resultado(s)</h2></div>
+            <span class="pill"><i class="fas fa-globe-europe" aria-hidden="true"></i> @aluguel.Services.LocationCatalog.CountryName(filters.Pais)</span>
+        </div>
+        <partial name="_MarketplaceCards" model="Model" />
+        @if (Model.PageCount > 1)
         {
-            <div class="c-card">
-                <div class="c-card__image">
-                    
-                    <img class="img" src="~/imagens/@item.item.imagem1" alt="@item.item.nmitem"
-                         width="100%"
-                         alt="@item.item.nmitem">
-                        
-                </div>
-
-                <div class="c-card__content">
-                    <h1>@item.item.nmitem</h1>
-                    <p>@item.modelo</p>
-                    <h3>Dias de Aluguel:@item.diasAluguel</h3>
-                    <span>R$:@item.vlitem </span>
-
-                    <a asp-controller="Anuncios" asp-action="Details" asp-route-id="@item.id">Saiba+</a>
-                    <span class="@item.item.nmitem" style="width:30%"></span>
-                    <span class="@item.modelo" style="width:85%"></span>
-                    <span class="Dias de Aluguel:@item.diasAluguel" style="width:60%"></span>
-
-                </div>
+            <div class="pagination-wrap">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter, filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort }))
             </div>
-
         }
-
-
-    </div>
-
-    <div class="mil">
-    <div class="pagination-container">
-        Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount
-
-        @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewData["CurrentFilter"] }))
-    </div>
-    </div>
-
-    <div class="footer-container">
-
-        <div class="footer-content-2">
-            <div>
-                <i class="fa fa-map-marker"></i>
-                <p>
-                    <a href="https://goo.gl/maps/7QMZjZMJ355Z2Z9J6">
-                        Visconde de Mauá, Resende - RJ
-                    </a>
-                </p>
-            </div>
-            <div>
-                <i class="fa fa-envelope"></i>
-                <p>
-                    <a href="mailto:rent.all.bn@gmail.com">
-                        rent.all.bn@gmail.com
-                    </a>
-                </p>
-            </div>
-            <div>
-                <i class="fa fa-phone"></i>
-                <p><a href="tel:2499965669">(24)999656679</a></p>
-            </div>
-            <div>
-                <i class="fa fa-whatsapp"></i>
-                <p>
-                    <a href="https://api.whatsapp.com/send?phone=5524999656679&text=Gostaria-de-mais-informações-sobre-serviço" target="_blank">
-                        +55 24-999656679
-                    </a>
-                </p>
-            </div>
-        </div>
-
-
-        <div class="footer-content-3">
-            <p class="footer-empresa">
-                <span>Sobre a Empresa</span>
-                Uma empresa de tecnologia baseada em negócios relacionados a desenvolvimento de sistemas digitais, software e serviços.
-            </p>
-            <div class="footer-icons">
-
-                <a href="https://github.com/RentAllBN"><i class="fa fa-github"></i></a>
-                <a href="https://www.instagram.com/rent.all._/"><i class="fa fa-instagram"></i></a>
-                <a href="https://twitter.com/RentAll_com"><i class="fa fa-twitter"></i></a>
-                <a href="https://www.linkedin.com/in/rent-all-0576ab268/"><i class="fa fa-linkedin"></i></a>
-
-            </div>
-            <hr>
-            <p>©2023 Rent All Ltda.</p>
-        </div>
-        <div class="copyright">
-            <hr>
-            <p>©Copyright. Todos os direitos reservados.</p>
-        </div>
-
-    </div>
-</body>
-
-
-</html>
+    </section>
+</div>

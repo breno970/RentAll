@@ -1,10 +1,9 @@
-﻿using aluguel.Models;
+using aluguel.Models;
 
-namespace aluguel.IServices
+namespace aluguel.IServices;
+
+public interface IItemService
 {
-    public interface IItemService
-    {
-        Item Save(Item item);
-        Item GetSavedItem();
-    }
+    Task<Item?> GetOwnedAsync(int itemId, string userId, CancellationToken ct = default);
+    Task<Item> SaveAsync(Item item, string userId, CancellationToken ct = default);
 }
