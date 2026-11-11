@@ -131,6 +131,48 @@ public class AnunciosController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteDemoListings()
+    {
+        var demoAds = await _db.Anuncios
+            .Where(ad => ad.iduser == UserId && ad.modelo.StartsWith("[DEMO] "))
+            .ToListAsync();
+        if (demoAds.Count == 0)
+        {
+            TempData["Error"] = "Não há anúncios de demonstração para apagar nesta conta.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var demoAdIds = demoAds.Select(ad => ad.id).ToArray();
+        if (await RentalDeletionGuard.HasOpenRentalsAsync(_db, demoAdIds))
+        {
+            TempData["Error"] = RentalDeletionGuard.BlockedMessage;
+            return RedirectToAction(nameof(Index));
+        }
+
+        var demoItemIds = demoAds.Select(ad => ad.itemid).Distinct().ToArray();
+        var orphanDemoItems = await _db.Items.Where(item =>
+            demoItemIds.Contains(item.id) && item.iduser == UserId &&
+            item.nmitem.StartsWith("[DEMO] ") &&
+            !_db.Anuncios.Any(other => other.itemid == item.id && !demoAdIds.Contains(other.id)))
+            .ToListAsync();
+
+        try
+        {
+            _db.Anuncios.RemoveRange(demoAds);
+            _db.Items.RemoveRange(orphanDemoItems);
+            await _db.SaveChangesAsync();
+            TempData["Success"] = $"Foram apagados {demoAds.Count} anúncios fictícios.";
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Could not delete demo rental listings.");
+            TempData["Error"] = "Não foi possível apagar todos os anúncios de demonstração.";
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     [AllowAnonymous]
     public async Task<IActionResult> Details(int? id)
     {
