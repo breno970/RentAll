@@ -1,10 +1,21 @@
 @model IEnumerable<aluguel.Models.Anuncio>
-@{ ViewData["Title"] = "Meus anúncios"; }
+@{ ViewData["Title"] = "Meus anúncios"; var demoCount = Model.Count(a => a.item?.nmitem.StartsWith("[DEMO] ") == true); }
 <div class="page-width">
     <div class="page-intro">
         <div><p class="eyebrow">A minha área</p><h1>Meus anúncios</h1><p>Acompanha o que colocaste disponível para alugar.</p></div>
         <a class="btn btn-primary" asp-action="Create"><i class="fas fa-plus"></i> Criar anúncio</a>
     </div>
+    <section class="demo-listings-panel" aria-labelledby="demo-listings-title">
+        <div>
+            <span class="demo-listings-kicker">CONTEÚDO DE APRESENTAÇÃO</span>
+            <h2 id="demo-listings-title">Anúncios de demonstração</h2>
+            <p>Gera artigos fictícios distribuídos pelas seis categorias. Ficam associados a esta conta e identificados como <strong>[DEMO]</strong>; podes apagá-los individualmente no painel abaixo.</p>
+            @if (demoCount > 0) { <span class="demo-listings-count">@demoCount anúncio(s) fictício(s) nesta conta</span> }
+        </div>
+        <form asp-controller="Anuncios" asp-action="CreateDemoListings" method="post">
+            <button class="btn btn-primary" type="submit"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> @(demoCount > 0 ? "Já existem anúncios demo" : "Gerar anúncios demo")</button>
+        </form>
+    </section>
     @if (!Model.Any())
     {
         <div class="empty-state">
@@ -26,6 +37,7 @@
                     else { <div class="manage-img"><i class="far fa-image"></i></div> }
                     <div class="manage-body">
                         <span class="pill"><i class="fas fa-circle" style="font-size:.46rem" aria-hidden="true"></i> @(ad.Pais == "PT" ? "Anúncio · Portugal" : "Histórico · indisponível no mercado atual")</span>
+                        @if (ad.item?.nmitem.StartsWith("[DEMO] ") == true) { <span class="demo-ad-badge">FICTÍCIO · PODE APAGAR</span> }
                         <h2>@(ad.item?.nmitem ?? ad.modelo)</h2>
                         <p>@aluguel.Services.RentalLocalization.FormatPrice(ad.vlitem, ad.Pais) por dia · @ad.Cidade, @ad.Estado</p>
                         <div class="manage-actions">
@@ -39,3 +51,9 @@
         </div>
     }
 </div>
+
+<style>
+.demo-listings-panel{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:24px 0 30px;padding:22px 24px;border:1px solid #d8e5dc;border-radius:18px;background:linear-gradient(125deg,#f2f8f3,#f7f9f7)}
+.demo-listings-panel h2{font-size:1.15rem;margin:6px 0}.demo-listings-panel p{max-width:700px;margin:0;color:#52645a;font-size:.92rem;line-height:1.55}.demo-listings-kicker{font-size:.68rem;font-weight:800;letter-spacing:.13em;color:#35784c}.demo-listings-count{display:inline-block;margin-top:9px;font-size:.82rem;font-weight:700;color:#285e3d}.demo-listings-panel form{flex:none}.demo-listings-panel button{white-space:nowrap}.demo-ad-badge{display:inline-block;margin:6px 0;padding:5px 9px;border-radius:999px;background:#fff2da;color:#805014;font-size:.68rem;font-weight:800;letter-spacing:.04em}
+@@media(max-width:680px){.demo-listings-panel{align-items:stretch;flex-direction:column;padding:18px}.demo-listings-panel form,.demo-listings-panel button{width:100%}}
+</style>
