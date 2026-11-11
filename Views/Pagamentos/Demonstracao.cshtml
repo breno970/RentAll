@@ -1,22 +1,20 @@
 @model aluguel.ViewModel.CartaoDemoViewModel
 @{
     ViewData["Title"] = "Demonstração completa de aluguer";
-    var money = (Func<decimal, string>)(n => aluguel.Services.RentalLocalization.FormatPrice((float)n, Model.Pais));
 }
 <link rel="stylesheet" href="~/css/payment-journey-demo.css" asp-append-version="true" />
-<div class="page-width ra-checkout-example ra-complete-demo" data-payment-example>
+<div class="page-width ra-checkout-example ra-complete-demo" data-payment-example data-rate-centimos="@Model.PrecoDiaCentimos">
     <div class="ra-demo-head">
         <div>
             <p class="eyebrow">RentAll · Demonstração interativa</p>
-            <h1>Um aluguer completo, do checkout à devolução</h1>
+            <h1>Alugar @Model.Artigo</h1>
             <p>Experimenta os dois papéis na mesma sessão, do pagamento simulado à confirmação da receção.</p>
         </div>
         <a class="btn btn-outline" asp-controller="Home" asp-action="Exemplos">Escolher outro artigo</a>
     </div>
     <div class="ra-demo-warning" role="note">
         <strong>Ambiente de demonstração — esta experiência é simulada, não cobra dinheiro e não recolhe dados bancários.</strong>
-        O resultado do checkout, a entrega, a devolução, os avisos e o reembolso são emulados no teu navegador.
-        Esta página não comunica com a Stripe, não reserva artigos nem atualiza os pedidos verdadeiros. Os comprovativos são exemplos sem validade fiscal.
+        As datas, a entrega e o comprovativo são exemplos sem validade fiscal.
     </div>
     <ol class="ra-demo-steps" aria-label="Etapas da demonstração">
         <li data-demo-step="0" aria-current="step">1. Acordo</li>
@@ -28,21 +26,21 @@
         <li data-demo-step="6">7. Devolver</li>
         <li data-demo-step="7">8. Concluir</li>
     </ol>
+    <p class="ra-demo-alert" data-demo-error hidden role="alert"></p>
     <div class="ra-demo-main">
         <div class="ra-demo-sections">
             <section class="ra-demo-box" data-demo-screen="0" aria-labelledby="ra-demo-agreement">
                 <span class="ra-demo-tag">ETAPA 1 DE 8 · ACORDO</span>
                 <h2 id="ra-demo-agreement" tabindex="-1">Confirmar o aluguer</h2>
-                <p>O anunciante aceitou o pedido neste cenário. Podes agora experimentar o checkout.</p>
-                @if (Model.Foto is not null)
-                {
-                    <img class="demo-order-photo" src="~/catalogo/@Model.Foto" alt="@Model.Artigo" width="120" height="120" />
-                }
-                <dl class="ra-demo-order">
-                    <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
-                    <div><dt>Valor de referência</dt><dd>@money(Model.Total)</dd></div>
-                    <div><dt>Tipo de operação</dt><dd>Aluguer entre particulares</dd></div>
-                    @if (Model.Foto is not null) { <div><dt>Duração</dt><dd>3 dias</dd></div> }
+                <p>Escolhe os dias de recolha e devolução. O preço é calculado por dia, até 30 dias.</p>
+                <div class="ra-demo-period">
+                    <label>Recolha <input class="form-control" type="date" data-demo-pickup required /></label>
+                    <label>Devolução <input class="form-control" type="date" data-demo-dropoff required /></label>
+                </div>
+                <dl class="ra-demo-order" aria-live="polite">
+                    <div><dt>Preço por dia</dt><dd data-demo-rate-label>—</dd></div>
+                    <div><dt>Duração</dt><dd data-demo-days>—</dd></div>
+                    <div class="ra-demo-total"><dt>Total simulado</dt><dd data-demo-total>—</dd></div>
                 </dl>
                 <label class="ra-demo-agreement">
                     <input type="checkbox" data-demo-ack />
@@ -54,7 +52,8 @@
             <section class="ra-demo-box" data-demo-screen="1" aria-labelledby="ra-demo-payment" hidden>
                 <span class="ra-demo-tag">ETAPA 2 DE 8 · CHECKOUT</span>
                 <h2 id="ra-demo-payment" tabindex="-1">Escolher o método de pagamento</h2>
-                <p>Um checkout com o aspeto de um produto real, mas sem campos bancários ou comunicação com o prestador. A integração Stripe de teste é independente deste percurso.</p>
+                <p>Confirma o total e escolhe como queres simular o pagamento.</p>
+                <dl class="ra-demo-order"><div class="ra-demo-total"><dt>Total simulado</dt><dd data-demo-total>—</dd></div></dl>
                 <div class="ra-demo-methods" role="group" aria-label="Selecionar método demonstrativo">
                     <button type="button" data-demo-method="card" aria-pressed="true" class="is-selected">Cartão de débito ou crédito</button>
                     <button type="button" data-demo-method="mbway" aria-pressed="false">MB WAY (apenas ilustrativo)</button>
@@ -83,8 +82,8 @@
                     <strong>Registo ilustrativo — sem valor contabilístico</strong>
                     <dl class="ra-demo-order">
                         <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
-                        <div><dt>Total demonstrativo</dt><dd>@money(Model.Total)</dd></div>
-                        <div><dt>Comissão de exemplo RentAll</dt><dd>@money(Model.Comissao)</dd></div>
+                        <div><dt>Total demonstrativo</dt><dd><span data-demo-total>—</span></dd></div>
+                        <div><dt>Comissão de exemplo RentAll</dt><dd><span data-demo-fee>—</span></dd></div>
                         <div><dt>Cobrado na realidade</dt><dd>0,00 €</dd></div>
                     </dl>
                 </div>
@@ -108,7 +107,7 @@
                         </select>
                     </label>
                     <label>Local público ou ponto de recolha
-                        <input class="form-control" type="text" data-demo-delivery-place minlength="3" maxlength="120" placeholder="Ex.: ponto de encontro junto à estação" autocomplete="off" required />
+                        <input class="form-control" type="text" data-demo-delivery-place minlength="3" maxlength="120" placeholder="Ex.: estação em @Model.Cidade" autocomplete="off" required />
                     </label>
                     <label>Data e hora propostas
                         <input class="form-control" type="datetime-local" data-demo-delivery-time required />
@@ -155,7 +154,7 @@
             <section class="ra-demo-box" data-demo-screen="6" aria-labelledby="ra-demo-return" hidden>
                 <span class="ra-demo-tag">ETAPA 7 DE 8 · DEVOLUÇÃO</span>
                 <h2 id="ra-demo-return" tabindex="-1">Confirmar a devolução</h2>
-                <p>O locatário regista a devolução e o anunciante confirma o recebimento e a verificação do artigo.</p>
+                <p>Devolução prevista para <strong data-demo-return-at>—</strong>, em <strong data-demo-place>—</strong>.</p>
                 <label class="ra-demo-agreement"><input type="checkbox" data-demo-return-check />
                     <span>A devolução e o estado do artigo foram verificados apenas para esta demonstração.</span>
                 </label>
@@ -174,14 +173,17 @@
                 <span class="ra-demo-tag">ETAPA 8 DE 8 · CONCLUSÃO</span>
                 <h2 id="ra-demo-complete" tabindex="-1">Aluguer demonstrativo concluído</h2>
                 <div class="ra-demo-result"><strong>Entrega e devolução confirmadas</strong><p>Todos os passos foram emulados. Nenhum artigo foi reservado e nenhum pagamento foi efetuado.</p></div>
-                <div class="ra-demo-receipt">
+                <div class="ra-demo-receipt" id="comprovativo-demo">
                     <strong>Comprovativo DEMO — não é fatura nem recibo fiscal</strong>
                     <dl class="ra-demo-order">
                         <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
-                        <div><dt>Referência demonstrativa</dt><dd>REN-DEMO-EXEMPLO</dd></div>
-                        <div><dt>Pagamento ilustrativo</dt><dd>@money(Model.Total)</dd></div>
-                        <div><dt>Comissão ilustrativa (10%)</dt><dd>@money(Model.Comissao)</dd></div>
-                        <div><dt>Recebimento do anunciante (hipotético)</dt><dd>@money(Model.Total - Model.Comissao)</dd></div>
+                        <div><dt>Referência</dt><dd data-demo-reference>—</dd></div>
+                        <div><dt>Período</dt><dd data-demo-period-label>—</dd></div>
+                        <div><dt>Local combinado</dt><dd data-demo-place>—</dd></div>
+                        <div><dt>Devolução prevista</dt><dd data-demo-return-at>—</dd></div>
+                        <div><dt>Pagamento ilustrativo</dt><dd><span data-demo-total>—</span></dd></div>
+                        <div><dt>Comissão ilustrativa (10%)</dt><dd><span data-demo-fee>—</span></dd></div>
+                        <div><dt>Recebimento do anunciante (hipotético)</dt><dd><span data-demo-owner-share>—</span></dd></div>
                         <div><dt>Valor realmente transacionado</dt><dd>0,00 €</dd></div>
                     </dl>
                 </div>
@@ -192,7 +194,7 @@
                 <p data-demo-rating-result role="status"></p>
                 <div class="ra-demo-controls">
                     <button class="btn btn-primary" type="button" data-demo-restart>Repetir a demonstração</button>
-                    <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Ver pedidos reais (sem alterações)</a>
+                    <button class="btn btn-outline" type="button" data-demo-print>Imprimir comprovativo</button>
                 </div>
             </section>
 
@@ -203,8 +205,8 @@
                     <p>O ciclo de cancelamento foi mostrado para efeitos de apresentação. Não houve captura de dinheiro, estorno, comunicação bancária nem alteração do pedido real.</p>
                 </div>
                 <dl class="ra-demo-order">
-                    <div><dt>Valor demonstrativo</dt><dd>@money(Model.Total)</dd></div>
-                    <div><dt>Reembolso emulado</dt><dd>@money(Model.Total)</dd></div>
+                    <div><dt>Valor demonstrativo</dt><dd><span data-demo-total>—</span></dd></div>
+                    <div><dt>Reembolso emulado</dt><dd><span data-demo-total>—</span></dd></div>
                     <div><dt>Montante realmente movimentado</dt><dd>0,00 €</dd></div>
                 </dl>
                 <button class="btn btn-primary" type="button" data-demo-restart>Recomeçar demonstração</button>
@@ -212,13 +214,22 @@
         </div>
         <aside class="ra-demo-sidebar-stack">
             <div class="ra-demo-box ra-demo-sidebar" aria-label="Resumo financeiro demonstrativo">
-                <span class="ra-demo-tag">EXPERIÊNCIA DE EXEMPLO</span>
+
                 <h2>Resumo do aluguer</h2>
-                <strong class="ra-demo-item">@Model.Artigo</strong>
+                <div class="ra-demo-product">
+                    @if (Model.Foto is not null)
+                    {
+                        <img src="~/catalogo/@Model.Foto" alt="" width="76" height="76" />
+                    }
+                    <div><strong class="ra-demo-item">@Model.Artigo</strong><br /><small>@Model.Cidade</small></div>
+                </div>
                 <dl class="ra-demo-order">
-                    <div><dt>Aluguer</dt><dd>@money(Model.Total)</dd></div>
-                    <div><dt>Comissão indicativa RentAll</dt><dd>@money(Model.Comissao)</dd></div>
-                    <div><dt>Parte do anunciante (hipotética)</dt><dd>@money(Model.Total - Model.Comissao)</dd></div>
+                    <div><dt>Período</dt><dd data-demo-period-label>—</dd></div>
+                    <div><dt>Local de entrega</dt><dd data-demo-place>Por combinar</dd></div>
+                    <div><dt>Devolução prevista</dt><dd data-demo-return-at>Por combinar</dd></div>
+                    <div class="ra-demo-total"><dt>Total simulado</dt><dd data-demo-total>—</dd></div>
+                    <div><dt>Comissão indicativa RentAll</dt><dd><span data-demo-fee>—</span></dd></div>
+                    <div><dt>Parte do anunciante (hipotética)</dt><dd><span data-demo-owner-share>—</span></dd></div>
                     <div><dt>Transação real</dt><dd>0,00 €</dd></div>
                 </dl>
                 <p class="ra-demo-sidebar-note">A divisão é indicativa, antes de taxas, impostos, disputas e reembolsos. A Stripe não é chamada nesta página.</p>
@@ -228,14 +239,8 @@
                 <ol data-demo-history aria-live="polite"></ol>
                 <p>Este histórico é temporário e desaparece ao atualizar a página. Não são enviados emails nem notificações reais.</p>
             </div>
-            <div class="ra-demo-box">
-                <h2>Pronto para mostrar</h2>
-                <p>Esta demonstração inclui os dois participantes na mesma página para facilitar apresentações. No produto real, cada pessoa só poderá agir na sua conta.</p>
-                <a asp-controller="Termos" asp-action="Index">Termos</a> · <a asp-controller="Privacidade" asp-action="Index">Privacidade</a>
-            </div>
         </aside>
     </div>
-    <p class="ra-demo-alert" data-demo-error hidden role="alert"></p>
 </div>
 @section Scripts {
     <script src="~/js/payment-demo-flow.js" asp-append-version="true" defer></script>

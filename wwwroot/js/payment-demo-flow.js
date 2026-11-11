@@ -10,8 +10,22 @@
   "use strict";
   const deliveryTypes = ["em_maos", "ponto_recolha", "transportadora"];
   const actors = ["owner", "renter"];
+  function quote(pickup, dropoff, rate, today) {
+    const calendarDay = value => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return NaN;
+      const date = new Date(value + "T00:00:00Z");
+      return Number.isFinite(date.valueOf()) && date.toISOString().slice(0, 10) === value ? date.valueOf() : NaN;
+    };
+    const days = (calendarDay(dropoff) - calendarDay(pickup)) / 86400000;
+    if (!(calendarDay(pickup) >= calendarDay(today)) || !Number.isInteger(days) || days < 1 || days > 30)
+      throw new Error("Escolhe uma recolha a partir de hoje e uma devolução entre 1 e 30 dias depois.");
+    if (!Number.isSafeInteger(rate) || rate <= 0 || rate > 1000000)
+      throw new Error("Preço diário indisponível.");
+    const total = rate * days;
+    return { pickup, dropoff, days, rate, total, fee: Math.round(total / 10) };
+  }
   function start() {
-    return { step: 0, method: "card", approved: null, delivery: null,
+    return { step: 0, quote: null, method: "card", approved: null, delivery: null,
       deliveryAgreed: false, handover: { owner: false, renter: false },
       returned: { owner: false, renter: false }, incident: false, rating: null,
       history: ["Demonstração iniciada (sem pagamento ou reserva real)."] };
@@ -31,8 +45,9 @@
       case "AGREE":
         requireStep(0);
         if (payload.accepted !== true) throw new Error("Confirma primeiro que é uma demonstração.");
+        state.quote = quote(payload.pickup, payload.dropoff, payload.rate, payload.today);
         state.step = 1;
-        record("Condições ilustrativas revistas.");
+        record("Período acordado para " + state.quote.days + " dia(s).");
         break;
       case "SET_METHOD":
         requireStep(1);
@@ -65,6 +80,8 @@
         const at = String(payload.at || "");
         const timestamp = Date.parse(at);
         if (!Number.isFinite(timestamp) || timestamp <= Date.now()) throw new Error("Seleciona uma data e hora futuras.");
+        if (at.slice(0, 10) !== state.quote.pickup)
+          throw new Error("A entrega tem de ocorrer no dia de recolha escolhido no início.");
         state.delivery = { kind: payload.kind, place, at };
         state.deliveryAgreed = false;
         record("Anunciante propôs uma modalidade e horário de entrega (simulados).");
@@ -135,5 +152,5 @@
     }
     return state;
   }
-  return Object.freeze({ start, apply });
+  return Object.freeze({ start, apply, quote });
 });

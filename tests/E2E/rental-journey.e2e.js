@@ -56,7 +56,11 @@ async function publicDemo(browser) {
     assert.strictEqual(photos.length, 22);
     assert.strictEqual(new Set(photos).size, photos.length, 'Fotos repetidas no catálogo de demonstração');
     await page.locator('a[aria-label="Simular aluguer de Projetor Full HD"]').click();
-    assert((await page.locator('[data-demo-screen="0"]').innerText()).includes('Projetor Full HD'));
+    assert(await page.getByRole('heading', { name: 'Alugar Projetor Full HD' }).isVisible());
+    const pickup = await page.locator('[data-demo-pickup]').inputValue();
+    const dropoff = new Date(Date.parse(pickup + 'T00:00:00Z') + 4 * 86400000).toISOString().slice(0, 10);
+    await page.locator('[data-demo-dropoff]').fill(dropoff);
+    assert.match(await page.locator('[data-demo-screen="0"] [data-demo-total]').innerText(), /88,00/);
     await page.locator('[data-demo-ack]').check();
     await page.locator('[data-demo-next]').click();
     await page.locator('[data-demo-authorize]').click();
@@ -73,6 +77,10 @@ async function publicDemo(browser) {
     await page.locator('[data-demo-return="renter"]').click();
     await page.locator('[data-demo-return="owner"]').click();
     assert(await page.getByRole('heading', { name: 'Aluguer demonstrativo concluído' }).isVisible());
+    const receipt = page.locator('#comprovativo-demo');
+    assert.match(await receipt.innerText(), /88,00/);
+    assert.match(await receipt.innerText(), /Estação de Coimbra/);
+    assert.match(await receipt.locator('[data-demo-reference]').innerText(), /^DEMO-[A-F0-9]{8}$/);
     log('Catálogo público: 22 fotos distintas e simulação individual até à devolução');
   } finally {
     await page.close();

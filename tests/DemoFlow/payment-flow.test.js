@@ -1,14 +1,19 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { start, apply } = require("../../wwwroot/js/payment-demo-flow.js");
+const { start, apply, quote } = require("../../wwwroot/js/payment-demo-flow.js");
 const future = () => new Date(Date.now() + 86400000).toISOString().slice(0, 16);
+function agreement() {
+  const pickup = future().slice(0, 10);
+  const dropoff = new Date(Date.now() + 4 * 86400000).toISOString().slice(0, 10);
+  return { accepted: true, pickup, dropoff, rate: 2199, today: new Date().toISOString().slice(0, 10) };
+}
 function approved() {
-  let s = apply(start(), "AGREE", { accepted: true });
+  let s = apply(start(), "AGREE", agreement());
   s = apply(s, "PAY", { approved: true });
   return apply(s, "CONTINUE");
 }
 test("payment refusal does not advance or reserve", () => {
-  let s = apply(apply(start(), "AGREE", { accepted: true }), "PAY", { approved: false });
+  let s = apply(apply(start(), "AGREE", agreement()), "PAY", { approved: false });
   assert.equal(s.step, 2);
   assert.throws(() => apply(s, "CONTINUE"));
   s = apply(s, "RETRY");
@@ -71,4 +76,18 @@ test("invalid actors and data are rejected", () => {
   s = apply(s, "PROPOSE_DELIVERY", { kind: "em_maos", place: "Praça central", at: future() });
   s = apply(s, "CONFIRM_DELIVERY");
   assert.throws(() => apply(s, "HANDOVER", { actor: "admin" }));
+});
+
+test("quote uses calendar days and exact cents across the clock change", () => {
+  const offer = quote("2027-03-27", "2027-03-30", 2199, "2027-03-01");
+  assert.deepEqual([offer.days, offer.total, offer.fee], [3, 6597, 660]);
+  assert.throws(() => quote("2027-02-30", "2027-03-01", 1000, "2027-02-01"));
+  assert.throws(() => quote("2027-03-03", "2027-03-03", 1000, "2027-03-01"));
+  assert.throws(() => quote("2027-03-03", "2027-04-03", 1000, "2027-03-01"));
+});
+test("delivery must match the day on the accepted quote", () => {
+  const s = approved();
+  assert.throws(() => apply(s, "PROPOSE_DELIVERY", {
+    kind: "em_maos", place: "Estação", at: s.quote.dropoff + "T18:00"
+  }), /dia de recolha/);
 });

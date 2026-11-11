@@ -47,12 +47,11 @@ public sealed class PagamentosController : Controller
             if (string.IsNullOrWhiteSpace(artigo)) return View(new CartaoDemoViewModel());
             var sample = DemoCatalogItem.All.FirstOrDefault(item => item.Slug == artigo);
             if (sample is null) return NotFound();
-            var total = (decimal)sample.DailyPrice * 3;
             return View(new CartaoDemoViewModel
             {
                 Artigo = sample.Name,
-                Total = total,
-                Comissao = total * 0.10m,
+                PrecoDiaCentimos = (int)Math.Round((decimal)sample.DailyPrice * 100),
+                Cidade = sample.City,
                 Foto = sample.Photo
             });
         }
