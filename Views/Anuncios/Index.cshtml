@@ -12,9 +12,18 @@
             <p>Gera artigos fictícios distribuídos pelas seis categorias. Ficam associados a esta conta e identificados como <strong>[DEMO]</strong>; podes apagá-los individualmente no painel abaixo.</p>
             @if (demoCount > 0) { <span class="demo-listings-count">@demoCount anúncio(s) fictício(s) nesta conta</span> }
         </div>
-        <form asp-controller="Anuncios" asp-action="CreateDemoListings" method="post">
-            <button class="btn btn-primary" type="submit"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> @(demoCount > 0 ? "Já existem anúncios demo" : "Gerar anúncios demo")</button>
-        </form>
+        @if (demoCount == 0)
+        {
+            <form asp-controller="Anuncios" asp-action="CreateDemoListings" method="post">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Gerar anúncios demo</button>
+            </form>
+        }
+        else
+        {
+            <form asp-controller="Anuncios" asp-action="DeleteDemoListings" method="post" onsubmit="return confirm('Apagar todos os anúncios fictícios desta conta?');">
+                <button class="btn btn-outline-danger" type="submit"><i class="far fa-trash-alt" aria-hidden="true"></i> Apagar os @demoCount anúncios demo</button>
+            </form>
+        }
     </section>
     @if (!Model.Any())
     {
