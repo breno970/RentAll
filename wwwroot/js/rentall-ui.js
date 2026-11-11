@@ -1,6 +1,18 @@
 (() => {
   "use strict";
   document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("img[data-photo-fallback]").forEach(image => {
+      const note = image.parentElement.querySelector("[data-photo-note]");
+      const fallback = new URL(image.dataset.photoFallback, document.baseURI).href;
+      const showFallback = () => {
+        if (image.src === fallback) return;
+        image.src = fallback;
+        image.alt = "";
+        if (note) note.hidden = false;
+      };
+      image.addEventListener("error", showFallback);
+      if (image.getAttribute("src") && image.complete && !image.naturalWidth) showFallback();
+    });
     const button = document.querySelector("[data-menu-toggle]");
     const menu = document.getElementById("main-navigation");
     if (button && menu) {
@@ -68,7 +80,7 @@
     });
     document.querySelectorAll("[data-submit-lock]").forEach(form => {
       form.addEventListener("submit", event => {
-        if (!form.checkValidity()) return;
+        if (event.defaultPrevented || !form.checkValidity()) return;
         // A second click while the first request is in flight would repeat the operation.
         if (form.dataset.submitting === "true") { event.preventDefault(); return; }
         form.dataset.submitting = "true";

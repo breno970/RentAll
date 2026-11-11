@@ -21,10 +21,12 @@
                 <div><small>Último pedido</small><strong>@Model.EstadoPedido</strong>
                     <p>@Model.DiasPedido @(Model.DiasPedido == 1 ? "dia" : "dias") · @aluguel.Services.RentalLocalization.FormatPrice((float)(Model.TotalPedido ?? 0), Model.Pais)</p>
                 </div>
-                <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Acompanhar pedido</a>
+                <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index"
+                   asp-route-pedido="@Model.PedidoId" asp-fragment="@($"pedido-{Model.PedidoId}")">Acompanhar pedido</a>
             </div>
         }
-        else if (!Model.SouAnunciante && Model.AnuncioAtivo && Model.PrecoDia > 0)
+        @if (!Model.SouAnunciante && Model.AnuncioAtivo && Model.PrecoDia > 0 &&
+            (Model.PedidoId is null || Model.EstadoPedido is "Cancelado" or "Recusado"))
         {
             <form asp-controller="Pedidos" asp-action="Criar" method="post" class="ra-request-inline">
                 <input type="hidden" name="anuncioId" value="@Model.AnuncioId" />
@@ -34,21 +36,36 @@
                 <button class="btn btn-primary" type="submit">Enviar pedido de aluguer</button>
             </form>
         }
-        else if (Model.SouAnunciante)
+        else if (Model.PedidoId is null && Model.SouAnunciante)
         {
             <a class="btn btn-outline" asp-controller="Pedidos" asp-action="Index">Gerir pedidos recebidos</a>
         }
-        else
+        else if (Model.PedidoId is null)
         {
             <p class="ra-journey-note">Podes continuar a conversar e combinar os próximos passos. O pedido formal depende de um anúncio ativo com preço definido.</p>
         }
     </section>
     <div class="ra-conversation">
         <div class="ra-safety-chat"><i class="fas fa-shield-alt" aria-hidden="true"></i> Mantém a negociação nesta conversa para consultares as condições acordadas. Não partilhes contactos, links ou dados bancários. Não existem pagamentos reais ativados na RentAll.</div>
-        <div class="ra-chat-history" aria-label="Histórico da conversa">
+            @if (Model.OlderThanId.HasValue || Model.ShowingOlderMessages)
+            {
+                <nav class="ra-chat-history-links" aria-label="Páginas de mensagens">
+                    @if (Model.OlderThanId.HasValue)
+                    {
+                        <a asp-action="Conversa" asp-route-anuncioId="@Model.AnuncioId"
+                           asp-route-peerId="@Model.OutroUtilizadorId" asp-route-antes="@Model.OlderThanId">Mensagens anteriores</a>
+                    }
+                    @if (Model.ShowingOlderMessages)
+                    {
+                        <a asp-action="Conversa" asp-route-anuncioId="@Model.AnuncioId"
+                           asp-route-peerId="@Model.OutroUtilizadorId" asp-fragment="nova-mensagem">Mensagens recentes</a>
+                    }
+                </nav>
+            }
+        <div class="ra-chat-history" aria-label="Histórico da conversa" data-chat-recent="@(Model.ShowingOlderMessages ? null : "true")" tabindex="0">
             @if (!Model.Mensagens.Any())
             {
-                <p class="ra-chat-empty">Diz olá e pergunta sobre a disponibilidade do artigo.</p>
+                <p class="ra-chat-empty">@(Model.ShowingOlderMessages ? "Sem mensagens anteriores." : "Diz olá e pergunta sobre a disponibilidade do artigo.")</p>
             }
             @foreach (var message in Model.Mensagens)
             {
@@ -58,7 +75,7 @@
                 </article>
             }
         </div>
-        <form asp-action="Enviar" method="post" class="ra-chat-form" data-guarded-message-form>
+        <form id="nova-mensagem" asp-action="Enviar" method="post" class="ra-chat-form" data-guarded-message-form data-submit-lock>
             <input type="hidden" name="anuncioId" value="@Model.AnuncioId" />
             <input type="hidden" name="peerId" value="@Model.OutroUtilizadorId" />
             <label for="messageText">A tua mensagem</label>

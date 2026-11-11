@@ -12,6 +12,7 @@ const BASE = process.env.BASE_URL || 'http://localhost:5080';
 const SHOTS = process.env.SHOT_DIR || '';
 const stamp = Date.now().toString(36);
 const PASSWORD = 'Teste#2026ra';
+const photoFixture = path.join(__dirname, '../../wwwroot/catalogo/camera.jpg');
 const log = (...a) => console.log('•', ...a);
 
 async function newUser(browser, first, viewport) {
@@ -61,7 +62,7 @@ async function operacao(page, op, fill) {
 }
 
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE });
   try {
     const anunciante = await newUser(browser, 'Ana');
     const locatario = await newUser(browser, 'Bruno', { width: 390, height: 844 });
@@ -81,7 +82,7 @@ async function operacao(page, op, fill) {
     await a.fill('#Cidade', 'Lisboa');
     await a.fill('#Preco', '12.50');
     await a.fill('#DiasAluguel', '14');
-    await a.setInputFiles('input[data-photo-files]', path.join(__dirname, 'fixture.png'));
+    await a.setInputFiles('input[data-photo-files]', photoFixture);
     await shot(a, '01-publicar');
     await Promise.all([a.waitForNavigation(), a.click('form.ra-publish-form button[type=submit]')]);
     let f = await flash(a);
@@ -92,6 +93,14 @@ async function operacao(page, op, fill) {
 
     // 2. Renter finds it, messages and requests 3 days.
     const b = locatario.page;
+    await b.goto(`${BASE}/?SearchString=${encodeURIComponent(stamp)}`);
+    assert.strictEqual(await b.locator('.listing-card').count(), 1, 'Pesquisa não encontrou o anúncio publicado');
+    const favorite = b.locator('.listing-card .fav-button');
+    await Promise.all([b.waitForNavigation(), favorite.click()]);
+    await b.goto(`${BASE}/Favoritos`);
+    assert.strictEqual(await b.locator('.listing-card').count(), 1, 'Anúncio não entrou nos favoritos');
+    await Promise.all([b.waitForNavigation(), b.locator('.listing-card .fav-button').click()]);
+    assert.strictEqual(await b.locator('.listing-card').count(), 0, 'Anúncio não saiu dos favoritos');
     await b.goto(`${BASE}/Anuncios/Details/${anuncioId}`);
     await shot(b, '02-anuncio-mobile');
     await b.goto(`${BASE}/Mensagens/Conversa?anuncioId=${anuncioId}`);
@@ -102,9 +111,12 @@ async function operacao(page, op, fill) {
 
     // Contact details must be refused.
     await b.fill('textarea[name=texto]', 'Liga-me para 912345678');
-    // Blocked client-side or server-side; either way it must never be stored.
     await b.locator('form:has(textarea[name=texto]) button[type=submit]').click();
-    await b.waitForTimeout(1500);
+    await b.locator('[data-message-warning]').waitFor({ state: 'visible' });
+    assert.strictEqual(await b.locator('textarea[name=texto]').inputValue(), 'Liga-me para 912345678');
+    await b.fill('textarea[name=texto]', 'Podemos combinar a entrega na estação?');
+    await Promise.all([b.waitForNavigation(), b.locator('form:has(textarea[name=texto]) button[type=submit]').click()]);
+    assert((await b.locator('.ra-chat-history').innerText()).includes('entrega na estação'), 'Mensagem corrigida não foi enviada');
     await b.goto(`${BASE}/Mensagens/Conversa?anuncioId=${anuncioId}`);
     assert(!(await b.content()).includes('912345678'), 'Mensagem com telefone foi guardada');
     log('Mensagem com telefone recusada (não persistida)');
@@ -136,18 +148,30 @@ async function operacao(page, op, fill) {
     assert(f.ok.includes('Contraproposta registada'), `Contraproposta falhou: ${f.err}`);
     log('Contraproposta do anunciante registada');
 
+    await b.goto(`${BASE}/Mensagens`);
+    assert(await b.getByText('Pedido por responder', { exact: true }).isVisible(),
+      'A caixa de entrada não sinalizou a contraproposta');
     await b.goto(`${BASE}/Pedidos`);
     const decidir = b.locator(`form[action*="/Pedidos/DecidirProposta"]:has(input[name=id][value="${pedidoId}"]):has(input[name=aceitar][value=true]), form[action*="/Pedidos/DecidirProposta"]:has(input[name=id][value="${pedidoId}"]):has(button[name=aceitar][value=true])`).first();
+    const versao = decidir.locator('input[name=versaoProposta]');
+    const versaoAtual = await versao.inputValue();
+    await versao.evaluate(input => { input.value = '1'; });
+    await Promise.all([b.waitForNavigation(), decidir.locator('button').first().click()]);
+    f = await flash(b);
+    assert(f.err.includes('contraproposta mudou'), 'Uma resposta obsoleta foi aceite');
+    assert.strictEqual(await versao.inputValue(), versaoAtual, 'O pedido mudou após a tentativa obsoleta');
     await Promise.all([b.waitForNavigation(), decidir.locator('button').first().click()]);
     f = await flash(b);
     assert(f.ok.includes('Contraproposta aceite'), `Aceitação falhou: ${f.err}`);
     log('Locatário aceitou a contraproposta (44,00 €)');
 
     // 4. Intruder cannot read or mutate the journey.
-    let r = await intruso.page.goto(`${BASE}/PercursoDemo/${pedidoId}`);
+    let r = await intruso.page.request.get(`${BASE}/PercursoDemo/${pedidoId}`);
     assert.strictEqual(r.status(), 404, 'Intruso conseguiu abrir o percurso');
-    r = await intruso.page.goto(`${BASE}/Pagamentos/Demonstracao?pedidoId=${pedidoId}`);
+    r = await intruso.page.request.get(`${BASE}/Pagamentos/Demonstracao?pedidoId=${pedidoId}`);
     assert.strictEqual(r.status(), 404, 'Intruso conseguiu abrir o checkout do pedido');
+    r = await intruso.page.request.get(`${BASE}/Pedidos?pedido=${pedidoId}`);
+    assert.strictEqual(r.status(), 404, 'Intruso conseguiu abrir o pedido');
     log('Conta não participante recebe 404 no percurso e no checkout');
 
     // 5. Persistent journey: checkout, delivery, rental, return, rating.
@@ -199,7 +223,7 @@ async function operacao(page, op, fill) {
         await form.locator('input[name=estadoArtigo][value=marcas_uso]').check();
         await form.locator('[name=acessorios]').fill('Cabo HDMI, comando, bolsa');
         await form.locator('[name=nota]').fill('Pequeno risco na tampa lateral.');
-        await form.locator('input[name=foto]').setInputFiles(path.join(__dirname, 'fixture.png'));
+        await form.locator('input[name=foto]').setInputFiles(photoFixture);
       });
       assert(f.ok.includes('Checklist'), `Checklist falhou: ${f.err}`);
       const html = await a.content();

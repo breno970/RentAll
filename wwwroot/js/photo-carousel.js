@@ -127,7 +127,9 @@
     const next = root.querySelector("[data-view-next]");
     if (!main || !urls.length) return;
     let index = 0;
+    const photoNote = root.querySelector("[data-photo-note]");
     const draw = () => {
+      if (photoNote) photoNote.hidden = true;
       main.src = urls[index]; main.alt = "Fotografia " + (index + 1) + " de " + urls.length;
       if (counter) counter.textContent = (index + 1) + " / " + urls.length;
       if (previous) previous.hidden = urls.length < 2;

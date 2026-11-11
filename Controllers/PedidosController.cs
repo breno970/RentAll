@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using X.PagedList;
 
 namespace aluguel.Controllers;
 
@@ -17,47 +18,52 @@ public sealed class PedidosController : Controller
     private string Me => User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? throw new UnauthorizedAccessException();
 
-    public async Task<IActionResult> Index(string? vista, CancellationToken ct)
+    public async Task<IActionResult> Index(string? vista, int? pagina, int? pedido, CancellationToken ct)
     {
         var me = Me;
-        var requests = await _db.PedidosAluguer.AsNoTracking()
-            .Where(p => p.InteressadoId == me || p.AnuncianteId == me)
-            .OrderByDescending(p => p.CriadoEm).Take(150).ToListAsync(ct);
-        var adIds = requests.Select(p => p.AnuncioId).Distinct().ToArray();
-        var adNames = await _db.Anuncios.AsNoTracking()
-            .Include(a => a.item).Where(a => adIds.Contains(a.id))
-            .Select(a => new { a.id, Nome = a.item != null ? a.item.nmitem : a.modelo })
-            .ToDictionaryAsync(a => a.id, a => a.Nome, ct);
-        // Dashboard filters work server-side and never expose other accounts.
-        vista = vista switch {
-            "recebidos" => "recebidos",
-            "enviados" => "enviados",
-            "pendentes" => "pendentes",
-            _ => "todos"
-        };
-        ViewBag.SelectedView = vista;
-        ViewBag.TotalRequests = requests.Count;
-        ViewBag.ReceivedCount = requests.Count(p => p.AnuncianteId == me);
-        ViewBag.SentCount = requests.Count(p => p.InteressadoId == me);
-        ViewBag.PendingToAnswer = requests.Count(p =>
+        var all = _db.PedidosAluguer.AsNoTracking()
+            .Where(p => p.InteressadoId == me || p.AnuncianteId == me);
+        var pending = all.Where(p =>
             (p.AnuncianteId == me && p.Estado == "Pendente") ||
             (p.Estado == "Contraproposta" && p.PropostaPorId != me));
-        var visible = vista switch {
-            "recebidos" => requests.Where(p => p.AnuncianteId == me).ToList(),
-            "enviados" => requests.Where(p => p.InteressadoId == me).ToList(),
-            "pendentes" => requests.Where(p =>
-                (p.AnuncianteId == me && p.Estado == "Pendente") ||
-                (p.Estado == "Contraproposta" && p.PropostaPorId != me)).ToList(),
-            _ => requests
+        vista = vista is "recebidos" or "enviados" or "pendentes" ? vista : "todos";
+        var filtered = vista switch
+        {
+            "recebidos" => all.Where(p => p.AnuncianteId == me),
+            "enviados" => all.Where(p => p.InteressadoId == me),
+            "pendentes" => pending,
+            _ => all
         };
-        ViewBag.AdNames = adNames;
+        if (pedido.HasValue)
+        {
+            filtered = all.Where(p => p.Id == pedido.Value);
+            if (!await filtered.AnyAsync(ct)) return NotFound();
+            vista = "todos";
+            pagina = 1;
+        }
+        var requests = await filtered.OrderByDescending(p => p.CriadoEm).ThenByDescending(p => p.Id)
+            .ToPagedListAsync(Math.Clamp(pagina ?? 1, 1, int.MaxValue / 20), 20);
+        if (requests.PageNumber > Math.Max(1, requests.PageCount))
+            return RedirectToAction(nameof(Index), new { vista, pagina = Math.Max(1, requests.PageCount) });
+
+        ViewBag.SelectedView = vista;
+        ViewBag.FocusedRequest = pedido;
+        ViewBag.ReceivedCount = await all.CountAsync(p => p.AnuncianteId == me, ct);
+        ViewBag.SentCount = await all.CountAsync(p => p.InteressadoId == me, ct);
+        ViewBag.TotalRequests = await all.CountAsync(ct);
+        ViewBag.PendingToAnswer = await pending.CountAsync(ct);
+        var adIds = requests.Select(p => p.AnuncioId).Distinct().ToArray();
+        ViewBag.AdNames = await _db.Anuncios.AsNoTracking()
+            .Where(a => adIds.Contains(a.id))
+            .Select(a => new { a.id, Nome = a.item != null ? a.item.nmitem : a.modelo })
+            .ToDictionaryAsync(a => a.id, a => a.Nome, ct);
         ViewBag.Me = me;
         ViewBag.StripeSandboxReady = _stripe.Available;
         var requestIds = requests.Select(r => r.Id).ToArray();
         ViewBag.PaymentStates = await _db.PagamentosAluguer.AsNoTracking()
             .Where(p => requestIds.Contains(p.PedidoId))
             .ToDictionaryAsync(p => p.PedidoId, p => p.Estado, ct);
-        return View(visible);
+        return View(requests);
     }
 
     [HttpPost]
@@ -78,7 +84,7 @@ public sealed class PedidosController : Controller
         }
         // A configured daily price is needed for a meaningful fee estimate.
         // Price-to-be-agreed listings stay in messaging, without invented totals.
-        if (ad.vlitem <= 0 || ad.vlitem > 10000000)
+        if (!float.IsFinite(ad.vlitem) || ad.vlitem < 0.005f || ad.vlitem > 10000000)
         {
             TempData["Error"] = "Este artigo tem preço a combinar. Fala com o anunciante nas mensagens.";
             return RedirectToAction("Details", "Anuncios", new { id = anuncioId });
@@ -92,12 +98,13 @@ public sealed class PedidosController : Controller
         decimal daily = decimal.Round((decimal)ad.vlitem, 2, MidpointRounding.AwayFromZero);
         decimal gross = decimal.Round(daily * dias, 2, MidpointRounding.AwayFromZero);
         decimal indicativeFee = decimal.Round(gross * 0.10m, 2, MidpointRounding.AwayFromZero);
-        _db.PedidosAluguer.Add(new PedidoAluguer
+        var request = new PedidoAluguer
         {
             AnuncioId = anuncioId, InteressadoId = me, AnuncianteId = ad.iduser,
             Dias = dias, PrecoDia = daily, Pais = ad.Pais, TotalEstimado = gross,
             ComissaoIndicativa = indicativeFee, Estado = "Pendente", CriadoEm = DateTime.UtcNow
-        });
+        };
+        _db.PedidosAluguer.Add(request);
         try
         {
             await _db.SaveChangesAsync(ct);
@@ -109,14 +116,15 @@ public sealed class PedidosController : Controller
             return RedirectToAction(nameof(Index));
         }
         TempData["Success"] = "Pedido enviado. O anunciante pode aceitá-lo ou recusá-lo. Ainda não foi feito nenhum pagamento.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), new { pedido = request.Id });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [EnableRateLimiting("rental-requests")]
-    public async Task<IActionResult> Responder(int id, bool aceitar, CancellationToken ct)
+    public async Task<IActionResult> Responder(int id, bool? aceitar, CancellationToken ct)
     {
+        if (!aceitar.HasValue || !ModelState.IsValid) return BadRequest();
         var request = await _db.PedidosAluguer.FirstOrDefaultAsync(p => p.Id == id &&
             p.AnuncianteId == Me, ct);
         if (request == null) return NotFound();
@@ -125,7 +133,10 @@ public sealed class PedidosController : Controller
             TempData["Error"] = "Este pedido já foi respondido.";
             return RedirectToAction(nameof(Index));
         }
-        request.Estado = aceitar ? "Aceite sem pagamento" : "Recusado";
+        if (aceitar.Value && !await CanAcceptAsync(request, request.Dias, ct))
+            return RedirectToAction(nameof(Index));
+
+        request.Estado = aceitar.Value ? "Aceite sem pagamento" : "Recusado";
         request.RespondidoEm = DateTime.UtcNow;
         try { await _db.SaveChangesAsync(ct); }
         catch (DbUpdateConcurrencyException)
@@ -133,7 +144,7 @@ public sealed class PedidosController : Controller
             TempData["Error"] = "Este pedido já foi alterado por outro participante.";
             return RedirectToAction(nameof(Index));
         }
-        TempData["Success"] = aceitar
+        TempData["Success"] = aceitar.Value
             ? "Pedido aceite. Combina os detalhes nas mensagens. O pagamento na RentAll ainda não está disponível."
             : "Pedido recusado.";
         return RedirectToAction(nameof(Index));
@@ -155,7 +166,7 @@ public sealed class PedidosController : Controller
         }
         var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .FirstOrDefaultAsync(a => a.id == request.AnuncioId, ct);
-        if (ad == null || ad.item?.snativo == "N")
+        if (ad is null || ad.Pais != "PT" || ad.item is null || ad.item.snativo == "N")
         {
             TempData["Error"] = "Este anúncio já não está disponível.";
             return RedirectToAction(nameof(Index));
@@ -186,8 +197,9 @@ public sealed class PedidosController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [EnableRateLimiting("rental-requests")]
-    public async Task<IActionResult> DecidirProposta(int id, bool aceitar, CancellationToken ct)
+    public async Task<IActionResult> DecidirProposta(int id, bool? aceitar, long versaoProposta, CancellationToken ct)
     {
+        if (!aceitar.HasValue || !ModelState.IsValid) return BadRequest();
         var me = Me;
         var request = await _db.PedidosAluguer.FirstOrDefaultAsync(p =>
             p.Id == id && (p.AnuncianteId == me || p.InteressadoId == me), ct);
@@ -195,23 +207,18 @@ public sealed class PedidosController : Controller
         if (request.Estado != "Contraproposta" || request.PropostaPorId == me ||
             !request.PropostaDias.HasValue || !request.PropostaPrecoDia.HasValue)
         {
-            TempData["Error"] = "Não existe uma contraproposta tua para decidir neste pedido.";
+            TempData["Error"] = "Não tens uma contraproposta para decidir neste pedido.";
             return RedirectToAction(nameof(Index));
         }
-        if (aceitar)
+        if (versaoProposta != (request.PropostaEm?.Ticks ?? 0))
         {
-            var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
-                .FirstOrDefaultAsync(a => a.id == request.AnuncioId, ct);
-            if (ad == null || ad.item?.snativo == "N")
-            {
-                TempData["Error"] = "Este anúncio já não está disponível.";
+            TempData["Error"] = "A contraproposta mudou. Revê as condições atuais antes de responder.";
+            return RedirectToAction(nameof(Index), new { pedido = id });
+        }
+        if (aceitar.Value)
+        {
+            if (!await CanAcceptAsync(request, request.PropostaDias.Value, ct))
                 return RedirectToAction(nameof(Index));
-            }
-            if (ad.diasAluguel > 0 && request.PropostaDias.Value > ad.diasAluguel)
-            {
-                TempData["Error"] = "O período proposto excede o limite atual do anúncio.";
-                return RedirectToAction(nameof(Index));
-            }
             request.Dias = request.PropostaDias.Value;
             request.PrecoDia = request.PropostaPrecoDia.Value;
             request.TotalEstimado = decimal.Round(request.PrecoDia * request.Dias, 2, MidpointRounding.AwayFromZero);
@@ -230,20 +237,47 @@ public sealed class PedidosController : Controller
             TempData["Error"] = "O pedido foi atualizado. Confirma a situação atual antes de responder.";
             return RedirectToAction(nameof(Index));
         }
-        TempData["Success"] = aceitar
+        TempData["Success"] = aceitar.Value
             ? "Contraproposta aceite. As condições foram atualizadas, mas ainda não existe pagamento."
             : "Contraproposta recusada. O pedido original continua pendente.";
         return RedirectToAction(nameof(Index));
     }
 
+    private async Task<bool> CanAcceptAsync(PedidoAluguer request, int days, CancellationToken ct)
+    {
+        var listing = await _db.Anuncios.AsNoTracking()
+            .Where(ad => ad.id == request.AnuncioId && ad.iduser == request.AnuncianteId &&
+                         ad.Pais == "PT" && ad.item != null && ad.item.snativo != "N")
+            .Select(ad => new { MaxDays = ad.diasAluguel })
+            .SingleOrDefaultAsync(ct);
+        if (listing is null)
+        {
+            TempData["Error"] = "Este anúncio já não está disponível. Podes recusar o pedido.";
+            return false;
+        }
+
+        if (days < 1 || days > 365 || (listing.MaxDays > 0 && days > listing.MaxDays))
+        {
+            TempData["Error"] = "O período excede o limite atual do anúncio. Podes enviar uma contraproposta.";
+            return false;
+        }
+
+        return true;
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     [EnableRateLimiting("rental-requests")]
-    public async Task<IActionResult> RetirarProposta(int id, CancellationToken ct)
+    public async Task<IActionResult> RetirarProposta(int id, long versaoProposta, CancellationToken ct)
     {
         var request = await _db.PedidosAluguer.FirstOrDefaultAsync(p =>
             p.Id == id && p.PropostaPorId == Me && p.Estado == "Contraproposta", ct);
         if (request == null) return NotFound();
+        if (versaoProposta != (request.PropostaEm?.Ticks ?? 0))
+        {
+            TempData["Error"] = "A contraproposta mudou. Revê as condições atuais antes de a retirar.";
+            return RedirectToAction(nameof(Index), new { pedido = id });
+        }
         request.Estado = "Pendente";
         request.PropostaDias = null;
         request.PropostaPrecoDia = null;

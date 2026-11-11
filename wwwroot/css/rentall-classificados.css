@@ -1,0 +1,112 @@
+:root {
+  --ink: #092e32;
+  --ink-soft: #315154;
+  --muted: #536b6d;
+  --paper: #f2f5f5;
+  --border: #dbe4e4;
+  --border-strong: #b9cdcd;
+  --forest: #096366;
+  --gold: #a7f1e0;
+  --max: 1200px;
+}
+body.rentall-app { font-family: "DM Sans", system-ui, sans-serif; }
+.site-header, .site-nav, .site-footer { background: #062e31; }
+.header-inner { min-height: 70px; }
+.brand-link, .footer-logo { display: inline-flex; align-items: center; }
+.brand-wordmark { color: #fff; font-size: 2rem; font-weight: 850; letter-spacing: -.075em; line-height: 1; }
+.brand-wordmark span { color: #a7f1e0; }
+body.rentall-app .header-cta {
+  background: #fff; color: #062e31; border: 2px solid #fff; border-radius: 6px; padding-inline: 16px;
+}
+body.rentall-app .header-cta:hover { background: #a7f1e0; border-color: #a7f1e0; }
+body.rentall-app .btn-primary, body.rentall-app .search-submit { background: #062e31; border-color: #062e31; color: #fff; }
+body.rentall-app .btn-primary:hover, body.rentall-app .search-submit:hover { background: #145256; border-color: #145256; }
+.market-search { padding-bottom: 18px; }
+body.rentall-app .market-search-title { font-size: clamp(1.7rem, 3vw, 2.5rem); margin: 0; }
+.market-banner {
+  display: grid; grid-template-columns: 1.12fr 1fr; align-items: stretch;
+  overflow: hidden; border-radius: 12px; background: #b9eee1;
+}
+.market-banner-copy { padding: clamp(24px, 4.2vw, 60px); align-self: center; }
+body.rentall-app .market-banner h1 {
+  font-size: clamp(2rem, 4.2vw, 3.5rem); letter-spacing: -.055em; line-height: 1.02; margin: 0;
+}
+.market-banner p { font-size: clamp(.9rem, 1.4vw, 1.09rem); max-width: 34ch; margin: 16px 0 0; }
+body.rentall-app .market-banner-photo { display: block; width: 100%; height: clamp(260px, 26vw, 340px); object-fit: cover; }
+.search-card { margin: 18px 0 0; padding: 17px; border-radius: 10px; }
+.search-main { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.1fr) auto; }
+.search-main > .field { position: relative; }
+.search-main .ra-filter-city-help { position: absolute; inset-block-start: 100%; inset-inline: 0; display: none; }
+.search-main .search-city:focus-within .ra-filter-city-help {
+  display: block; z-index: 2; background: #fff; border: 1px solid var(--border); padding: 7px; border-radius: 5px;
+}
+body.rentall-app .search-submit { min-height: 44px; }
+.advanced-filters summary { width: fit-content; }
+.market-categories { background: #fff; padding-block: 30px 34px; border-block: 1px solid var(--border); }
+.market-categories h2 { margin: 0 0 21px; }
+.market-category-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.market-category-grid a {
+  display: grid; justify-items: center; align-content: start; text-align: center; gap: 9px;
+  padding: 8px 4px; border-radius: 9px; font-weight: 750;
+}
+.market-category-grid a:hover { background: var(--paper); text-decoration: none; }
+.market-category-grid img { width: clamp(66px, 8vw, 96px); height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
+.market-results { padding-top: 5px; }
+.market-results .results-heading { justify-content: flex-start; }
+.results-heading p { margin: 4px 0 0; color: var(--muted); }
+.listing-grid { gap: 16px; }
+.listing-grid .listing-card { border-radius: 9px; background: #fff; }
+.listing-grid .listing-image { margin: 8px 8px 0; border-radius: 6px; aspect-ratio: 1.35; background: #e0eded; }
+.listing-body { padding: 12px 13px 15px; }
+.listing-kicker { color: var(--muted); }
+.listing-price { color: var(--ink); }
+.listing-price small { display: inline; margin-left: 3px; }
+.photo-note {
+  position: absolute; inset: auto auto 8px 8px; margin: 0; padding: 3px 7px; z-index: 1;
+  border-radius: 4px; color: #fff; background: #062e31; font-size: .72rem;
+}
+.detail-illustration, .ra-photo-frame { position: relative; margin: 0; }
+.detail-illustration img { display: block; width: 100%; }
+.panel, .form-panel { border-radius: 9px; }
+.market-category-page .search-card { margin-bottom: 22px; }
+
+@media (max-width: 1040px) {
+  .search-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+  .search-main .search-query { grid-column: 1 / -1; }
+}
+@media (max-width: 650px) {
+  .header-inner { min-height: 58px; }
+  .footer-main { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 14px; }
+  .footer-about, .footer-contact { grid-column: 1 / -1; }
+  .brand-wordmark { font-size: 1.68rem; }
+  .market-banner { grid-template-columns: 1fr; }
+  .market-banner-copy { padding: 25px 20px; }
+  body.rentall-app .market-banner-photo { height: 145px; object-position: center 53%; }
+  .search-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .search-main .search-city { grid-column: auto; }
+  .search-submit { grid-column: 1 / -1; }
+  .market-categories { padding-block: 20px; }
+  .market-category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .market-category-grid a { font-size: .82rem; }
+  .listing-grid { gap: 10px; }
+  .listing-grid .listing-image { margin: 5px 5px 0; aspect-ratio: 1.1; }
+}
+.market-category-intro {
+  align-items: center; background: #d8f4ed; border-radius: 10px; padding: clamp(16px, 3vw, 32px);
+}
+.market-category-intro img {
+  width: clamp(70px, 15vw, 136px); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%;
+}
+@media (min-width: 651px) and (max-width: 1040px) {
+  .search-main .search-submit { grid-column: auto; }
+}
+@media (max-width: 650px) {
+  .market-category-intro { flex-direction: row; align-items: center; }
+}
+body.rentall-app .market-publish-intro {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px;
+  max-width: none; padding: clamp(16px, 3vw, 32px); border-radius: 10px; background: #d8f4ed; color: var(--ink);
+}
+body.rentall-app .market-publish-intro p { color: var(--ink-soft); }
+.market-publish-intro img { width: clamp(68px, 16vw, 144px); height: auto; border-radius: 9px; }
+.market-publish-intro .ra-progress-track { grid-column: 1 / -1; }

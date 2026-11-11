@@ -59,7 +59,8 @@ public sealed class PublicarController : Controller
         if (!decimal.TryParse(text, NumberStyles.AllowDecimalPoint,
                 CultureInfo.InvariantCulture, out var value) || value < 0 || value > 10000000)
             return false;
-        amount = (float)value;
+        amount = (float)decimal.Round(value, 2, MidpointRounding.AwayFromZero);
+        if (value > 0 && amount == 0) return false;
         return true;
     }
 
@@ -97,11 +98,19 @@ public sealed class PublicarController : Controller
             ModelState.AddModelError(nameof(vm.Preco), "Indica um preço válido em euros, ou deixa em branco.");
         if (vm.Photos.Count is < 1 or > 5)
             ModelState.AddModelError(nameof(vm.Photos), "Seleciona entre 1 e 5 fotografias.");
-        var order = (vm.PhotoOrder ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
-        if (order.Length != vm.Photos.Count ||
-            order.Distinct(StringComparer.Ordinal).Count() != vm.Photos.Count ||
-            order.Where((token, i) => true).Any(t => !t.StartsWith("n:", StringComparison.Ordinal) ||
-                !int.TryParse(t[2..], out var index) || index < 0 || index >= vm.Photos.Count))
+        var order = new List<int>(5);
+        foreach (var token in (vm.PhotoOrder ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (!token.StartsWith("n:", StringComparison.Ordinal) ||
+                !int.TryParse(token.AsSpan(2), NumberStyles.None, CultureInfo.InvariantCulture, out var index) ||
+                index >= vm.Photos.Count || order.Contains(index))
+            {
+                order.Clear();
+                break;
+            }
+            order.Add(index);
+        }
+        if (order.Count != vm.Photos.Count)
             ModelState.AddModelError(nameof(vm.Photos), "A ordem das fotografias é inválida. Seleciona-as novamente.");
         if (!await _db.Categorias.AnyAsync(x => x.id == vm.Categoria, ct))
             ModelState.AddModelError(nameof(vm.Categoria), "Escolhe uma categoria.");
@@ -121,7 +130,7 @@ public sealed class PublicarController : Controller
                 stored.Add(await _images.UploadAsync(file, Owner, ct));
 
             // A ordem é controlada pelo carrossel; apenas índices de ficheiros recém-enviados.
-            var arranged = order.Select(t => stored[int.Parse(t[2..], CultureInfo.InvariantCulture)]).ToList();
+            var arranged = order.Select(index => stored[index]).ToList();
             var item = new Item
             {
                 nmitem = vm.Nome!.Trim(), dsitem = vm.Descricao!.Trim(),
@@ -149,7 +158,9 @@ public sealed class PublicarController : Controller
             };
             _db.Anuncios.Add(ad);
             await _db.SaveChangesAsync(ct);
-            TempData["Success"] = "Anúncio publicado! A localização exata e os contactos não foram recolhidos.";
+            TempData["Success"] = item.snativo == "N"
+                ? "Anúncio guardado e oculto. Podes torná-lo visível a partir de Meus itens."
+                : "Anúncio publicado. Já aparece no catálogo.";
             return item.snativo == "N"
                 ? RedirectToAction("Index", "Anuncios")
                 : RedirectToAction("Details", "Anuncios", new { id = ad.id });
@@ -166,7 +177,7 @@ public sealed class PublicarController : Controller
             ModelState.AddModelError("", ex is ImageStorageException imageError
                 ? imageError.UserMessage
                 : ex is InvalidDataException ? ex.Message
-                : "Não foi possível publicar. Verifica o serviço de imagens ou a ligação à base de dados.");
+                : "Não foi possível publicar agora. Seleciona novamente as fotografias e tenta outra vez.");
             await LoadCategories();
             return View(vm);
         }

@@ -8,14 +8,10 @@
 <form class="search-card" data-marketplace-filters asp-controller="Home" asp-action="@action" method="get" role="search" aria-label="Pesquisar artigos">
     <div class="search-main">
         <div class="field search-query">
-            <label for="filter-search">O que procura?</label>
+            <label for="filter-search">O que procuras?</label>
             <input class="form-control" id="filter-search" type="search" name="SearchString" placeholder="Ferramenta, bicicleta, câmara..." value="@Model.SearchString" autocomplete="off" />
         </div>
         <input type="hidden" name="Pais" value="PT" data-region-country />
-        <div class="field ra-pt-only">
-            <span class="ra-pt-only-label">Mercado</span>
-            <strong>Portugal <small>EUR (€)</small></strong>
-        </div>
         <div class="field">
             <label for="filter-region" data-region-label>@LocationCatalog.RegionLabel(Model.Pais)</label>
             <select class="form-select" id="filter-region" name="Estado" data-region-uf>
@@ -35,7 +31,7 @@
         <button class="btn btn-brand search-submit" type="submit"><i class="fas fa-search" aria-hidden="true"></i> Pesquisar</button>
     </div>
     <details class="advanced-filters" @(Model.CategoriaId.HasValue || Model.MinPrice.HasValue || Model.MaxPrice.HasValue || !string.IsNullOrEmpty(Model.Bairro) || Model.Sort != "recentes" ? "open" : "")>
-        <summary><i class="fas fa-sliders-h" aria-hidden="true"></i> Mais filtros: categoria, preço, bairro e ordenação</summary>
+        <summary><i class="fas fa-sliders-h" aria-hidden="true"></i> Mais filtros</summary>
         <div class="search-extra">
             @if (action == "Index")
             {

@@ -1,5 +1,6 @@
-@model IEnumerable<aluguel.Models.PedidoAluguer>
+@model X.PagedList.IPagedList<aluguel.Models.PedidoAluguer>
 @using aluguel.Services
+@using X.PagedList.Mvc.Core
 @{
     ViewData["Title"] = "Pedidos de aluguer";
     var names = ViewBag.AdNames as Dictionary<int, string> ?? new();
@@ -18,21 +19,16 @@
 <link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true"/>
 <div class="page-width ra-request-page">
     <div class="page-intro">
-        <div><p class="eyebrow">RentAll · Alugueres</p><h1>Pedidos de aluguer</h1>
+        <div><h1>Pedidos de aluguer</h1>
             <p>Acompanha os pedidos dos teus artigos e os que enviaste a outros anunciantes.</p></div>
         <a class="btn btn-outline" asp-controller="Home" asp-action="Index">Explorar artigos</a>
     </div>
     <div class="ra-fee-disclosure"><i class="fas fa-info-circle" aria-hidden="true"></i>
         Os pedidos registam apenas interesse no aluguer. Não existem cobranças, reservas pagas nem proteção financeira ativadas nesta fase. A comissão indicativa não é cobrada.
     </div>
-    <div class="ra-proto-detail-note">
-        <strong>Prepara a entrega e a devolução</strong>
-        <p>Consulta as recomendações para confirmar o estado do artigo e explora as próximas funcionalidades de caução e gestão de danos. A experiência interativa não altera os teus pedidos.</p>
-        <a asp-controller="Experiencia" asp-action="ComoFunciona" class="ra-proto-textlink">Consultar o percurso completo</a>
-    </div>
     <section class="ra-pipeline-overview" aria-label="Resumo dos alugueres">
         <div class="ra-pipeline-heading">
-            <div><h2>O teu painel de alugueres</h2><p>Vê rapidamente o que precisa de resposta e acompanha as conversas.</p></div>
+            <h2>Resumo dos pedidos</h2>
             @if (pendingToAnswer > 0)
             {
                 <a class="btn btn-primary" asp-action="Index" asp-route-vista="pendentes">
@@ -41,7 +37,7 @@
             }
         </div>
         <div class="ra-pipeline-kpis">
-            <div><span>Pedidos</span><strong>@totalRequests</strong><small>no teu histórico recente</small></div>
+            <div><span>Pedidos</span><strong>@totalRequests</strong><small>no teu histórico</small></div>
             <div><span>Recebidos</span><strong>@receivedCount</strong><small>pelos teus artigos</small></div>
             <div><span>Enviados</span><strong>@sentCount</strong><small>a anunciantes</small></div>
             <div class="@(pendingToAnswer > 0 ? "needs-attention" : "")"><span>A aguardar resposta tua</span><strong>@pendingToAnswer</strong><small>@(pendingToAnswer == 0 ? "Tudo acompanhado" : "Pedidos por responder")</small></div>
@@ -53,6 +49,10 @@
             <a asp-action="Index" class="@(selectedView == "pendentes" ? "is-active" : "")" asp-route-vista="pendentes" aria-current="@(selectedView == "pendentes" ? "page" : null)">Por responder @if (pendingToAnswer > 0) { <span class="ra-pipeline-count">@pendingToAnswer</span> }</a>
         </nav>
     </section>
+    @if (ViewBag.FocusedRequest is int)
+    {
+        <a class="btn btn-outline mb-3" asp-action="Index">Ver todos os pedidos</a>
+    }
     @if (!Model.Any())
     {
         <div class="empty-state"><i class="far fa-calendar-check"></i>
@@ -67,7 +67,7 @@
         {
             var owner = request.AnuncianteId == me;
             var name = names.TryGetValue(request.AnuncioId, out var label) ? label : "Anúncio";
-            <article class="ra-request-card">
+            <article class="ra-request-card" id="pedido-@request.Id">
                 <div class="ra-request-top">
                     <span class="ra-request-kind">@(owner ? "Pedido recebido" : "Pedido enviado")</span>
                     <span class="ra-request-status @((owner && request.Estado == "Pendente") || (request.Estado == "Contraproposta" && request.PropostaPorId != me) ? "is-awaiting-action" : "")">@request.Estado</span>
@@ -112,6 +112,7 @@
                         {
                             <p>Aguarda a decisão da outra pessoa. Podes retirar a proposta.</p>
                             <form asp-action="RetirarProposta" method="post">
+                                <input type="hidden" name="versaoProposta" value="@(request.PropostaEm?.Ticks ?? 0)" />
                                 <input type="hidden" name="id" value="@request.Id" />
                                 <button type="submit" class="btn btn-outline">Retirar contraproposta</button>
                             </form>
@@ -121,11 +122,13 @@
                             <p>Confirma os novos valores antes de aceitares. O pedido não implica pagamento.</p>
                             <div class="ra-request-actions">
                                 <form asp-action="DecidirProposta" method="post">
+                                    <input type="hidden" name="versaoProposta" value="@(request.PropostaEm?.Ticks ?? 0)" />
                                     <input type="hidden" name="id" value="@request.Id" />
                                     <input type="hidden" name="aceitar" value="true" />
                                     <button type="submit" class="btn btn-primary">Aceitar contraproposta</button>
                                 </form>
                                 <form asp-action="DecidirProposta" method="post">
+                                    <input type="hidden" name="versaoProposta" value="@(request.PropostaEm?.Ticks ?? 0)" />
                                     <input type="hidden" name="id" value="@request.Id" />
                                     <input type="hidden" name="aceitar" value="false" />
                                     <button type="submit" class="btn btn-outline">Recusar contraproposta</button>
@@ -204,5 +207,11 @@
             </article>
         }
         </div>
+        @if (Model.PageCount > 1)
+        {
+            <nav class="pagination-wrap" aria-label="Páginas de pedidos">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { vista = selectedView, pagina = page }))
+            </nav>
+        }
     }
 </div>

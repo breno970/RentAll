@@ -21,9 +21,17 @@ public sealed class MensagensController : Controller
     public async Task<IActionResult> Index(CancellationToken ct)
     {
         var me = Me;
-        var messages = await _db.Mensagens.AsNoTracking()
+        var latestMessageIds = _db.Mensagens
             .Where(m => m.RemetenteId == me || m.DestinatarioId == me)
-            .OrderByDescending(m => m.CriadaEm).Take(500).ToListAsync(ct);
+            .GroupBy(m => new
+            {
+                m.AnuncioId,
+                PeerId = m.RemetenteId == me ? m.DestinatarioId : m.RemetenteId
+            })
+            .Select(thread => thread.Max(m => m.Id));
+        var messages = await _db.Mensagens.AsNoTracking()
+            .Where(m => latestMessageIds.Contains(m.Id))
+            .OrderByDescending(m => m.CriadaEm).ThenByDescending(m => m.Id).Take(250).ToListAsync(ct);
         var requests = await _db.PedidosAluguer.AsNoTracking()
             .Where(p => p.AnuncianteId == me || p.InteressadoId == me)
             .OrderByDescending(p => p.CriadoEm).Take(150).ToListAsync(ct);
@@ -32,26 +40,23 @@ public sealed class MensagensController : Controller
         var ads = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .Where(a => ids.Contains(a.id))
             .ToDictionaryAsync(a => a.id, ct);
-        var threads = messages.GroupBy(m => new
+        var threads = messages.Select(message =>
         {
-            m.AnuncioId,
-            PeerId = m.RemetenteId == me ? m.DestinatarioId : m.RemetenteId
-        }).Select(g =>
-        {
-            ads.TryGetValue(g.Key.AnuncioId, out var ad);
+            var peer = message.RemetenteId == me ? message.DestinatarioId : message.RemetenteId;
+            ads.TryGetValue(message.AnuncioId, out var ad);
             return new ResumoConversa
             {
-                AnuncioId = g.Key.AnuncioId, OutroUtilizadorId = g.Key.PeerId,
+                AnuncioId = message.AnuncioId, OutroUtilizadorId = peer,
                 NomeArtigo = ad?.item?.nmitem ?? "Anúncio",
-                UltimaMensagem = g.Max(m => m.CriadaEm),
-                UltimoTexto = g.OrderByDescending(m => m.CriadaEm).First().Texto,
-                PedidoPendente = requests.Any(p => p.AnuncioId == g.Key.AnuncioId &&
+                UltimaMensagem = message.CriadaEm,
+                UltimoTexto = message.Texto,
+                PedidoPendente = requests.Any(p => p.AnuncioId == message.AnuncioId &&
                     ((p.Estado == "Pendente" && p.AnuncianteId == me) ||
                      (p.Estado == "Contraproposta" && p.PropostaPorId != me)) &&
-                    p.InteressadoId == g.Key.PeerId),
+                    (p.AnuncianteId == me ? p.InteressadoId : p.AnuncianteId) == peer),
                 SouAnunciante = ad?.iduser == me
             };
-        }).OrderByDescending(g => g.UltimaMensagem).ToList();
+        }).ToList();
         // Rental requests are a valid conversation context before the first message.
         foreach (var request in requests)
         {
@@ -73,7 +78,7 @@ public sealed class MensagensController : Controller
         return View(threads.OrderByDescending(t => t.UltimaMensagem).ToList());
     }
 
-    public async Task<IActionResult> Conversa(int anuncioId, string? peerId, CancellationToken ct)
+    public async Task<IActionResult> Conversa(int anuncioId, string? peerId, int? antes, CancellationToken ct)
     {
         var ad = await _db.Anuncios.AsNoTracking().Include(a => a.item)
             .FirstOrDefaultAsync(a => a.id == anuncioId, ct);
@@ -91,38 +96,47 @@ public sealed class MensagensController : Controller
             p.AnuncianteId == ad.iduser &&
             p.InteressadoId == (owner ? other : me), ct);
         if (owner && !hasMessage && !hasRequest) return NotFound();
-        if (!owner && ad.item?.snativo == "N" && !hasMessage && !hasRequest)
+        if (!owner && !IsPublic(ad) && !hasMessage && !hasRequest)
             return NotFound();
 
-        return View(await BuildConversationAsync(ad, owner, me, other, ct));
+        return View(await BuildConversationAsync(ad, owner, me, other, ct, antes));
     }
 
     private async Task<ConversaViewModel> BuildConversationAsync(Anuncio ad, bool owner,
-        string me, string other, CancellationToken ct)
+        string me, string other, CancellationToken ct, int? before = null)
     {
         var anuncioId = ad.id;
+        const int pageSize = 50;
         var messages = await _db.Mensagens.AsNoTracking()
             .Where(m => m.AnuncioId == anuncioId &&
+                (!before.HasValue || m.Id < before.Value) &&
                 ((m.RemetenteId == me && m.DestinatarioId == other) ||
                  (m.RemetenteId == other && m.DestinatarioId == me)))
-            .OrderBy(m => m.CriadaEm).Take(250).ToListAsync(ct);
+            .OrderByDescending(m => m.Id).Take(pageSize + 1).ToListAsync(ct);
+        var hasOlderMessages = messages.Count > pageSize;
+        if (hasOlderMessages) messages.RemoveAt(pageSize);
+        messages.Reverse();
         var latestRequest = await _db.PedidosAluguer.AsNoTracking()
             .Where(p => p.AnuncioId == anuncioId &&
                 p.InteressadoId == (owner ? other : me) && p.AnuncianteId == ad.iduser)
-            .OrderByDescending(p => p.CriadoEm)
+            .OrderByDescending(p => p.CriadoEm).ThenByDescending(p => p.Id)
             .Select(p => new { p.Id, p.Estado, p.TotalEstimado, p.Dias, p.Pais })
             .FirstOrDefaultAsync(ct);
         return new ConversaViewModel {
             AnuncioId = ad.id, NomeArtigo = ad.item?.nmitem ?? ad.modelo,
             MeuId = me, OutroUtilizadorId = other,
             SouAnunciante = owner, Mensagens = messages,
-            AnuncioAtivo = ad.item?.snativo != "N",
+            AnuncioAtivo = IsPublic(ad),
+            OlderThanId = hasOlderMessages ? messages[0].Id : null,
+            ShowingOlderMessages = before.HasValue,
             PrecoDia = ad.vlitem, PrazoMaximo = ad.diasAluguel > 0 ? ad.diasAluguel : 365,
             Pais = ad.Pais, PedidoId = latestRequest?.Id,
             EstadoPedido = latestRequest?.Estado, DiasPedido = latestRequest?.Dias,
             TotalPedido = latestRequest?.TotalEstimado
         };
     }
+
+    private static bool IsPublic(Anuncio ad) => ad.Pais == "PT" && ad.item is { snativo: not "N" };
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -143,7 +157,7 @@ public sealed class MensagensController : Controller
             p.AnuncioId == anuncioId && p.AnuncianteId == ad.iduser &&
             p.InteressadoId == (owner ? other : me), ct);
         if (owner && !previous && !hasRequest) return Forbid();
-        if (ad.item?.snativo == "N" && !previous && !hasRequest) return NotFound();
+        if (!IsPublic(ad) && !previous && !hasRequest) return NotFound();
 
         var body = texto?.Trim() ?? "";
         var reason = MarketplaceContactSafety.Classify(body);
@@ -163,6 +177,6 @@ public sealed class MensagensController : Controller
             Texto = body, CriadaEm = DateTime.UtcNow
         });
         await _db.SaveChangesAsync(ct);
-        return RedirectToAction(nameof(Conversa), new { anuncioId, peerId = other });
+        return RedirectToAction(nameof(Conversa), "Mensagens", new { anuncioId, peerId = other }, "nova-mensagem");
     }
 }

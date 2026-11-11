@@ -2,6 +2,9 @@
   "use strict";
 
   document.addEventListener("DOMContentLoaded", () => {
+    const history = document.querySelector("[data-chat-recent]");
+    if (history) history.scrollTop = history.scrollHeight;
+
     const editor = document.getElementById("messageText");
     if (!editor) return;
 
@@ -37,15 +40,18 @@
       event.preventDefault();
       showWarning(true);
       editor.focus();
-    });
+    }, { capture: true });
 
     document.querySelectorAll("[data-chat-suggestion]").forEach(button => {
       button.addEventListener("click", () => {
         const proposal = button.getAttribute("data-chat-suggestion") || "";
         if (!proposal) return;
-        editor.value = editor.value.trim()
+        const updated = editor.value.trim()
           ? editor.value.trim() + "\n" + proposal
           : proposal;
+        if (updated.length > editor.maxLength) return;
+        editor.value = updated;
+        showWarning(false);
         editor.focus();
         editor.setSelectionRange(editor.value.length, editor.value.length);
       });

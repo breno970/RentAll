@@ -16,6 +16,8 @@ public sealed class ConversaViewModel
     public string? EstadoPedido { get; init; }
     public int? DiasPedido { get; init; }
     public decimal? TotalPedido { get; init; }
+    public int? OlderThanId { get; init; }
+    public bool ShowingOlderMessages { get; init; }
     public IReadOnlyList<Mensagem> Mensagens { get; init; } = Array.Empty<Mensagem>();
 }
 public sealed class ResumoConversa

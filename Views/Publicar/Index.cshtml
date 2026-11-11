@@ -8,10 +8,12 @@
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
 <div class="page-width ra-publish">
-    <header class="ra-publish-head">
-        <p class="eyebrow">Publicar na RentAll</p>
-        <h1>Publica o teu artigo.</h1>
-        <p>Fotografias, preço e localização num único formulário. Não precisas de partilhar a tua morada nem o telefone.</p>
+    <header class="ra-publish-head market-publish-intro">
+        <div>
+            <h1>Publica o teu artigo</h1>
+            <p>Adiciona fotografias e indica o preço e a localidade. A tua morada e o teu telefone ficam privados.</p>
+        </div>
+        <img src="~/catalogo/ferramentas.jpg" alt="" width="144" height="144" />
     </header>
     <form asp-controller="Publicar" asp-action="Index" class="ra-publish-form" method="post"
           enctype="multipart/form-data" data-submit-lock data-single-publish>

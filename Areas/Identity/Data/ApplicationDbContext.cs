@@ -33,6 +33,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
         builder.Entity<PagamentoAluguer>().HasIndex(p => p.StripeSessionId).IsUnique();
         builder.Entity<PedidoAluguer>().HasIndex(p => new { p.AnuncianteId, p.CriadoEm });
         builder.Entity<PedidoAluguer>().Property(p => p.Estado).IsConcurrencyToken();
+        builder.Entity<PedidoAluguer>().Property(p => p.PropostaEm).IsConcurrencyToken();
         builder.Entity<PercursoAluguerDemo>().HasKey(p => p.PedidoId);
         builder.Entity<PercursoAluguerDemo>().Property(p => p.Versao).IsConcurrencyToken();
         builder.Entity<PercursoDemoEvento>().ToTable("PercursoDemoEventos");

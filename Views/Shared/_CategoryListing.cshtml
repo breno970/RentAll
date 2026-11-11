@@ -4,20 +4,20 @@
 @{
     var filters = ViewData["Filters"] as MarketplaceFilters ?? new MarketplaceFilters();
     var heading = ViewData["CategoryName"] as string ?? "Categoria";
-    var icon = ViewData["CategoryIcon"] as string ?? "fas fa-box";
+    var photo = Url.Content("~/catalogo/" + MarketplaceCategory.PhotoFor(filters.CategoriaId));
     var action = ViewData["FilterAction"] as string ?? "Index";
 }
-<div class="page-width">
-    <div class="page-intro">
+<div class="page-width market-category-page">
+    <div class="page-intro market-category-intro">
         <div>
             <p class="eyebrow"><a asp-controller="Home" asp-action="Index" asp-route-Pais="@filters.Pais">Explorar</a> / Categorias</p>
-            <h1><i class="@icon" aria-hidden="true"></i> @heading</h1>
+            <h1>@heading</h1>
             <p>Encontra objetos disponíveis para alugar na tua região.</p>
         </div>
-        <a class="btn btn-outline" asp-controller="Home" asp-action="Index" asp-route-Pais="@filters.Pais"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todas as categorias</a>
+        <img src="@photo" alt="" width="136" height="136" />
     </div>
     <partial name="_MarketplaceFilters" model="filters" />
-    <div class="results-heading"><h2>@Model.TotalItemCount anúncio(s)</h2><span class="pill">@aluguel.Services.LocationCatalog.CountryName(filters.Pais)</span></div>
+    <div class="results-heading"><h2>@Model.TotalItemCount @(Model.TotalItemCount == 1 ? "anúncio" : "anúncios")</h2><span class="pill">@aluguel.Services.LocationCatalog.CountryName(filters.Pais)</span></div>
     <partial name="_MarketplaceCards" model="Model" />
     @if (Model.PageCount > 1)
     {

@@ -41,9 +41,13 @@
             @foreach (var ad in Model)
             {
                 <article class="manage-card">
-                    @if (!string.IsNullOrWhiteSpace(ad.item?.imagem1))
-                    { <img class="manage-img" src="@Url.Content("~/imagens/" + ad.item.imagem1)" alt="@(ad.item?.nmitem ?? ad.modelo)" loading="lazy" /> }
-                    else { <div class="manage-img"><i class="far fa-image"></i></div> }
+                    @{
+                        var photo = aluguel.ViewModel.MarketplaceCategory.ListingPhotos(ad.item).FirstOrDefault();
+                        var illustration = Url.Content("~/catalogo/" + aluguel.ViewModel.MarketplaceCategory.PhotoFor(ad.categoriaid));
+                    }
+                    <img class="manage-img" src="@(photo is null ? illustration : Url.Content("~/imagens/" + photo))"
+                         alt="@(photo is null ? "Imagem ilustrativa" : ad.item?.nmitem ?? ad.modelo)"
+                         data-photo-fallback="@(photo is null ? null : illustration)" loading="lazy" />
                     <div class="manage-body">
                         <span class="pill"><i class="fas fa-circle" style="font-size:.46rem" aria-hidden="true"></i> @(ad.Pais == "PT" ? "Anúncio · Portugal" : "Histórico · indisponível no mercado atual")</span>
                         @if (ad.item?.nmitem.StartsWith("[DEMO] ") == true) { <span class="demo-ad-badge">FICTÍCIO · PODE APAGAR</span> }

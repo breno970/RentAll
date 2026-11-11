@@ -21,11 +21,11 @@ for path in files:
         issues.append(f"{relative}: legacy duplicated footer remains")
 
 layout = (root / "Views/Shared/_Layout.cshtml").read_text(encoding="utf-8-sig")
-for required in ('~/imagens/ra.png', '~/imagens/ico.png', '~/css/rentall-2026.css', 'class="site-footer"'):
+for required in ('class="brand-wordmark"', '~/imagens/ico.png', '~/css/rentall-classificados.css', 'class="site-footer"'):
     if required not in layout:
         issues.append(f"Layout missing {required}")
 
-if not (root / "wwwroot/css/rentall-2026.css").is_file():
+if not (root / "wwwroot/css/rentall-classificados.css").is_file():
     issues.append("Main CSS file missing")
 if not (root / "wwwroot/js/rentall-ui.js").is_file():
     issues.append("Main interaction script missing")

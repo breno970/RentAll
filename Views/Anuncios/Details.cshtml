@@ -1,7 +1,8 @@
 @model aluguel.Models.Anuncio
 @{
     ViewData["Title"] = Model.item?.nmitem ?? Model.modelo;
-    var photos = new[] { Model.item?.imagem1, Model.item?.imagem2, Model.item?.imagem3, Model.item?.imagem4, Model.item?.imagem5 }.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+    var photos = aluguel.ViewModel.MarketplaceCategory.ListingPhotos(Model.item).ToArray();
+    var illustration = Url.Content("~/catalogo/" + aluguel.ViewModel.MarketplaceCategory.PhotoFor(Model.categoriaid));
     var place = string.Join(", ", new[] { Model.Cidade, Model.Estado, aluguel.Services.LocationCatalog.CountryName(Model.Pais) });
     var mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + Uri.EscapeDataString(place);
     var isSaved = ViewData["IsFavorite"] is bool value && value;
@@ -28,14 +29,21 @@
                         <div class="ra-photo-stage">
                             <button type="button" data-view-prev aria-label="Fotografia anterior"><i class="fas fa-chevron-left"></i></button>
                             <div class="ra-photo-frame">
-                                <img class="detail-main-image" data-view-main alt="Fotografia de @(Model.item?.nmitem ?? Model.modelo)" />
+                                <img class="detail-main-image" data-view-main data-photo-fallback="@illustration" alt="Fotografia de @(Model.item?.nmitem ?? Model.modelo)" />
+                                <p class="photo-note" data-photo-note hidden>Imagem ilustrativa</p>
                                 <p data-view-counter aria-live="polite"></p>
                             </div>
                             <button type="button" data-view-next aria-label="Próxima fotografia"><i class="fas fa-chevron-right"></i></button>
                         </div>
                     </div>
                 }
-                else { <div class="detail-main-image image-empty"><i class="far fa-image"></i></div> }
+                else
+                {
+                    <figure class="detail-illustration">
+                        <img class="detail-main-image" src="@illustration" alt="" />
+                        <figcaption class="photo-note">Imagem ilustrativa</figcaption>
+                    </figure>
+                }
             </div>
             <div class="panel" style="margin-top:18px">
                 <h2>Sobre este artigo</h2>
@@ -43,7 +51,7 @@
             </div>
         </div>
         <aside class="panel">
-            <h1 class="detail-name" style="margin:18px 0 6px">@(Model.item?.nmitem ?? Model.modelo)</h1>
+            <h2 class="detail-name" style="margin:18px 0 6px">@(Model.item?.nmitem ?? Model.modelo)</h2>
             @if (!string.IsNullOrWhiteSpace(Model.modelo)) { <p class="muted">@Model.modelo</p> }
             <div class="detail-price">@aluguel.Services.RentalLocalization.FormatPrice(Model.vlitem, Model.Pais) @if (Model.vlitem > 0) { <small>/ dia</small> }</div>
             <div class="detail-facts">

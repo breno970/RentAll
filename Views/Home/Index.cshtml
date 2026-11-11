@@ -4,63 +4,81 @@
 @{
     ViewData["Title"] = "Aluga o que precisas, perto de ti";
     var filters = ViewData["Filters"] as MarketplaceFilters ?? new MarketplaceFilters();
+    var browsing = !filters.CategoriaId.HasValue && !filters.MinPrice.HasValue && !filters.MaxPrice.HasValue &&
+        string.IsNullOrWhiteSpace(filters.SearchString) && string.IsNullOrWhiteSpace(filters.Estado) &&
+        string.IsNullOrWhiteSpace(filters.RegionFilter) && string.IsNullOrWhiteSpace(filters.Bairro) &&
+        filters.Sort == "recentes" && (filters.Page ?? 1) == 1;
 }
-<link rel="stylesheet" href="~/css/rental-prototype.css" asp-append-version="true" />
-<div class="page-width">
-    <section class="hero" aria-labelledby="hero-heading">
-        <div>
-            <div class="eyebrow">RentAll · Exclusivamente em Portugal</div>
-            <h1 id="hero-heading">Encontra artigos para alugar<br /><em>perto de ti, em Portugal.</em></h1>
-            <p>Ferramentas para um projeto, material para um fim de semana ou equipamentos para uma ocasião. Descobre artigos disponíveis na tua região.</p>
-            <div class="hero-actions">
-                <a class="btn btn-brand" href="#procurar"><i class="fas fa-search" aria-hidden="true"></i> Explorar artigos</a>
-                <a class="btn btn-secondary" asp-controller="Publicar" asp-action="Index"><i class="fas fa-plus" aria-hidden="true"></i> Publicar um artigo</a>
+<section class="market-search" aria-labelledby="market-title">
+    <div class="page-width">
+        @if (browsing)
+        {
+            <div class="market-banner">
+                <div class="market-banner-copy">
+                    <h1 id="market-title">Aluga o que precisas,<br />perto de ti.</h1>
+                    <p>Encontra ferramentas, equipamento e outros artigos para alugar em Portugal.</p>
+                </div>
+                <img class="market-banner-photo" src="~/catalogo/aluguer.jpg" alt="" width="750" height="500" fetchpriority="high" />
+            </div>
+        }
+        else
+        {
+            <h1 id="market-title" class="market-search-title">Pesquisar artigos</h1>
+        }
+        <partial name="_MarketplaceFilters" model="filters" />
+    </div>
+</section>
+
+@if (browsing)
+{
+    <section class="market-categories" aria-labelledby="category-heading">
+        <div class="page-width">
+            <h2 id="category-heading">Categorias</h2>
+            <nav class="market-category-grid" aria-label="Categorias de aluguer">
+                @foreach (var category in MarketplaceCategory.All)
+                {
+                    <a asp-controller="Home" asp-action="@category.Action" asp-route-Pais="@filters.Pais">
+                        <img src="~/catalogo/@category.Photo" alt="" width="96" height="96" />
+                        <span>@category.Name</span>
+                    </a>
+                }
+            </nav>
+        </div>
+    </section>
+}
+
+<section id="procurar" class="market-results page-width" aria-labelledby="results-heading">
+    @if (browsing && Model.TotalItemCount == 0)
+    {
+        <div class="results-heading">
+            <div>
+                <h2 id="results-heading">Exemplos de aluguer</h2>
+                <p>Artigos e preços ilustrativos. Escolhe uma categoria para procurar anúncios publicados.</p>
             </div>
         </div>
-        <div class="hero-art" aria-hidden="true">
-            <div class="hero-orbit"><img src="~/imagens/ico.png" alt="" /></div>
-            <span class="hero-mini one"><i class="fas fa-check-circle"></i> Aluga localmente</span>
-            <span class="hero-mini two"><i class="fas fa-recycle"></i> Menos desperdício</span>
+        <div class="listing-grid">
+            @foreach (var category in MarketplaceCategory.All)
+            {
+                <article class="listing-card">
+                    <a class="listing-image" asp-action="@category.Action" aria-label="Explorar @category.Name">
+                        <img src="~/catalogo/@category.Photo" alt="" width="512" height="512" loading="lazy" />
+                    </a>
+                    <div class="listing-body">
+                        <span class="listing-kicker">@category.Name</span>
+                        <h3><a asp-action="@category.Action">@category.Example</a></h3>
+                        <div class="listing-price">@aluguel.Services.RentalLocalization.FormatPrice(category.DailyPrice, "PT") <small>/ dia</small></div>
+                    </div>
+                </article>
+            }
         </div>
-    </section>
-
-    <section class="benefit-strip" aria-label="Benefícios da plataforma">
-        <div class="benefit"><i class="fas fa-wallet" aria-hidden="true"></i><span><b>Aluga só quando precisas</b><small>Sem comprar para uma única ocasião</small></span></div>
-        <div class="benefit"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span><b>Em Portugal</b><small>Pesquisa por distrito e concelho</small></span></div>
-        <div class="benefit"><i class="fas fa-comments" aria-hidden="true"></i><span><b>Conversa e negocia</b><small>Mensagens e pedidos na RentAll</small></span></div>
-    </section>
-
-    <section class="ra-proto-teaser" aria-labelledby="trust-first-heading">
-        <div>
-            <p class="ra-proto-kicker">Alugar com confiança</p>
-            <h2 id="trust-first-heading">Do pedido à devolução, com mais clareza.</h2>
-            <p>Encontra artigos, conversa com o anunciante e acompanha os pedidos. Consulta as recomendações de entrega e devolução e as próximas funcionalidades de proteção.</p>
-        </div>
-        <a class="btn btn-outline" asp-controller="Experiencia" asp-action="ComoFunciona">Ver como funciona</a>
-    </section>
-
-    <section aria-labelledby="category-heading">
-        <div class="section-heading">
-            <div><p class="eyebrow">Categorias</p><h2 id="category-heading">Explora por categoria</h2></div>
-        </div>
-        <nav class="category-grid" aria-label="Categorias disponíveis">
-            <a class="category-link" asp-controller="Home" asp-action="VideoGame" asp-route-Pais="@filters.Pais"><i class="fas fa-gamepad" aria-hidden="true"></i> Consolas e jogos</a>
-            <a class="category-link" asp-controller="Home" asp-action="AudioVisual" asp-route-Pais="@filters.Pais"><i class="fas fa-camera" aria-hidden="true"></i> Áudio e vídeo</a>
-            <a class="category-link" asp-controller="Home" asp-action="MusicaHobbie" asp-route-Pais="@filters.Pais"><i class="fas fa-guitar" aria-hidden="true"></i> Música e hobbies</a>
-            <a class="category-link" asp-controller="Home" asp-action="EsporteGinastica" asp-route-Pais="@filters.Pais"><i class="fas fa-bicycle" aria-hidden="true"></i> Desporto e lazer</a>
-            <a class="category-link" asp-controller="Home" asp-action="Ferramentas" asp-route-Pais="@filters.Pais"><i class="fas fa-tools" aria-hidden="true"></i> Ferramentas</a>
-            <a class="category-link" asp-controller="Home" asp-action="Eletrodomesticos" asp-route-Pais="@filters.Pais"><i class="fas fa-blender" aria-hidden="true"></i> Casa e cozinha</a>
-        </nav>
-    </section>
-
-    <section id="procurar" style="scroll-margin-top:105px" aria-labelledby="search-heading">
-        <div class="section-heading">
-            <div><p class="eyebrow">Pesquisa por zona</p><h2 id="search-heading">Encontra na tua região</h2></div>
-        </div>
-        <partial name="_MarketplaceFilters" model="filters" />
+    }
+    else
+    {
         <div class="results-heading">
-            <div><p class="eyebrow">Artigos disponíveis</p><h2>@Model.TotalItemCount resultado(s)</h2></div>
-            <span class="pill"><i class="fas fa-globe-europe" aria-hidden="true"></i> @aluguel.Services.LocationCatalog.CountryName(filters.Pais)</span>
+            <div>
+                <h2 id="results-heading">@(browsing ? "Anúncios recentes" : "Resultados da pesquisa")</h2>
+                <p>@Model.TotalItemCount @(Model.TotalItemCount == 1 ? "anúncio" : "anúncios")</p>
+            </div>
         </div>
         <partial name="_MarketplaceCards" model="Model" />
         @if (Model.PageCount > 1)
@@ -69,5 +87,5 @@
                 @Html.PagedListPager(Model, page => Url.Action("Index", new { page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter, filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort }))
             </div>
         }
-    </section>
-</div>
+    }
+</section>
