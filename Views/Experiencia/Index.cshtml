@@ -10,7 +10,7 @@
             <p>Descobre artigos em Portugal, fala com quem os anuncia e organiza os pedidos sem sair da RentAll.</p>
             <div class="ra-proto-actions">
                 <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Encontrar artigos</a>
-                <a class="btn btn-outline" href="#simulador">Conhecer todas as etapas</a>
+                <a class="btn btn-outline" asp-controller="Home" asp-action="Exemplos">Experimentar um aluguer</a>
             </div>
         </div>
         <div class="ra-proto-snapshot" aria-label="Como utilizar a RentAll">
@@ -131,7 +131,7 @@
                         <div><span>Comissão RentAll incluída no aluguer</span><strong data-proto-fee>5,40 €</strong></div>
                     </div>
                     <p class="ra-proto-deposit">A caução seria uma garantia separada, com limites e condições comunicados antecipadamente. <strong>Não pode ser retida automaticamente por uma denúncia.</strong> A disponibilidade de pré-autorização depende do prestador, do método e dos prazos de captura.</p>
-                    <a class="ra-proto-textlink" asp-controller="Pagamentos" asp-action="Demonstracao">Ver a demonstração de pagamento com cartão</a>
+                    <a class="ra-proto-textlink" asp-controller="Pagamentos" asp-action="Demonstracao" asp-route-completo="true">Ver a demonstração de pagamento com cartão</a>
                     <button class="btn btn-primary" type="button" data-proto-next>Simular confirmação e entrega</button>
                 </section>
 

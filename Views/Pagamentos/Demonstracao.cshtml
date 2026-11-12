@@ -10,7 +10,10 @@
             <h1>Alugar @Model.Artigo</h1>
             <p>Experimenta os dois papéis na mesma sessão, do pagamento simulado à confirmação da receção.</p>
         </div>
-        <a class="btn btn-outline" asp-controller="Home" asp-action="Exemplos">Escolher outro artigo</a>
+        <div class="ra-demo-controls">
+            <a class="btn btn-outline" asp-controller="Pagamentos" asp-action="Demonstracao" asp-route-artigo="@Model.Slug">Simulação rápida</a>
+            <a class="btn btn-outline" asp-controller="Home" asp-action="Exemplos">Escolher outro artigo</a>
+        </div>
     </div>
     <div class="ra-demo-warning" role="note">
         <strong>Ambiente de demonstração — esta experiência é simulada, não cobra dinheiro e não recolhe dados bancários.</strong>

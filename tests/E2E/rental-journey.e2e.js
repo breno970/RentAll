@@ -56,6 +56,13 @@ async function publicDemo(browser) {
     assert.strictEqual(photos.length, 22);
     assert.strictEqual(new Set(photos).size, photos.length, 'Fotos repetidas no catálogo de demonstração');
     await page.locator('a[aria-label="Simular aluguer de Projetor Full HD"]').click();
+    await page.locator('[data-quick-days]').fill('4');
+    assert.match(await page.locator('[data-quick-total]').first().innerText(), /88,00/);
+    await page.getByRole('button', { name: 'Simular pagamento' }).click();
+    await page.getByRole('button', { name: 'Simular recolha' }).click();
+    await page.getByRole('button', { name: 'Simular devolução' }).click();
+    assert(await page.getByRole('heading', { name: 'Simulação concluída' }).isVisible());
+    await page.getByRole('link', { name: 'Ver percurso completo' }).click();
     assert(await page.getByRole('heading', { name: 'Alugar Projetor Full HD' }).isVisible());
     const pickup = await page.locator('[data-demo-pickup]').inputValue();
     const dropoff = new Date(Date.parse(pickup + 'T00:00:00Z') + 4 * 86400000).toISOString().slice(0, 10);

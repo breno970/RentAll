@@ -21,7 +21,7 @@ for path in files:
         issues.append(f"{relative}: legacy duplicated footer remains")
 
 layout = (root / "Views/Shared/_Layout.cshtml").read_text(encoding="utf-8-sig")
-for required in ('class="brand-wordmark"', '~/imagens/ico.png', '~/css/rentall-classificados.css', 'class="site-footer"'):
+for required in ('~/imagens/ra.png', '~/imagens/ico.png', '~/css/rentall-classificados.css', 'class="site-footer"'):
     if required not in layout:
         issues.append(f"Layout missing {required}")
 

@@ -1,7 +1,8 @@
 /* RentAll design system · 2026. Brand artwork remains untouched. */
 :root {
   --ink:#21342f; --ink-soft:#485b54; --muted:#76847e; --forest:#135c47; --forest-deep:#104738;
-  --mint:#d9eee4; --gold:#f5c64b; --gold-soft:#fff4cf; --paper:#f7f9f6; --surface:#fff;
+  --brand-dark:#173c32; --brand-mint:#6fc59f; --gold:#fbe966; --gold-soft:#fff9d4;
+  --mint:#d9eee4; --paper:#f7f9f6; --surface:#fff;
   --border:#dfe8e3; --border-strong:#cbd7d0; --danger:#c3454e; --danger-soft:#fff0f1;
   --shadow-sm:0 3px 12px rgba(24,58,43,.045);
   --shadow:0 14px 42px rgba(21,57,45,.075); --shadow-lg:0 24px 65px rgba(16,62,44,.13);
@@ -20,7 +21,8 @@ body.rentall-app a:hover{color:var(--forest-deep)}
 body.rentall-app button{cursor:pointer}
 body.rentall-app :is(button,input,select,textarea){font:inherit}
 body.rentall-app img{max-width:100%;height:auto}
-body.rentall-app :is(input,select,textarea,button,a):focus-visible{outline:3px solid #e7bd48;outline-offset:3px}
+body.rentall-app :is(input,select,textarea,button,a):focus-visible{outline:3px solid var(--forest);outline-offset:3px}
+body.rentall-app :is(.site-header,.site-footer) :is(button,a):focus-visible{outline-color:var(--gold)}
 body.rentall-app :is(.form-control,.form-select,textarea){width:100%;min-width:0;min-height:48px;background:#fff;border:1px solid var(--border-strong);border-radius:12px;padding:12px 14px;color:var(--ink);font-size:1rem;box-shadow:none;line-height:1.45;transition:box-shadow .18s,border-color .18s}
 body.rentall-app :is(.form-control,.form-select,textarea):focus{border-color:var(--forest);box-shadow:0 0 0 4px rgba(19,92,71,.09);outline:0}
 body.rentall-app textarea{min-height:130px;resize:vertical}

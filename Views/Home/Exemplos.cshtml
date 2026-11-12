@@ -1,12 +1,12 @@
 @model IEnumerable<aluguel.ViewModel.DemoCatalogItem>
 @{ ViewData["Title"] = "Catálogo de demonstração"; }
-<div class="page-width market-results">
+<div class="page-width market-results market-demo-catalog">
     <div class="page-intro market-category-intro">
         <div>
-            <h1>Catálogo de demonstração</h1>
-            <p>Escolhe um artigo fictício e experimenta o pagamento, a receção e a devolução sem criar conta.</p>
+            <h1>Experimenta um aluguer</h1>
+            <p>Escolhe um artigo de exemplo. Em três passos, simulas o pagamento, a recolha e a devolução, sem criar conta.</p>
         </div>
-        <a class="btn btn-outline" asp-action="Index">Voltar ao catálogo</a>
+        <a class="btn btn-outline" asp-action="Index">Ver anúncios</a>
     </div>
     <partial name="_DemoCatalogCards" model="Model" />
 </div>

@@ -40,15 +40,17 @@ public sealed class PagamentosController : Controller
     [AllowAnonymous]
     [HttpGet("Demonstracao")]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-    public async Task<IActionResult> Demonstracao(int? pedidoId, string? artigo, CancellationToken ct)
+    public async Task<IActionResult> Demonstracao(int? pedidoId, string? artigo, CancellationToken ct, bool completo = false)
     {
         if (!pedidoId.HasValue)
         {
-            if (string.IsNullOrWhiteSpace(artigo)) return View(new CartaoDemoViewModel());
+            var view = completo ? "Demonstracao" : "DemonstracaoRapida";
+            if (string.IsNullOrWhiteSpace(artigo)) return View(view, new CartaoDemoViewModel());
             var sample = DemoCatalogItem.All.FirstOrDefault(item => item.Slug == artigo);
             if (sample is null) return NotFound();
-            return View(new CartaoDemoViewModel
+            return View(view, new CartaoDemoViewModel
             {
+                Slug = sample.Slug,
                 Artigo = sample.Name,
                 PrecoDiaCentimos = (int)Math.Round((decimal)sample.DailyPrice * 100),
                 Cidade = sample.City,

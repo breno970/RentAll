@@ -1,0 +1,69 @@
+@model aluguel.ViewModel.CartaoDemoViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Simular um aluguer";
+    var rate = (Model.PrecoDiaCentimos / 100m).ToString("C", CultureInfo.GetCultureInfo("pt-PT"));
+}
+<link rel="stylesheet" href="~/css/payment-journey-demo.css" asp-append-version="true" />
+<div class="page-width ra-checkout-example ra-quick-demo" data-quick-demo data-rate-centimos="@Model.PrecoDiaCentimos">
+    <header class="ra-demo-head">
+        <div>
+            <h1>Simular um aluguer</h1>
+            <p>Experimenta o pagamento, a recolha e a devolução.</p>
+        </div>
+    </header>
+    <p class="ra-demo-warning">Simulação gratuita, sem cobranças nem reservas reais.</p>
+    <div class="ra-demo-box ra-quick-card">
+        <div class="ra-demo-product">
+            @if (Model.Foto is not null)
+            {
+                <img src="~/catalogo/@Model.Foto" alt="" width="76" height="76" />
+            }
+            <div><strong>@Model.Artigo</strong><br /><small>@Model.Cidade · @rate por dia</small></div>
+        </div>
+        <ol class="ra-demo-steps" aria-label="Etapas da simulação">
+            <li data-quick-step aria-current="step">1. Pagamento</li>
+            <li data-quick-step>2. Recolha</li>
+            <li data-quick-step>3. Devolução</li>
+        </ol>
+        <form data-quick-panel>
+            <h2 tabindex="-1">Quanto tempo queres alugar?</h2>
+            <label class="ra-quick-duration">Duração em dias
+                <input class="form-control" type="number" min="1" max="30" step="1" value="1" required data-quick-days />
+            </label>
+            <dl class="ra-demo-order" aria-live="polite">
+                <div class="ra-demo-total"><dt>Total simulado</dt><dd data-quick-total>@rate</dd></div>
+            </dl>
+            <button type="submit" class="btn btn-primary">Simular pagamento</button>
+        </form>
+        <section data-quick-panel hidden>
+            <h2 tabindex="-1">Recolher o artigo</h2>
+            <p>Pagamento simulado aprovado. Neste exemplo, encontras-te com o anunciante num local público em @Model.Cidade. Confere o estado do artigo antes de o receberes.</p>
+            <button type="button" class="btn btn-primary" data-quick-next>Simular recolha</button>
+        </section>
+        <section data-quick-panel hidden>
+            <h2 tabindex="-1">Devolver o artigo</h2>
+            <p>Recolha simulada concluída. No fim do aluguer, devolves o artigo no local combinado e o anunciante confirma o seu estado.</p>
+            <button type="button" class="btn btn-primary" data-quick-next>Simular devolução</button>
+        </section>
+        <section data-quick-panel hidden>
+            <h2 tabindex="-1">Simulação concluída</h2>
+            <p>O artigo foi devolvido no cenário de demonstração.</p>
+            <dl class="ra-demo-order">
+                <div><dt>Duração</dt><dd data-quick-duration></dd></div>
+                <div><dt>Total simulado</dt><dd data-quick-total>@rate</dd></div>
+                <div class="ra-demo-total"><dt>Valor cobrado</dt><dd>0,00 €</dd></div>
+            </dl>
+            <button type="button" class="btn btn-primary" data-quick-restart>Recomeçar</button>
+        </section>
+        <noscript><p>Ativa o JavaScript para experimentar a simulação.</p></noscript>
+    </div>
+    <div class="ra-demo-controls ra-quick-links">
+        <a class="btn btn-outline" asp-controller="Home" asp-action="Exemplos">Escolher outro artigo</a>
+        <a class="ra-quick-full-link" asp-controller="Pagamentos" asp-action="Demonstracao"
+           asp-route-artigo="@Model.Slug" asp-route-completo="true">Ver percurso completo</a>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/payment-demo-quick.js" asp-append-version="true" defer></script>
+}
