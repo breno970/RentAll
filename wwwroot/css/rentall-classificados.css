@@ -15,14 +15,20 @@ body.rentall-app .btn-primary:hover, body.rentall-app .search-submit:hover { bac
 body.rentall-app .market-search-title { font-size: clamp(1.7rem, 3vw, 2.5rem); margin: 0; }
 .market-banner {
   display: grid; grid-template-columns: 1.12fr 1fr; align-items: stretch;
-  overflow: hidden; border-radius: 12px; background: var(--gold-soft);
+  overflow: hidden; border-radius: 16px; background: var(--brand-dark); color: #fff;
 }
 .market-banner-copy { padding: clamp(24px, 4.2vw, 60px); align-self: center; }
 body.rentall-app .market-banner h1 {
-  font-size: clamp(2rem, 4.2vw, 3.5rem); letter-spacing: -.055em; line-height: 1.02; margin: 0;
+  font-size: clamp(2rem, 4.2vw, 3.5rem); letter-spacing: -.055em; line-height: 1.06;
+  margin: 0; max-width: 15ch; color: #fff;
 }
-.market-banner p { font-size: clamp(.9rem, 1.4vw, 1.09rem); max-width: 34ch; margin: 16px 0 0; }
+.market-banner p { font-size: clamp(.95rem, 1.4vw, 1.09rem); max-width: 38ch; margin: 16px 0 0; color: #e0efe8; }
 .market-banner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+body.rentall-app .market-banner-actions .btn-primary { background: var(--gold); border-color: var(--gold); color: var(--brand-dark); }
+body.rentall-app .market-banner-actions .btn-primary:hover { background: var(--gold-soft); border-color: var(--gold-soft); }
+body.rentall-app .market-banner-actions .btn-outline { color: #fff; background: transparent; border-color: #a3c2b4; }
+body.rentall-app .market-banner-actions .btn-outline:hover { background: #285344; }
+body.rentall-app .market-banner-actions .btn:focus-visible { outline-color: var(--gold); }
 #pesquisa { scroll-margin-top: 90px; }
 body.rentall-app .market-banner-photo { display: block; width: 100%; height: clamp(260px, 26vw, 340px); object-fit: cover; }
 .search-card { margin: 18px 0 0; padding: 17px; border-radius: 10px; }
@@ -102,8 +108,13 @@ body.rentall-app .market-publish-intro p { color: var(--ink-soft); }
 .market-publish-intro img { width: clamp(68px, 16vw, 144px); height: auto; border-radius: 9px; }
 .market-publish-intro .ra-progress-track { grid-column: 1 / -1; }
 
-.market-demo-preview { margin-top: 20px; }
-.market-demo-preview .section-heading p { color: var(--muted); margin: 5px 0 0; }
+.market-listings-empty, .market-publish-callout {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding: clamp(18px, 4vw, 32px); border-radius: 12px;
+}
+.market-listings-empty { border: 1px dashed var(--border-strong); background: var(--surface); }
+.market-publish-callout { margin-top: 36px; background: var(--mint); }
+body.rentall-app :is(.market-listings-empty, .market-publish-callout) p { margin: 0; color: var(--ink-soft); }
 .market-demo-catalog .market-category-intro { border-inline-start: 4px solid var(--brand-mint); }
 .market-demo-catalog .market-category-intro .btn { flex-shrink: 0; }
 @media (max-width: 650px) {

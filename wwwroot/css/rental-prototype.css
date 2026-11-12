@@ -30,6 +30,8 @@
 .ra-proto-principles p{color:var(--proto-soft);font-size:.83rem;line-height:1.7;min-height:112px}
 .ra-proto-principles small{display:block;color:#708172;border-top:1px solid #e8ede8;padding-top:10px;font-size:.74rem}
 .ra-proto-workflow{margin:59px 0 49px;scroll-margin-top:97px}
+.ra-proto-workflow>summary{width:fit-content;font-weight:750;color:var(--proto-green);cursor:pointer}
+.ra-proto-workflow[open]>summary{margin-bottom:20px}
 .ra-proto-section-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:22px}
 .ra-proto-reset{border:1px solid #bfcdc0;border-radius:8px;background:#fff;padding:11px 16px;color:#244d34;font-weight:750;min-height:43px;cursor:pointer}
 .ra-proto-workflow-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:18px;align-items:start}

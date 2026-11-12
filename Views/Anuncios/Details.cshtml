@@ -7,6 +7,9 @@
     var place = string.Join(", ", new[] { Model.Cidade, Model.Estado, aluguel.Services.LocationCatalog.CountryName(Model.Pais) });
     var mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + Uri.EscapeDataString(place);
     var isSaved = ViewData["IsFavorite"] is bool value && value;
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    var isOwner = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == Model.iduser;
+    var canRequest = sample is null && Model.vlitem > 0 && Model.item?.snativo != "N" && !isOwner;
 }
 <link rel="stylesheet" href="~/css/photo-carousel.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/rental-confidence.css" asp-append-version="true" />
@@ -52,8 +55,7 @@
             </div>
         </div>
         <aside class="panel">
-            <h2 class="detail-name" style="margin:18px 0 6px">@(Model.item?.nmitem ?? Model.modelo)</h2>
-            @if (!string.IsNullOrWhiteSpace(Model.modelo)) { <p class="muted">@Model.modelo</p> }
+            <h2 class="detail-name" style="margin:0 0 6px">Condições do aluguer</h2>
             <div class="detail-price">@aluguel.Services.RentalLocalization.FormatPrice(Model.vlitem, Model.Pais) @if (Model.vlitem > 0) { <small>/ dia</small> }</div>
             <div class="detail-facts">
                 <div><small>Período</small><strong>@(Model.diasAluguel > 0 ? $"Até {Model.diasAluguel} dia(s)" : "A combinar")</strong></div>
@@ -61,13 +63,11 @@
                 <div><small>Tipo</small><strong>@(Model.tipo?.nmtipo ?? "Outros")</strong></div>
                 <div><small>Localização</small><strong>@Model.Cidade, @Model.Estado</strong></div>
             </div>
-            @if (User.Identity?.IsAuthenticated == true &&
-                 User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser &&
-                 Model.vlitem > 0 && Model.item?.snativo != "N")
+            @if (canRequest && signedIn)
             {
                 <div class="ra-request-widget" id="rental-request" style="scroll-margin-top:100px">
                     <h3><i class="far fa-calendar-check" aria-hidden="true"></i> Pedir aluguer</h3>
-                    <p>Envia um pedido ao anunciante para confirmar a disponibilidade. Não é uma reserva paga.</p>
+                    <p>Envia um pedido para confirmar a disponibilidade com o anunciante. O envio é gratuito.</p>
                     <form asp-controller="Pedidos" asp-action="Criar" method="post">
                         <input type="hidden" name="anuncioId" value="@Model.id"/>
                         <label for="rental-days">Número de dias
@@ -76,11 +76,18 @@
                         <button class="btn btn-primary" type="submit">Enviar pedido</button>
                     </form>
                     <div class="ra-money-calc" data-rental-calculator data-daily-price="@Model.vlitem.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-country="@Model.Pais" aria-live="polite">Valor estimado a partir do preço indicado no anúncio.</div>
-                    <p>Nenhum pagamento é realizado agora. A comissão ilustrativa de 10% é apenas uma proposta para uma futura modalidade de pagamento na RentAll.</p>
                 </div>
             }
-            else if (User.Identity?.IsAuthenticated == true &&
-                     User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == Model.iduser)
+            else if (canRequest)
+            {
+                <div class="ra-request-widget">
+                    <h3>Pedir aluguer</h3>
+                    <p>Entra para enviar um pedido e confirmar a disponibilidade.</p>
+                    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login"
+                       asp-route-returnUrl="@Context.Request.Path">Entrar para pedir aluguer</a>
+                </div>
+            }
+            else if (isOwner)
             {
                 <div class="ra-rental-motivation">
                     <strong><i class="far fa-calendar-check"></i> Organiza os teus alugueres</strong>
@@ -91,14 +98,14 @@
             @if (sample is not null)
             {
                 <div class="ra-rental-motivation">
-                    <strong>Artigo de demonstração</strong>
-                    <p>Experimenta o pagamento e a receção deste artigo na simulação individual.</p>
+                    <strong>Artigo de exemplo</strong>
+                    <p>Podes explorar o percurso deste artigo sem efetuar uma reserva.</p>
                     <a class="btn btn-primary" asp-controller="Pagamentos" asp-action="Demonstracao"
                        asp-route-artigo="@sample.Slug">Simular aluguer</a>
                 </div>
             }
-            <div class="ra-rental-safety">
-                <h3><i class="fas fa-shield-alt" aria-hidden="true"></i> Aluguer com mais confiança</h3>
+            <details class="ra-rental-safety">
+                <summary>Cuidados antes de alugar</summary>
                 <ul>
                     <li>Combina uma entrega em local público e verifica a identidade do artigo presencialmente.</li>
                     <li>Guarda fotografias do estado do objeto antes e depois do aluguer.</li>
@@ -106,7 +113,7 @@
                     <li>Conserva o histórico do pedido e da conversa na RentAll.</li>
                 </ul>
                 <p class="muted" style="font-size:.8rem;margin-top:12px">A RentAll ainda não oferece pagamento protegido, seguro ou garantias financeiras.</p>
-            </div>
+            </details>
             <div class="contact-box">
                 <h2 style="font-size:1rem">Falar com o anunciante</h2>
                 <p class="muted" style="font-size:.88rem">Publicado por <strong>@(string.IsNullOrWhiteSpace(Model.NomeFantasia) ? "Anunciante RentAll" : Model.NomeFantasia)</strong></p>
@@ -171,7 +178,7 @@
 </div>
 
 
-@if (Model.item?.snativo != "N" &&
+@if (sample is null && Model.item?.snativo != "N" &&
      User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.iduser)
 {
     <nav class="ra-detail-mobile-bar" aria-label="Ações do anúncio">

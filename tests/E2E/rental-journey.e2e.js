@@ -83,7 +83,7 @@ async function publicDemo(browser) {
     await page.locator('[data-demo-return-check]').check();
     await page.locator('[data-demo-return="renter"]').click();
     await page.locator('[data-demo-return="owner"]').click();
-    assert(await page.getByRole('heading', { name: 'Aluguer demonstrativo concluído' }).isVisible());
+    assert(await page.getByRole('heading', { name: 'Percurso de aluguer concluído' }).isVisible());
     const receipt = page.locator('#comprovativo-demo');
     assert.match(await receipt.innerText(), /88,00/);
     assert.match(await receipt.innerText(), /Estação de Coimbra/);
@@ -319,7 +319,7 @@ async function operacao(page, op, fill) {
     await b.reload();
     assert((await b.content()).match(/Conclu[ií]do/), 'Estado concluído não persistiu após recarregar');
     await b.goto(`${BASE}/Mensagens/Conversa?anuncioId=${anuncioId}`);
-    assert(await b.getByText('Aluguer demonstrativo concluído', { exact: true }).isVisible(),
+    assert(await b.getByText('Percurso de aluguer concluído', { exact: true }).isVisible(),
       'Conversa não mostra o aluguer concluído');
     await b.getByRole('link', { name: 'Ver resumo do aluguer', exact: true }).click();
     await shot(b, '05-concluido-mobile');

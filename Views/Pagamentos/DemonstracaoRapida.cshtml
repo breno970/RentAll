@@ -1,18 +1,17 @@
 @model aluguel.ViewModel.CartaoDemoViewModel
 @using System.Globalization
 @{
-    ViewData["Title"] = "Simular um aluguer";
+    ViewData["Title"] = "Percurso de aluguer";
     var rate = (Model.PrecoDiaCentimos / 100m).ToString("C", CultureInfo.GetCultureInfo("pt-PT"));
 }
 <link rel="stylesheet" href="~/css/payment-journey-demo.css" asp-append-version="true" />
 <div class="page-width ra-checkout-example ra-quick-demo" data-quick-demo data-rate-centimos="@Model.PrecoDiaCentimos">
     <header class="ra-demo-head">
         <div>
-            <h1>Simular um aluguer</h1>
-            <p>Experimenta o pagamento, a recolha e a devolução.</p>
+            <h1>Percurso de aluguer</h1>
         </div>
     </header>
-    <p class="ra-demo-warning">Simulação gratuita, sem cobranças nem reservas reais.</p>
+    <p class="ra-demo-warning">Percurso de exemplo. Sem cobranças nem reservas.</p>
     <div class="ra-demo-box ra-quick-card">
         <div class="ra-demo-product">
             @if (Model.Foto is not null)
@@ -48,7 +47,7 @@
         </section>
         <section data-quick-panel hidden>
             <h2 tabindex="-1">Simulação concluída</h2>
-            <p>O artigo foi devolvido no cenário de demonstração.</p>
+            <p>Terminaste o percurso de aluguer.</p>
             <dl class="ra-demo-order">
                 <div><dt>Duração</dt><dd data-quick-duration></dd></div>
                 <div><dt>Total simulado</dt><dd data-quick-total>@rate</dd></div>

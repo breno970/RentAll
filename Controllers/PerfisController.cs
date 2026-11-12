@@ -22,7 +22,8 @@ public sealed class PerfisController : Controller
 
         var listings = await _db.Anuncios.AsNoTracking()
             .Include(a => a.item).Include(a => a.categoria).Include(a => a.tipo)
-            .Where(a => a.iduser == id && a.Pais == "PT" && a.item != null && a.item.snativo != "N")
+            .Where(a => a.iduser == id && a.Pais == "PT" && a.item != null && a.item.snativo != "N" &&
+                        !a.item.nmitem.StartsWith("[DEMO] "))
             .OrderByDescending(a => a.id)
             .Take(60).ToListAsync(ct);
 

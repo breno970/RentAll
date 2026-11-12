@@ -1,7 +1,7 @@
 @model aluguel.ViewModel.PercursoDemoViewModel
 @using aluguel.Services
 @{
-    ViewData["Title"] = "Percurso do aluguer de demonstração";
+    ViewData["Title"] = "Acompanhamento do aluguer";
     var pedido = Model.Pedido;
     var demo = Model.Percurso;
     var owner = Model.SouAnunciante;
@@ -19,12 +19,12 @@
     var proposedDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(1), tz).ToString("yyyy-MM-ddTHH:mm");
     var daysLabel = pedido.Dias == 1 ? "1 dia" : $"{pedido.Dias} dias";
     var labels = new Dictionary<string, string> {
-        ["Checkout"] = "A aguardar checkout", ["PagamentoRecusado"] = "Pagamento de demonstração recusado",
-        ["PagamentoSimulado"] = "Pagamento de demonstração aprovado",
+        ["Checkout"] = "A aguardar checkout", ["PagamentoRecusado"] = "Pagamento simulado recusado",
+        ["PagamentoSimulado"] = "Pagamento simulado aprovado",
         ["EntregaProposta"] = "Entrega proposta", ["EntregaAcordada"] = "Entrega acordada",
-        ["EmCurso"] = "Aluguer em curso (demonstração)",
-        ["DevolucaoPendente"] = "Devolução por confirmar", ["Concluido"] = "Aluguer demonstrativo concluído",
-        ["Cancelado"] = "Cancelado e reembolsado (demonstração)", ["NaoIniciado"] = "Pronto para iniciar"
+        ["EmCurso"] = "Aluguer em curso (simulado)",
+        ["DevolucaoPendente"] = "Devolução por confirmar", ["Concluido"] = "Percurso concluído",
+        ["Cancelado"] = "Cancelado e reembolsado (simulado)", ["NaoIniciado"] = "Pronto para iniciar"
     };
     var steps = new[] {
         ("Checkout", new[] { "Checkout", "PagamentoRecusado" }),
@@ -70,7 +70,7 @@
         </div>
     </header>
     <div class="ra-live-warning" role="note">
-        <strong>DEMONSTRAÇÃO — pagamento e entrega simulados.</strong>
+        <strong>Pagamento e entrega simulados.</strong>
         As confirmações são guardadas e visíveis para os dois participantes, mas não comprovam pagamentos,
         reservas, entregas físicas, reembolsos ou qualquer transferência. Não introduzas dados bancários.
     </div>
@@ -96,7 +96,7 @@
                 }
                 else if (demo == null)
                 {
-                    <h2>Começar o percurso demonstrativo</h2>
+                    <h2>Começar o percurso do aluguer</h2>
                     <p>Assim que o locatário iniciar, os dois participantes poderão acompanhar o mesmo fluxo com estados guardados na RentAll.</p>
                     @if (!owner)
                     {
@@ -118,11 +118,11 @@
                             <div><dt>Duração</dt><dd>@daysLabel</dd></div>
                             <div><dt>Total do aluguer</dt><dd>@total</dd></div>
                             <div><dt>Comissão indicativa RentAll (10%, incluída)</dt><dd>@fee</dd></div>
-                            <div class="is-total"><dt>A cobrar nesta demonstração</dt><dd>0,00 €</dd></div>
+                            <div class="is-total"><dt>A cobrar neste percurso</dt><dd>0,00 €</dd></div>
                         </dl>
                         <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" class="ra-live-form" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
-                            <label>Método de pagamento demonstrativo
+                            <label>Método de pagamento
                                 <select name="metodo" class="form-select" required>
                                     <option value="cartao">Cartão (simulado)</option>
                                     <option value="mbway">MB WAY (simulado)</option>
@@ -339,7 +339,7 @@
                 }
                 else if (stage == "Concluido")
                 {
-                    <h2>Aluguer concluído — demonstração</h2>
+                    <h2>Percurso de aluguer concluído</h2>
                     <p>Entrega, receção e devolução foram confirmadas por contas diferentes. Nenhum pagamento nem envio real foi efetuado.</p>
                     @if (!owner && !demo.Avaliacao.HasValue)
                     {
@@ -423,7 +423,7 @@
             @if (demo?.PagamentoEm != null)
             {
                 <section class="ra-live-card ra-live-receipt" aria-labelledby="receipt-title">
-                    <h2 id="receipt-title">Comprovativo demonstrativo</h2>
+                    <h2 id="receipt-title">Resumo do aluguer</h2>
                     <p class="ra-live-receipt-stamp">SEM VALOR FISCAL · NÃO É UM PAGAMENTO</p>
                     <dl class="ra-live-amounts">
                         <div><dt>Referência</dt><dd>@receiptRef</dd></div>
@@ -448,7 +448,7 @@
             </section>
             <section class="ra-live-card">
                 <h2>Apresentar sem contas?</h2>
-                <p>A demonstração independente permite representar os dois papéis num só navegador, sem guardar dados.</p>
+                <p>No exemplo interativo, podes explorar os dois papéis sem guardar dados.</p>
                 <a asp-controller="Pagamentos" asp-action="Demonstracao" class="btn btn-outline">Abrir apresentação guiada</a>
             </section>
         </aside>

@@ -19,7 +19,8 @@ public class HomeController : Controller
     {
         return _db.Anuncios.AsNoTracking()
             .Include(a => a.item).Include(a => a.categoria).Include(a => a.tipo)
-            .Where(a => a.item != null && a.item.snativo != "N");
+            .Where(a => a.item != null && a.item.snativo != "N" &&
+                        !a.item.nmitem.StartsWith("[DEMO] "));
     }
 
     private async Task<IActionResult> Results(MarketplaceFilters filters, string view, int? categoryOverride = null)
@@ -90,9 +91,7 @@ public class HomeController : Controller
 
         // Only municipalities already appearing on public, active listings.
         // No third-party geo API, exact addresses or user account details.
-        var locations = _db.Anuncios.AsNoTracking()
-            .Where(a => a.Pais == pais && a.item != null && a.item.snativo != "N" &&
-                        a.Cidade != null && a.Cidade != "");
+        var locations = AvailableAds().Where(a => a.Pais == pais && a.Cidade != null && a.Cidade != "");
         if (estado != null) locations = locations.Where(a => a.Estado == estado);
         var cities = await locations.Select(a => a.Cidade.Trim())
             .Distinct().OrderBy(c => c).Take(90).ToListAsync(ct);

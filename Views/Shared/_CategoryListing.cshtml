@@ -17,7 +17,10 @@
         <img src="@photo" alt="" width="136" height="136" />
     </div>
     <partial name="_MarketplaceFilters" model="filters" />
-    <div class="results-heading"><h2>@Model.TotalItemCount @(Model.TotalItemCount == 1 ? "anúncio" : "anúncios")</h2><span class="pill">@aluguel.Services.LocationCatalog.CountryName(filters.Pais)</span></div>
+    @if (Model.TotalItemCount > 0)
+    {
+        <div class="results-heading"><h2>@Model.TotalItemCount @(Model.TotalItemCount == 1 ? "anúncio" : "anúncios")</h2></div>
+    }
     <partial name="_MarketplaceCards" model="Model" />
     @if (Model.PageCount > 1)
     {

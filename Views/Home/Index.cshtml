@@ -15,11 +15,11 @@
         {
             <div class="market-banner">
                 <div class="market-banner-copy">
-                    <h1 id="market-title">Aluga o que precisas,<br />perto de ti.</h1>
-                    <p>Encontra ferramentas, equipamento e outros artigos para alugar em Portugal.</p>
+                    <h1 id="market-title">Aluga o que precisas, perto de ti.</h1>
+                    <p>Encontra ferramentas, equipamento e artigos de lazer para alugar. Combina as condições diretamente com quem anuncia.</p>
                     <div class="market-banner-actions">
                         <a class="btn btn-primary" href="#pesquisa">Procurar artigos</a>
-                        <a class="btn btn-outline" asp-action="Exemplos">Experimentar um aluguer</a>
+                        <a class="btn btn-outline" asp-controller="Experiencia" asp-action="ComoFunciona">Como funciona</a>
                     </div>
                 </div>
                 <img class="market-banner-photo" src="~/catalogo/aluguer.jpg" alt="" width="750" height="500" fetchpriority="high" />
@@ -53,34 +53,42 @@
     </section>
 }
 
-@if (!browsing || Model.TotalItemCount > 0)
-{
-    <section id="procurar" class="market-results page-width" aria-labelledby="results-heading">
-        <div class="results-heading">
-            <div>
-                <h2 id="results-heading">@(browsing ? "Anúncios recentes" : "Resultados da pesquisa")</h2>
+<section id="procurar" class="market-results page-width" aria-labelledby="results-heading">
+    <div class="results-heading">
+        <div>
+            <h2 id="results-heading">@(browsing ? "Anúncios recentes" : "Resultados da pesquisa")</h2>
+            @if (Model.TotalItemCount > 0)
+            {
                 <p>@Model.TotalItemCount @(Model.TotalItemCount == 1 ? "anúncio" : "anúncios")</p>
-            </div>
+            }
         </div>
+    </div>
+    @if (browsing && Model.TotalItemCount == 0)
+    {
+        <div class="market-listings-empty">
+            <p>Ainda não há anúncios publicados. Tens um artigo que outras pessoas possam usar?</p>
+            <a class="btn btn-primary" asp-controller="Publicar" asp-action="Index">Publicar anúncio</a>
+        </div>
+    }
+    else
+    {
         <partial name="_MarketplaceCards" model="Model" />
-        @if (Model.PageCount > 1)
-        {
-            <div class="pagination-wrap">
-                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter, filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort }))
-            </div>
-        }
-    </section>
-}
-@if (browsing)
-{
-    <section class="page-width market-results market-demo-preview" aria-labelledby="demo-catalog-title">
-        <div class="section-heading">
-            <div>
-                <h2 id="demo-catalog-title">Experimenta um aluguer</h2>
-                <p>Escolhe um artigo de exemplo e simula um aluguer em três passos.</p>
-            </div>
-            <a class="btn btn-outline" asp-action="Exemplos">Ver os @DemoCatalogItem.All.Count artigos</a>
+    }
+    @if (Model.PageCount > 1)
+    {
+        <div class="pagination-wrap">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, filters.Pais, filters.SearchString, filters.Estado, filters.RegionFilter, filters.Bairro, filters.CategoriaId, filters.MinPrice, filters.MaxPrice, filters.Sort }))
         </div>
-        <partial name="_DemoCatalogCards" model="DemoCatalogItem.All.Take(8)" />
+    }
+</section>
+
+@if (browsing && Model.TotalItemCount > 0)
+{
+    <section class="page-width market-publish-callout" aria-labelledby="market-publish-title">
+        <div>
+            <h2 id="market-publish-title">Põe os teus artigos a render</h2>
+            <p>Publica gratuitamente e recebe pedidos de aluguer na RentAll.</p>
+        </div>
+        <a class="btn btn-primary" asp-controller="Publicar" asp-action="Index">Publicar anúncio</a>
     </section>
 }

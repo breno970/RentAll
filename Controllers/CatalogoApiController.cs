@@ -52,7 +52,7 @@ public sealed class CatalogoApiController : ControllerBase
         if (!LocationCatalog.IsValidCountry(pais))
             return BadRequest(new { erro = "País inválido." });
         var published = _db.Anuncios.AsNoTracking().Where(a => a.Pais == pais &&
-            a.item != null && a.item.snativo != "N");
+            a.item != null && a.item.snativo != "N" && !a.item.nmitem.StartsWith("[DEMO] "));
         // Aggregate statistics only; no names, exact addresses, or hidden listings.
         var listings = await published.CountAsync(ct);
         var cities = await published.Select(a => a.Cidade).Distinct().CountAsync(ct);

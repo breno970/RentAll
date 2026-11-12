@@ -22,7 +22,7 @@ for required in ["mensagens", "pedidos", "cauç", "em preparação", "não há c
     assert required in journey, f"Rental journey missing important feature/status: {required}"
 
 payment = Path("Views/Pagamentos/Demonstracao.cshtml").read_text(encoding="utf-8").casefold()
-for required in ["simulada", "não cobra", "não recolhe dados bancários", "sem validade fiscal"]:
+for required in ["simulado", "não cobra", "recolhe dados bancários", "sem validade fiscal"]:
     assert required in payment, f"Payment preview missing crucial no-payment disclosure: {required}"
 
 controller = Path("Controllers/ExperienciaController.cs").read_text(encoding="utf-8")

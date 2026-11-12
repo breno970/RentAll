@@ -1,12 +1,11 @@
 @model aluguel.ViewModel.CartaoDemoViewModel
 @{
-    ViewData["Title"] = "Demonstração completa de aluguer";
+    ViewData["Title"] = "Percurso completo de aluguer";
 }
 <link rel="stylesheet" href="~/css/payment-journey-demo.css" asp-append-version="true" />
 <div class="page-width ra-checkout-example ra-complete-demo" data-payment-example data-rate-centimos="@Model.PrecoDiaCentimos">
     <div class="ra-demo-head">
         <div>
-            <p class="eyebrow">RentAll · Demonstração interativa</p>
             <h1>Alugar @Model.Artigo</h1>
             <p>Experimenta os dois papéis na mesma sessão, do pagamento simulado à confirmação da receção.</p>
         </div>
@@ -16,10 +15,10 @@
         </div>
     </div>
     <div class="ra-demo-warning" role="note">
-        <strong>Ambiente de demonstração — esta experiência é simulada, não cobra dinheiro e não recolhe dados bancários.</strong>
+        <strong>Este percurso é simulado. A RentAll não cobra dinheiro nem recolhe dados bancários.</strong>
         As datas, a entrega e o comprovativo são exemplos sem validade fiscal.
     </div>
-    <ol class="ra-demo-steps" aria-label="Etapas da demonstração">
+    <ol class="ra-demo-steps" aria-label="Etapas do percurso">
         <li data-demo-step="0" aria-current="step">1. Acordo</li>
         <li data-demo-step="1">2. Checkout</li>
         <li data-demo-step="2">3. Pagamento</li>
@@ -57,7 +56,7 @@
                 <h2 id="ra-demo-payment" tabindex="-1">Escolher o método de pagamento</h2>
                 <p>Confirma o total e escolhe como queres simular o pagamento.</p>
                 <dl class="ra-demo-order"><div class="ra-demo-total"><dt>Total simulado</dt><dd data-demo-total>—</dd></div></dl>
-                <div class="ra-demo-methods" role="group" aria-label="Selecionar método demonstrativo">
+                <div class="ra-demo-methods" role="group" aria-label="Escolher método de pagamento">
                     <button type="button" data-demo-method="card" aria-pressed="true" class="is-selected">Cartão de débito ou crédito</button>
                     <button type="button" data-demo-method="mbway" aria-pressed="false">MB WAY (apenas ilustrativo)</button>
                 </div>
@@ -66,7 +65,7 @@
                     <strong>•••• &nbsp; •••• &nbsp; •••• &nbsp; 4242</strong>
                     <span>Validade ••/•• &nbsp; Segurança •••</span>
                 </div>
-                <p class="ra-demo-method-info" data-demo-method-info>Não introduzas dados de cartão: a RentAll não os recolhe nesta demonstração.</p>
+                <p class="ra-demo-method-info" data-demo-method-info>O cartão de exemplo já está preenchido.</p>
                 <div class="ra-demo-controls">
                     <button class="btn btn-primary" type="button" data-demo-authorize>Simular pagamento aprovado</button>
                     <button class="btn btn-outline" type="button" data-demo-decline>Simular pagamento recusado</button>
@@ -85,7 +84,7 @@
                     <strong>Registo ilustrativo — sem valor contabilístico</strong>
                     <dl class="ra-demo-order">
                         <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
-                        <div><dt>Total demonstrativo</dt><dd><span data-demo-total>—</span></dd></div>
+                        <div><dt>Total simulado</dt><dd><span data-demo-total>—</span></dd></div>
                         <div><dt>Comissão de exemplo RentAll</dt><dd><span data-demo-fee>—</span></dd></div>
                         <div><dt>Cobrado na realidade</dt><dd>0,00 €</dd></div>
                     </dl>
@@ -145,7 +144,7 @@
             <section class="ra-demo-box" data-demo-screen="5" aria-labelledby="ra-demo-active" hidden>
                 <span class="ra-demo-tag">ETAPA 6 DE 8 · ALUGUER EM CURSO</span>
                 <h2 id="ra-demo-active" tabindex="-1">Artigo recebido na simulação</h2>
-                <div class="ra-demo-result"><strong>Entrega confirmada pelos dois participantes</strong><p>Nesta demonstração, o artigo está agora na posse do locatário. O histórico abaixo apresenta notificações ilustrativas.</p></div>
+                <div class="ra-demo-result"><strong>Entrega confirmada pelos dois participantes</strong><p>O locatário pode usar o artigo até à data de devolução combinada.</p></div>
                 <div class="ra-demo-controls">
                     <button class="btn btn-primary" type="button" data-demo-start-return>Iniciar devolução</button>
                     <button class="btn btn-outline" type="button" data-demo-report-incident>Simular problema com o artigo</button>
@@ -159,7 +158,7 @@
                 <h2 id="ra-demo-return" tabindex="-1">Confirmar a devolução</h2>
                 <p>Devolução prevista para <strong data-demo-return-at>—</strong>, em <strong data-demo-place>—</strong>.</p>
                 <label class="ra-demo-agreement"><input type="checkbox" data-demo-return-check />
-                    <span>A devolução e o estado do artigo foram verificados apenas para esta demonstração.</span>
+                    <span>Conferi a devolução e o estado do artigo.</span>
                 </label>
                 <div class="ra-demo-party-grid">
                     <div><strong>Locatário</strong><p data-demo-return-renter>Por confirmar</p><button type="button" class="btn btn-outline" data-demo-return="renter">Confirmar devolução</button></div>
@@ -174,10 +173,10 @@
 
             <section class="ra-demo-box" data-demo-screen="7" aria-labelledby="ra-demo-complete" hidden>
                 <span class="ra-demo-tag">ETAPA 8 DE 8 · CONCLUSÃO</span>
-                <h2 id="ra-demo-complete" tabindex="-1">Aluguer demonstrativo concluído</h2>
+                <h2 id="ra-demo-complete" tabindex="-1">Percurso de aluguer concluído</h2>
                 <div class="ra-demo-result"><strong>Entrega e devolução confirmadas</strong><p>Todos os passos foram emulados. Nenhum artigo foi reservado e nenhum pagamento foi efetuado.</p></div>
                 <div class="ra-demo-receipt" id="comprovativo-demo">
-                    <strong>Comprovativo DEMO — não é fatura nem recibo fiscal</strong>
+                    <strong>Resumo do percurso · sem validade fiscal</strong>
                     <dl class="ra-demo-order">
                         <div><dt>Artigo</dt><dd>@Model.Artigo</dd></div>
                         <div><dt>Referência</dt><dd data-demo-reference>—</dd></div>
@@ -196,7 +195,7 @@
                 <button class="btn btn-outline" type="button" data-demo-rate>Registar avaliação fictícia</button>
                 <p data-demo-rating-result role="status"></p>
                 <div class="ra-demo-controls">
-                    <button class="btn btn-primary" type="button" data-demo-restart>Repetir a demonstração</button>
+                    <button class="btn btn-primary" type="button" data-demo-restart>Recomeçar</button>
                     <button class="btn btn-outline" type="button" data-demo-print>Imprimir comprovativo</button>
                 </div>
             </section>
@@ -208,15 +207,15 @@
                     <p>O ciclo de cancelamento foi mostrado para efeitos de apresentação. Não houve captura de dinheiro, estorno, comunicação bancária nem alteração do pedido real.</p>
                 </div>
                 <dl class="ra-demo-order">
-                    <div><dt>Valor demonstrativo</dt><dd><span data-demo-total>—</span></dd></div>
+                    <div><dt>Valor do aluguer</dt><dd><span data-demo-total>—</span></dd></div>
                     <div><dt>Reembolso emulado</dt><dd><span data-demo-total>—</span></dd></div>
                     <div><dt>Montante realmente movimentado</dt><dd>0,00 €</dd></div>
                 </dl>
-                <button class="btn btn-primary" type="button" data-demo-restart>Recomeçar demonstração</button>
+                <button class="btn btn-primary" type="button" data-demo-restart>Recomeçar</button>
             </section>
         </div>
         <aside class="ra-demo-sidebar-stack">
-            <div class="ra-demo-box ra-demo-sidebar" aria-label="Resumo financeiro demonstrativo">
+            <div class="ra-demo-box ra-demo-sidebar" aria-label="Resumo financeiro">
 
                 <h2>Resumo do aluguer</h2>
                 <div class="ra-demo-product">

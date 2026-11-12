@@ -11,33 +11,33 @@
         <div><p class="eyebrow">A minha área</p><h1>Meus anúncios</h1><p>Acompanha o que colocaste disponível para alugar.</p></div>
         <a class="btn btn-primary" asp-action="Create"><i class="fas fa-plus"></i> Criar anúncio</a>
     </div>
-    <section class="demo-listings-panel" aria-labelledby="demo-listings-title">
+    <details class="demo-listings-panel">
+        <summary>Gerir anúncios de exemplo</summary>
         <div>
-            <h2 id="demo-listings-title">Anúncios de demonstração</h2>
-            <p>Gera artigos fictícios distribuídos pelas seis categorias. Ficam associados a esta conta e identificados como <strong>[DEMO]</strong>; podes apagá-los individualmente no painel abaixo.</p>
+            <p>Cria anúncios de exemplo na tua conta para veres como ficam. Estes anúncios ficam fora da pesquisa pública.</p>
             @if (demoCount > 0) { <span class="demo-listings-count">@demoCount anúncio(s) fictício(s) nesta conta</span> }
         </div>
         @if (missing > 0)
         {
             <form asp-controller="Anuncios" asp-action="CreateDemoListings" method="post">
-                <button class="btn btn-primary" type="submit">Adicionar artigos de demonstração (@missing)</button>
+                <button class="btn btn-primary" type="submit">Adicionar artigos de exemplo (@missing)</button>
             </form>
         }
         @if (demoCount > 0)
         {
             <form asp-controller="Anuncios" asp-action="DeleteDemoListings" method="post" onsubmit="return confirm('Apagar todos os anúncios fictícios desta conta?');">
-                <button class="btn btn-outline-danger" type="submit"><i class="far fa-trash-alt" aria-hidden="true"></i> Apagar os @demoCount anúncios demo</button>
+                <button class="btn btn-outline-danger" type="submit"><i class="far fa-trash-alt" aria-hidden="true"></i> Apagar os @demoCount anúncios de exemplo</button>
             </form>
         }
-    </section>
+    </details>
     @if (!Model.Any())
     {
         <div class="empty-state">
             <div class="empty-symbol"><i class="far fa-list-alt"></i></div>
             <h2>Ainda não publicaste anúncios</h2>
-            <p>Começa por cadastrar um item com fotografias; depois escolhe o preço, a disponibilidade e a região.</p>
-            <a class="btn btn-primary" asp-controller="Items" asp-action="Create">Cadastrar um item</a>
-            <a class="btn btn-outline" asp-action="Create">Já tenho um item</a>
+            <p>Começa por registar um artigo com fotografias; depois escolhe o preço, a disponibilidade e a região.</p>
+            <a class="btn btn-primary" asp-controller="Items" asp-action="Create">Registar um artigo</a>
+            <a class="btn btn-outline" asp-action="Create">Já tenho um artigo</a>
         </div>
     }
     else
@@ -61,7 +61,7 @@
                         <div class="manage-actions">
                             <a asp-action="Details" asp-route-id="@ad.id"><i class="far fa-eye"></i> Ver</a>
                             @if (ad.Pais == "PT") { <a asp-action="Edit" asp-route-id="@ad.id"><i class="fas fa-pen"></i> Editar</a> }
-                            <a class="danger-link" asp-action="Delete" asp-route-id="@ad.id"><i class="far fa-trash-alt"></i> Excluir</a>
+                            <a class="danger-link" asp-action="Delete" asp-route-id="@ad.id"><i class="far fa-trash-alt"></i> Apagar</a>
                         </div>
                     </div>
                 </article>
@@ -71,7 +71,7 @@
 </div>
 
 <style>
-.demo-listings-panel{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:24px 0 30px;padding:22px 24px;border:1px solid #d8e5dc;border-radius:18px;background:linear-gradient(125deg,#f2f8f3,#f7f9f7)}
-.demo-listings-panel h2{font-size:1.15rem;margin:6px 0}.demo-listings-panel p{max-width:700px;margin:0;color:#52645a;font-size:.92rem;line-height:1.55}.demo-listings-kicker{font-size:.68rem;font-weight:800;letter-spacing:.13em;color:#35784c}.demo-listings-count{display:inline-block;margin-top:9px;font-size:.82rem;font-weight:700;color:#285e3d}.demo-listings-panel form{flex:none}.demo-listings-panel button{white-space:nowrap}.demo-ad-badge{display:inline-block;margin:6px 0;padding:5px 9px;border-radius:999px;background:#fff2da;color:#805014;font-size:.68rem;font-weight:800;letter-spacing:.04em}
+.demo-listings-panel{margin:24px 0 30px;padding:22px 24px;border:1px solid #d8e5dc;border-radius:18px;background:linear-gradient(125deg,#f2f8f3,#f7f9f7)}
+.demo-listings-panel summary{font-weight:750;cursor:pointer}.demo-listings-panel[open] summary{margin-bottom:12px}.demo-listings-panel form{margin-top:12px}.demo-listings-panel p{max-width:700px;margin:0;color:#52645a;font-size:.92rem;line-height:1.55}.demo-listings-kicker{font-size:.68rem;font-weight:800;letter-spacing:.13em;color:#35784c}.demo-listings-count{display:inline-block;margin-top:9px;font-size:.82rem;font-weight:700;color:#285e3d}.demo-listings-panel form{flex:none}.demo-listings-panel button{white-space:nowrap}.demo-ad-badge{display:inline-block;margin:6px 0;padding:5px 9px;border-radius:999px;background:#fff2da;color:#805014;font-size:.68rem;font-weight:800;letter-spacing:.04em}
 @@media(max-width:680px){.demo-listings-panel{align-items:stretch;flex-direction:column;padding:18px}.demo-listings-panel form,.demo-listings-panel button{width:100%}}
 </style>
