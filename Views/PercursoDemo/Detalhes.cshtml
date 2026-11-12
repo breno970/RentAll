@@ -238,7 +238,7 @@
                         <form asp-controller="PercursoDemo" asp-action="Atualizar" method="post" data-submit-lock>
                             <input type="hidden" name="pedidoId" value="@pedido.Id" />
                             <input type="hidden" name="operacao" value="@(owner ? "entregar" : "receber")" />
-                            <p class="ra-live-hint">Ao confirmar, declaras uma entrega de demonstração, sem validação física do objeto pela RentAll.</p>
+                            <p class="ra-live-hint">Esta confirmação regista uma entrega simulada.</p>
                             <button class="btn btn-primary" type="submit">@(owner ? "Confirmar entrega" : "Confirmar receção")</button>
                         </form>
                     }

@@ -109,7 +109,7 @@ public sealed class PercursoDemoController : Controller
                 return RedirectToAction(nameof(Detalhes), new { pedidoId });
             }
         }
-        TempData["Success"] = "Percurso de demonstração iniciado. O pedido financeiro real não foi alterado.";
+        TempData["Success"] = "Percurso iniciado. Nenhum pagamento foi efetuado.";
         return RedirectToAction(nameof(Detalhes), new { pedidoId });
     }
 
@@ -127,7 +127,7 @@ public sealed class PercursoDemoController : Controller
         if (pedido == null) return NotFound();
         if (pedido.Estado != "Aceite sem pagamento")
         {
-            TempData["Error"] = "Este pedido deixou de estar elegível para demonstração.";
+            TempData["Error"] = "Este pedido deixou de estar elegível para o percurso de aluguer.";
             return RedirectToAction(nameof(Detalhes), new { pedidoId });
         }
         var percurso = await _db.PercursosAluguerDemo

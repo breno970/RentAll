@@ -28,10 +28,10 @@
     return { step: 0, quote: null, method: "card", approved: null, delivery: null,
       deliveryAgreed: false, handover: { owner: false, renter: false },
       returned: { owner: false, renter: false }, incident: false, rating: null,
-      history: ["Demonstração iniciada (sem pagamento ou reserva real)."] };
+      history: ["Percurso iniciado. Sem cobrança nem reserva."] };
   }
   function apply(previous, type, payload = {}) {
-    if (!previous || typeof previous !== "object") throw new Error("Estado de demonstração inválido.");
+    if (!previous || typeof previous !== "object") throw new Error("Não foi possível carregar o percurso.");
     if (type === "RESTART") return start();
     const state = {
       ...previous, handover: { ...previous.handover },
@@ -44,7 +44,7 @@
     switch (type) {
       case "AGREE":
         requireStep(0);
-        if (payload.accepted !== true) throw new Error("Confirma primeiro que é uma demonstração.");
+        if (payload.accepted !== true) throw new Error("Confirma que compreendes as condições do percurso.");
         state.quote = quote(payload.pickup, payload.dropoff, payload.rate, payload.today);
         state.step = 1;
         record("Período acordado para " + state.quote.days + " dia(s).");
@@ -59,8 +59,8 @@
         if (typeof payload.approved !== "boolean") throw new Error("Resultado inválido.");
         state.approved = payload.approved;
         state.step = 2;
-        record(payload.approved ? "Checkout de demonstração: aprovação simulada (0 € cobrados)." :
-          "Checkout de demonstração: pagamento recusado (0 € cobrados).");
+        record(payload.approved ? "Pagamento simulado aprovado. Valor cobrado: 0 €." :
+          "Pagamento simulado recusado. Valor cobrado: 0 €.");
         break;
       case "RETRY":
         requireStep(2);
@@ -102,7 +102,7 @@
         record((payload.actor === "owner" ? "Anunciante" : "Locatário") + " confirmou a entrega de exemplo.");
         if (state.handover.owner && state.handover.renter) {
           state.step = 5;
-          record("Entrega concluída na demonstração; aluguer em curso.");
+          record("Entrega simulada concluída.");
         }
         break;
       case "START_RETURN":
@@ -120,7 +120,7 @@
         record((payload.actor === "owner" ? "Anunciante" : "Locatário") + " confirmou a devolução de exemplo.");
         if (state.returned.owner && state.returned.renter) {
           state.step = 7;
-          record("Aluguer demonstrativo concluído. Nenhum valor transferido.");
+          record("Percurso de aluguer concluído. Nenhum valor transferido.");
         }
         break;
       case "REPORT_INCIDENT":
@@ -136,7 +136,7 @@
         break;
       case "CANCEL_REFUND":
         requireStep(3);
-        if (!state.approved || state.deliveryAgreed) throw new Error("Cancelamento demonstrativo indisponível.");
+        if (!state.approved || state.deliveryAgreed) throw new Error("O cancelamento não está disponível nesta etapa.");
         state.step = 8;
         record("Cancelamento e reembolso integral simulados. Não houve cobrança nem reembolso real.");
         break;
@@ -148,7 +148,7 @@
         record("Avaliação ilustrativa atribuída: " + payload.rating + "/5.");
         break;
       default:
-        throw new Error("Ação de demonstração desconhecida.");
+        throw new Error("Ação indisponível.");
     }
     return state;
   }

@@ -50,7 +50,7 @@ public class AnunciosController : Controller
         var missing = samples.Where(sample => !existing.Contains("[DEMO] " + sample.Name)).ToArray();
         if (missing.Length == 0)
         {
-            TempData["Success"] = "Já tens todos os artigos de demonstração.";
+            TempData["Success"] = "Já tens todos os artigos de exemplo.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -64,7 +64,7 @@ public class AnunciosController : Controller
 
         if (available.Length == 0)
         {
-            TempData["Error"] = "Não existem categorias e tipos configurados para gerar anúncios de demonstração.";
+            TempData["Error"] = "Não existem categorias e tipos configurados para gerar anúncios de exemplo.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -73,7 +73,7 @@ public class AnunciosController : Controller
             var item = new Item
             {
                 nmitem = "[DEMO] " + sample.Name,
-                dsitem = "Exemplo fictício para demonstração da RentAll. Este anúncio pode ser removido no painel da conta que o criou.",
+                dsitem = "Artigo de exemplo da RentAll. Este anúncio pode ser removido no painel da conta que o criou.",
                 dtcriacao = DateTime.UtcNow,
                 snativo = "S",
                 imagem1 = "ra.png",
@@ -92,7 +92,7 @@ public class AnunciosController : Controller
                 Cidade = sample.City,
                 Estado = sample.City,
                 contato = "",
-                NomeFantasia = "RentAll · Demonstração",
+                NomeFantasia = "RentAll · Artigos de exemplo",
                 Pais = "PT",
                 iduser = UserId,
                 categoriaid = sample.CategoryId,
@@ -103,12 +103,12 @@ public class AnunciosController : Controller
         try
         {
             await _db.SaveChangesAsync();
-            TempData["Success"] = $"Foram criados {available.Length} anúncios fictícios, distribuídos pelas categorias disponíveis. Estão identificados como [DEMO] e podem ser apagados nesta área.";
+            TempData["Success"] = $"Foram criados {available.Length} anúncios fictícios, distribuídos pelas categorias disponíveis. Podes apagá-los nesta área.";
         }
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "Could not create demo rental listings.");
-            TempData["Error"] = "Não foi possível criar os anúncios de demonstração. Tente novamente.";
+            TempData["Error"] = "Não foi possível criar os anúncios de exemplo. Tente novamente.";
         }
 
         return RedirectToAction(nameof(Index));
@@ -122,7 +122,7 @@ public class AnunciosController : Controller
             .ToListAsync();
         if (demoAds.Count == 0)
         {
-            TempData["Error"] = "Não há anúncios de demonstração para apagar nesta conta.";
+            TempData["Error"] = "Não há anúncios de exemplo para apagar nesta conta.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -150,7 +150,7 @@ public class AnunciosController : Controller
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "Could not delete demo rental listings.");
-            TempData["Error"] = "Não foi possível apagar todos os anúncios de demonstração.";
+            TempData["Error"] = "Não foi possível apagar todos os anúncios de exemplo.";
         }
 
         return RedirectToAction(nameof(Index));

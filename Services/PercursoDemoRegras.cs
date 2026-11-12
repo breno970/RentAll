@@ -67,10 +67,10 @@ public static class PercursoDemoRegras
                 break;
             case "aprovar":
             case "recusar":
-                Exigir(!anunciante, "Só o locatário pode avançar no checkout de demonstração.");
+                Exigir(!anunciante, "Só o locatário pode avançar no pagamento simulado.");
                 Exigir(estado is "Checkout" or "PagamentoRecusado",
                     "Este checkout já foi tratado. Consulta o estado atual.");
-                Exigir(metodo is "cartao" or "mbway", "Seleciona um método demonstrativo válido.");
+                Exigir(metodo is "cartao" or "mbway", "Seleciona um método de pagamento válido.");
                 p.MetodoPagamento = metodo;
                 if (operacao == "aprovar")
                 {
@@ -135,7 +135,7 @@ public static class PercursoDemoRegras
             case "incidente":
                 Exigir(estado is "EmCurso" or "DevolucaoPendente",
                     "Uma ocorrência só pode ser aberta durante o aluguer ou devolução.");
-                Exigir(!p.IncidenteAberto, "Já existe uma ocorrência de demonstração aberta.");
+                Exigir(!p.IncidenteAberto, "Já existe uma ocorrência aberta.");
                 p.IncidenteAberto = true;
                 break;
             case "resolver":
@@ -174,7 +174,7 @@ public static class PercursoDemoRegras
             "aceitar" => "Entrega acordada. Ambas as partes podem confirmar a entrega.",
             "entregar" or "receber" => "Confirmação guardada. O percurso avança quando ambas as partes confirmarem.",
             "devolver" => "Devolução registada. Aguarda confirmação do anunciante.",
-            "concluir" => "Aluguer demonstrativo concluído. Não houve pagamento real.",
+            "concluir" => "Percurso de aluguer concluído. Não houve pagamento real.",
             "incidente" => "Ocorrência fictícia registada. O fecho fica suspenso.",
             "resolver" => "Ocorrência resolvida e registada no histórico.",
             "cancelar" => "Cancelamento e reembolso fictícios registados. Não houve movimentos financeiros.",

@@ -81,14 +81,14 @@
         button.setAttribute("aria-pressed", String(selected));
       });
       setText("[data-demo-method-info]", state.method === "card"
-        ? "A página de demonstração nunca solicita dados bancários; numa transação real o checkout seria servido pelo prestador."
+        ? "O cartão de exemplo já está preenchido."
         : "MB WAY apenas ilustrativo: não há pedido ao telemóvel, QR code ou contacto a serviços externos.");
 
       if (isCurrent(2)) {
         const success = state.approved === true;
         setText("[data-demo-result-title]", success
-          ? "Pagamento aprovado — APENAS DEMONSTRAÇÃO"
-          : "Pagamento recusado — APENAS DEMONSTRAÇÃO");
+          ? "Pagamento simulado aprovado"
+          : "Pagamento simulado recusado");
         setText("[data-demo-result-text]", success
           ? "A autorização foi emulada. O cenário pode avançar para entrega, mas não existe cobrança, reserva real ou sessão Stripe."
           : "A recusa foi emulada. Podes voltar a experimentar o checkout, sem alteração ao pedido nem qualquer cobrança.");
@@ -155,7 +155,7 @@
         render();
         if (state.step !== previousStep) q('[data-demo-screen="' + state.step + '"] h2')?.focus();
       } catch (ex) {
-        notice(ex instanceof Error ? ex.message : "Não foi possível avançar nesta demonstração.");
+        notice(ex instanceof Error ? ex.message : "Não foi possível avançar no percurso.");
       }
     }
     pickup.min = today();

@@ -11,7 +11,7 @@ public static class RentalJourneyProgress
         "EntregaAcordada" => "Entrega acordada",
         "EmCurso" => "Receção confirmada na simulação",
         "DevolucaoPendente" => "Devolução simulada por confirmar",
-        "Concluido" => "Aluguer demonstrativo concluído",
+        "Concluido" => "Percurso de aluguer concluído",
         "Cancelado" => "Aluguer cancelado",
         _ => "Pedido aceite"
     };
